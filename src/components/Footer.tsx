@@ -43,7 +43,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="border-t border-gray-200 pt-4 flex flex-col md:flex-row md:justify-between text-gray-600 text-sm">
           <div className="flex flex-col md:flex-row md:space-x-4 mb-4 md:mb-0">
-            <p>© 2024 Your Brand, Inc.</p>
+            <p>© 2024 Izzac.</p>
             <p className="hidden md:block">·</p>
             <Link href="/privacy">Privacy</Link>
             <p>·</p>

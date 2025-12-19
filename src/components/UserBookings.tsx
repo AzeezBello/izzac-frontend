@@ -2,16 +2,16 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 
 const UserBookings = () => {
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get('/api/bookings/');
+        const response = await api.get('/bookings/');
         setBookings(response.data);
       } catch (error) {
         setError('Failed to fetch bookings.');

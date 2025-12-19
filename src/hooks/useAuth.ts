@@ -1,21 +1,19 @@
 // src/hooks/useAuth.ts
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useAuth as useAuthContext } from '../context/AuthContext';
 
-export const useAuth = (requiredRole: 'host' | 'rider' | 'admin') => {
+export const useRequireAuth = (redirectTo = '/login') => {
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { isAuthenticated, isLoading } = useAuthContext();
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const userRole = localStorage.getItem('role'); // Assume role is stored after login
-
-    if (token && userRole === requiredRole) {
-      setIsAuthorized(true);
-    } else {
-      router.push('/login');
+    if (!isLoading && !isAuthenticated) {
+      router.push(redirectTo);
     }
-  }, [requiredRole, router]);
+  }, [isAuthenticated, isLoading, redirectTo, router]);
 
-  return isAuthorized;
+  return { isAuthenticated, isLoading };
 };
+
+export default useRequireAuth;

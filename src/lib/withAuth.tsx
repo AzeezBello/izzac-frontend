@@ -1,17 +1,19 @@
 // src/lib/withAuth.tsx
-import { useRouter } from 'next/router';
-import { useEffect, ReactNode } from 'react';
+"use client";
+
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const withAuth = (WrappedComponent: React.ComponentType) => {
   return (props: any) => {
     const router = useRouter();
 
     useEffect(() => {
-      const token = localStorage.getItem('token');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
       if (!token) {
         router.push('/login');
       }
-    }, []);
+    }, [router]);
 
     return <WrappedComponent {...props} />;
   };

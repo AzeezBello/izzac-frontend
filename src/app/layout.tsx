@@ -1,19 +1,20 @@
 // src/app/layout.tsx
-import '../styles/globals.css'; // Ensure this path points to `src/styles/globals.css`
+import '../styles/globals.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ReactNode } from 'react';
-
-
+import { AuthProvider } from '../context/AuthContext';
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
       <head />
       <body className="min-h-screen flex flex-col bg-white text-gray-800">
-        <Header />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
