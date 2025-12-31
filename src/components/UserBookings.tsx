@@ -4,16 +4,24 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 
+type Booking = {
+  id: number;
+  car: { make: string; model: string };
+  start_date: string;
+  end_date: string;
+};
+
 const UserBookings = () => {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await api.get('/bookings/');
+        const response = await api.get<Booking[]>('/bookings/');
         setBookings(response.data);
-      } catch (error) {
+      } catch (err) {
+        console.error('Failed to fetch bookings:', err);
         setError('Failed to fetch bookings.');
       }
     };

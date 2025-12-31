@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from 'react';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
@@ -51,10 +52,15 @@ const BookCarForm = ({ carId, pricePerDay }: BookCarFormProps) => {
         end_date: endDate,
       });
       setMessage(`Booking confirmed! Total $${data.total_price}`);
-    } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      const nonField = err?.response?.data?.non_field_errors?.[0];
-      const validation = typeof err?.response?.data === 'string' ? err.response.data : null;
+    } catch (error: unknown) {
+      const errorDetails = axios.isAxiosError<{ detail?: string; non_field_errors?: string[] }>(error)
+        ? {
+            detail: error.response?.data?.detail ?? null,
+            nonField: error.response?.data?.non_field_errors?.[0] ?? null,
+            validation: typeof error.response?.data === 'string' ? error.response.data : null,
+          }
+        : { detail: null, nonField: null, validation: null };
+      const { detail, nonField, validation } = errorDetails;
       setError(detail || nonField || validation || 'Could not complete your booking.');
     } finally {
       setSubmitting(false);

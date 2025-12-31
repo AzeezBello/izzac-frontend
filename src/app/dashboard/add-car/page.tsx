@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/api';
 import { useRequireAuth } from '../../../hooks/useAuth';
@@ -44,9 +45,11 @@ const AddCarPage = () => {
       });
       setSuccess('Car listed successfully!');
       router.push('/dashboard');
-    } catch (err: any) {
-      const message = err?.response?.data?.detail || 'Failed to add car. Please check required fields.';
-      setError(message);
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ detail?: string }>(error)
+        ? error.response?.data?.detail
+        : null;
+      setError(message || 'Failed to add car. Please check required fields.');
     } finally {
       setSubmitting(false);
     }

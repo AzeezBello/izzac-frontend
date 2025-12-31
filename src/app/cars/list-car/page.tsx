@@ -2,8 +2,8 @@
 "use client";
 
 import Link from 'next/link';
-import { useRequireAuth } from '../../hooks/useAuth';
-import Loader from '../../components/Loader';
+import { useRequireAuth } from '../../../hooks/useAuth';
+import Loader from '../../../components/Loader';
 
 const ListCarPage = () => {
   const { isAuthenticated, isLoading } = useRequireAuth('/login?next=/cars/list-car');

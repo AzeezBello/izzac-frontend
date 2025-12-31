@@ -2,10 +2,10 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { ComponentType, FC, useEffect } from 'react';
 
-const withAuth = (WrappedComponent: React.ComponentType) => {
-  return (props: any) => {
+const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
+  const WithAuthWrapper: FC<P> = (props) => {
     const router = useRouter();
 
     useEffect(() => {
@@ -17,6 +17,10 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
 
     return <WrappedComponent {...props} />;
   };
+
+  WithAuthWrapper.displayName = `WithAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+  return WithAuthWrapper;
 };
 
 export default withAuth;

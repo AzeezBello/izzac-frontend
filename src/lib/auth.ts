@@ -1,4 +1,5 @@
 // src/lib/auth.ts
+import axios from 'axios';
 import api, { setAuthToken } from './api';
 
 export const login = async (username: string, password: string) => {
@@ -8,8 +9,11 @@ export const login = async (username: string, password: string) => {
     setAuthToken(access);
     localStorage.setItem('refreshToken', refresh);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError<{ detail?: string }>(error)
+      ? error.response?.data?.detail
+      : null;
     console.error('Login failed:', error);
-    return { success: false, message: error.response?.data?.detail || 'Login error' };
+    return { success: false, message: message || 'Login error' };
   }
 };
