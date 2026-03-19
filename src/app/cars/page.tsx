@@ -30,11 +30,13 @@ const CarsPage = () => {
   useEffect(() => {
     const loadCars = async () => {
       try {
-        const { data } = await publicApi.get('/cars/');
+        const { data } = await publicApi.get('/cars/', {
+          params: { available: 'true' },
+        });
         setCars(data);
       } catch (err) {
         console.error(err);
-        setError('Could not load cars right now.');
+        setError('Could not load available cars right now.');
       }
     };
 
@@ -55,8 +57,8 @@ const CarsPage = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <p className="uppercase text-emerald-700 font-semibold text-xs">Browse</p>
-          <h1 className="text-3xl font-bold text-gray-900">All cars</h1>
-          <p className="text-gray-600 text-sm">Filter by location or budget and tap a card to view details.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Available cars</h1>
+          <p className="text-gray-600 text-sm">Filter live listings by location or budget and tap a card to view details.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <input
@@ -94,7 +96,7 @@ const CarsPage = () => {
             </Link>
           ))}
           {!error && filteredCars.length === 0 && (
-            <div className="col-span-full text-center text-gray-500 py-8">No cars found with those filters.</div>
+            <div className="col-span-full text-center text-gray-500 py-8">No available cars found with those filters.</div>
           )}
         </div>
       )}
