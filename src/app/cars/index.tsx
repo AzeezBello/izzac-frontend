@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import publicApi from '../../lib/publicApi';
+import { resolveApiAssetUrl } from '../../lib/config';
 
 type Car = {
   id: number;
@@ -16,8 +17,7 @@ type Car = {
 };
 
 const resolveImage = (path?: string) => {
-  if (!path) return '/window.svg';
-  return path.startsWith('http') ? path : `${process.env.NEXT_PUBLIC_API_URL}${path}`;
+  return resolveApiAssetUrl(path);
 };
 
 const CarsPage = () => {

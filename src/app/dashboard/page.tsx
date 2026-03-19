@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '../../lib/api';
+import { resolveApiAssetUrl } from '../../lib/config';
 import { useRequireAuth } from '../../hooks/useAuth';
 import Loader from '../../components/Loader';
 
@@ -58,7 +59,7 @@ const HostDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cars.map((car) => (
           <div key={car.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-            <img src={car.image?.startsWith('http') ? car.image : `${process.env.NEXT_PUBLIC_API_URL}${car.image}`} alt={`${car.make} ${car.model}`} className="w-full h-44 object-cover" />
+            <img src={resolveApiAssetUrl(car.image)} alt={`${car.make} ${car.model}`} className="w-full h-44 object-cover" />
             <div className="p-4 space-y-1">
               <h2 className="text-xl font-semibold text-gray-900">{car.make} {car.model}</h2>
               <p className="text-gray-600 text-sm">{car.year} • {car.location}</p>

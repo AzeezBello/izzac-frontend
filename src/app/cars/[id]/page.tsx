@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import BookCarForm from '@/components/BookCarForm';
 import publicApi from '@/lib/publicApi';
+import { resolveApiAssetUrl } from '@/lib/config';
 
 interface Car {
   id: number;
@@ -18,8 +19,7 @@ interface Car {
 }
 
 const resolveImage = (path?: string) => {
-  if (!path) return '/window.svg';
-  return path.startsWith('http') ? path : `${process.env.NEXT_PUBLIC_API_URL}${path}`;
+  return resolveApiAssetUrl(path);
 };
 
 const CarDetailsPage = () => {

@@ -6,9 +6,14 @@ Next.js 15 app for the Izzac car sharing platform. It consumes the Django API (`
 1) Install deps: `npm install`
 2) Add `.env.local`:
 ```
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+NEXT_PUBLIC_API_URL=https://izzac-backend.vercel.app
 ```
 3) Run dev server: `npm run dev` (http://localhost:3000)
+
+To work against a local Django server instead, override it with:
+```
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
 
 ## Routes
 - `/` – landing + featured cars

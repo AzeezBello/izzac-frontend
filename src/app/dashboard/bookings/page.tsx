@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '../../../lib/api';
+import { resolveApiAssetUrl } from '../../../lib/config';
 import { useRequireAuth } from '../../../hooks/useAuth';
 import Loader from '../../../components/Loader';
 
@@ -77,7 +78,7 @@ const BookingsPage = () => {
         {bookings.map((booking) => (
           <div key={booking.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4">
             <img
-              src={booking.car.image?.startsWith('http') ? booking.car.image : `${process.env.NEXT_PUBLIC_API_URL}${booking.car.image}`}
+              src={resolveApiAssetUrl(booking.car.image)}
               alt={`${booking.car.make} ${booking.car.model}`}
               className="w-full md:w-40 h-32 object-cover rounded-lg"
             />
