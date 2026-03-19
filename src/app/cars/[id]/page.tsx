@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import BookCarForm from '@/components/BookCarForm';
+import FallbackImage from '@/components/FallbackImage';
 import publicApi from '@/lib/publicApi';
 import { resolveApiAssetUrl } from '@/lib/config';
 
@@ -49,7 +50,7 @@ const CarDetailsPage = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-10 grid md:grid-cols-2 gap-8">
       <div className="space-y-4">
-        <img
+        <FallbackImage
           src={resolveImage(car.image)}
           alt={`${car.make} ${car.model}`}
           className="w-full h-80 object-cover rounded-xl shadow"

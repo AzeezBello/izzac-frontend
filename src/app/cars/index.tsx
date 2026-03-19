@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import publicApi from '../../lib/publicApi';
+import FallbackImage from '../../components/FallbackImage';
 import { resolveApiAssetUrl } from '../../lib/config';
 
 type Car = {
@@ -82,7 +83,7 @@ const CarsPage = () => {
           {filteredCars.map((car) => (
             <Link key={car.id} href={`/cars/${car.id}`} className="block">
               <div className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden h-full">
-                <img src={resolveImage(car.image)} alt={`${car.make} ${car.model}`} className="w-full h-48 object-cover" />
+                <FallbackImage src={resolveImage(car.image)} alt={`${car.make} ${car.model}`} className="w-full h-48 object-cover" />
                 <div className="p-4 space-y-2">
                   <h2 className="text-xl font-semibold text-gray-900">{car.make} {car.model}</h2>
                   <p className="text-gray-600 text-sm">{car.year} • {car.location}</p>

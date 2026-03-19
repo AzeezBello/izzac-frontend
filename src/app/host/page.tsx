@@ -7,7 +7,7 @@ import HostFaq from '../../components/HostPage/HostFaq';
 
 const HostPage = () => {
   return (
-    <div >
+    <div className="bg-gradient-to-b from-emerald-50 via-white to-white">
       <HostFeatures />
       <ProtectionComparison />
       <HostFaq />

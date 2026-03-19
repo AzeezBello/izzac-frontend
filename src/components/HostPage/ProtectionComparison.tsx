@@ -1,89 +1,50 @@
 // src/components/HostPage/ProtectionComparison.tsx
 import Link from 'next/link';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { hostWorkflow } from '../../lib/productContent';
 
 const ProtectionComparison = () => {
   return (
-    <section className="text-center p-8">
-      <h2 className="text-4xl font-bold mb-8">Izzac it with top-to-bottom protection</h2>
-      <div className="grid grid-cols-3 gap-6 text-left">
-        
-        {/* Existing Rows */}
+    <section className="max-w-6xl mx-auto px-4 md:px-6 py-12">
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8">
         <div>
-          <h3 className="font-bold text-lg">Rider identity verification</h3>
-          <p>Our comprehensive verification system checks details such as name, address, government ID, and more to confirm the identity of Riders who book on Izzac.</p>
+          <p className="text-emerald-700 font-semibold uppercase tracking-[0.22em] text-xs mb-3">Host workflow</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">How hosting works across the actual app</h2>
+          <p className="text-gray-600 mt-3 max-w-3xl">
+            These are the live capabilities hosts can use today, from protected listing creation to host-side bookings visibility.
+          </p>
         </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-
-        <div>
-          <h3 className="font-bold text-lg">Reservation screening</h3>
-          <p>Our proprietary technology analyses hundreds of factors in each reservation and blocks certain bookings that show a high risk for disruptive parties and property damage.</p>
-        </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-        <div className="flex items-center justify-center text-red-500">
-          <FaTimesCircle className="h-6 w-6" />
-        </div>
-
-        <div>
-          <h3 className="font-bold text-lg">$3m damage protection</h3>
-          <p>Izzac reimburses you for damage caused by riders to your car</p>
-        </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-        <div className="flex items-center justify-center text-red-500">
-          <FaTimesCircle className="h-6 w-6" />
-        </div>
-
-        <div>
-          <h3 className="font-bold text-lg">Income loss</h3>
-        </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-        <div className="flex items-center justify-center text-red-500">
-          <FaTimesCircle className="h-6 w-6" />
-        </div>
-
-        <div>
-          <h3 className="font-bold text-lg">Deep cleaning</h3>
-        </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-        <div className="flex items-center justify-center text-red-500">
-          <FaTimesCircle className="h-6 w-6" />
-        </div>
-
-        <div>
-          <h3 className="font-bold text-lg">24-hour safety line</h3>
-          <p>If you ever feel unsafe, our app provides one-tap access to specially trained safety agents, day or night.</p>
-        </div>
-        <div className="flex items-center justify-center text-green-500">
-          <FaCheckCircle className="h-6 w-6" />
-        </div>
-        <div className="flex items-center justify-center text-red-500">
-          <FaTimesCircle className="h-6 w-6" />
-        </div>
+        <Link href="/dashboard/bookings" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+          Open bookings workspace
+        </Link>
       </div>
 
-      <p className="text-sm mt-6 text-gray-500">
-        Comparison is based on public information and free offerings by top competitors as of 22/10.{' '}
-        <a href="#" className="text-blue-500 underline">Find details and exclusions here.</a>
-      </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {hostWorkflow.map((stage) => (
+          <div key={stage.title} className="rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm">
+            <h3 className="text-xl font-semibold text-gray-900">{stage.title}</h3>
+            <p className="text-sm text-gray-600 mt-3 leading-6">{stage.description}</p>
+            <div className="space-y-3 mt-5">
+              {stage.items.map((item) => (
+                <div key={item} className="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm text-gray-700">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <Link href="/signup?role=host">
-        <button className="mt-8 px-4 py-2 border border-gray-800 text-gray-800 rounded-lg hover:bg-gray-800 hover:text-white transition">
-          Learn more
-        </button>
-      </Link>
+      <div className="rounded-[2rem] bg-gray-900 text-white p-6 md:p-8 mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h3 className="text-2xl font-bold">Use one account across the full platform</h3>
+          <p className="text-gray-300 mt-2 max-w-2xl">
+            Hosts can still browse and book cars as riders, while the same account powers garage management and host-side bookings.
+          </p>
+        </div>
+        <Link href="/signup?role=host" className="px-5 py-3 rounded-lg bg-emerald-500 text-white font-semibold text-center hover:bg-emerald-400 transition">
+          Create a host account
+        </Link>
+      </div>
     </section>
   );
 };

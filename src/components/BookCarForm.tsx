@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { getApiErrorMessage } from '../lib/errors';
 
 type BookCarFormProps = {
   carId: number;
@@ -53,15 +53,7 @@ const BookCarForm = ({ carId, pricePerDay }: BookCarFormProps) => {
       });
       setMessage(`Booking confirmed! Total $${data.total_price}`);
     } catch (error: unknown) {
-      const errorDetails = axios.isAxiosError<{ detail?: string; non_field_errors?: string[] }>(error)
-        ? {
-            detail: error.response?.data?.detail ?? null,
-            nonField: error.response?.data?.non_field_errors?.[0] ?? null,
-            validation: typeof error.response?.data === 'string' ? error.response.data : null,
-          }
-        : { detail: null, nonField: null, validation: null };
-      const { detail, nonField, validation } = errorDetails;
-      setError(detail || nonField || validation || 'Could not complete your booking.');
+      setError(getApiErrorMessage(error, 'Could not complete your booking.'));
     } finally {
       setSubmitting(false);
     }
