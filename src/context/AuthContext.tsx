@@ -3,6 +3,7 @@
 
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import api, { setAuthToken } from '../lib/api';
+import { getApiErrorMessage } from '../lib/errors';
 
 type AuthActionResult = { success: boolean; message?: string };
 
@@ -63,9 +64,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const currentUser = await fetchCurrentUser();
       setUser(currentUser);
       return { success: true };
-    } catch (error: any) {
-      const message = error?.response?.data?.detail || 'Unable to log in. Please check your credentials.';
-      return { success: false, message };
+    } catch (error: unknown) {
+      return {
+        success: false,
+        message: getApiErrorMessage(error, 'Unable to log in. Please check your credentials.'),
+      };
     } finally {
       setIsLoading(false);
     }
@@ -80,9 +83,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const currentUser = await fetchCurrentUser();
       setUser(currentUser);
       return { success: true };
-    } catch (error: any) {
-      const message = error?.response?.data?.detail || 'Unable to create your account right now.';
-      return { success: false, message };
+    } catch (error: unknown) {
+      return {
+        success: false,
+        message: getApiErrorMessage(error, 'Unable to create your account right now.'),
+      };
     } finally {
       setIsLoading(false);
     }

@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Loader from '../../components/Loader';
 import { useAuth } from '../../context/AuthContext';
 
-const SignupPage = () => {
+const SignupContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role');
+  const role = searchParams?.get('role');
   const { register, isAuthenticated, isLoading } = useAuth();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -86,5 +87,11 @@ const SignupPage = () => {
     </div>
   );
 };
+
+const SignupPage = () => (
+  <Suspense fallback={<Loader />}>
+    <SignupContent />
+  </Suspense>
+);
 
 export default SignupPage;

@@ -1,14 +1,15 @@
 // src/app/login/page.tsx
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Loader from '../../components/Loader';
 import { useAuth } from '../../context/AuthContext';
 
-const LoginPage = () => {
+const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get('next');
+  const nextPath = searchParams?.get('next');
   const { login, isAuthenticated, isLoading } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -72,5 +73,11 @@ const LoginPage = () => {
     </div>
   );
 };
+
+const LoginPage = () => (
+  <Suspense fallback={<Loader />}>
+    <LoginContent />
+  </Suspense>
+);
 
 export default LoginPage;

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '../../../lib/api';
 import { useRequireAuth } from '../../../hooks/useAuth';
 import Loader from '../../../components/Loader';
+import { getApiErrorMessage } from '../../../lib/errors';
 
 const AddCarPage = () => {
   const router = useRouter();
@@ -44,9 +45,8 @@ const AddCarPage = () => {
       });
       setSuccess('Car listed successfully!');
       router.push('/dashboard');
-    } catch (err: any) {
-      const message = err?.response?.data?.detail || 'Failed to add car. Please check required fields.';
-      setError(message);
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, 'Failed to add car. Please check required fields.'));
     } finally {
       setSubmitting(false);
     }

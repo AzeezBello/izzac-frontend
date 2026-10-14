@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { getApiErrorMessage } from '../lib/errors';
 
 type BookCarFormProps = {
   carId: number;
@@ -51,11 +52,8 @@ const BookCarForm = ({ carId, pricePerDay }: BookCarFormProps) => {
         end_date: endDate,
       });
       setMessage(`Booking confirmed! Total $${data.total_price}`);
-    } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      const nonField = err?.response?.data?.non_field_errors?.[0];
-      const validation = typeof err?.response?.data === 'string' ? err.response.data : null;
-      setError(detail || nonField || validation || 'Could not complete your booking.');
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, 'Could not complete your booking.'));
     } finally {
       setSubmitting(false);
     }
