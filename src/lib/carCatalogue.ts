@@ -1,3 +1,5 @@
+import { resolveApiAssetUrl } from "./config";
+
 export type CarCategory =
   | "Executive Sedan"
   | "Luxury SUV"
@@ -40,7 +42,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2013,
     price_per_day: 75000,
     location: "Surulere, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/toyota-camry-se-2013.png",
     category: "Executive Sedan",
     transmission: "6-Speed Auto",
     drivetrain: "FWD",
@@ -62,7 +64,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2022,
     price_per_day: 84000,
     location: "Lekki Phase 1, Lagos",
-    image: "/images/feature1.webp",
+    image: "/images/cars/toyota-corolla-le-2022.jpg",
     category: "City Commuter",
     transmission: "CVT Auto",
     drivetrain: "FWD",
@@ -84,7 +86,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2022,
     price_per_day: 125000,
     location: "Ikeja GRA, Lagos",
-    image: "/images/feature3.webp",
+    image: "/images/cars/toyota-prado-txl-2022.jpg",
     category: "Luxury SUV",
     transmission: "6-Speed Auto",
     drivetrain: "4WD",
@@ -106,7 +108,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 200000,
     location: "Lekki Phase 1, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/toyota-highlander-hybrid-2023.webp",
     category: "Electric & Hybrid",
     transmission: "e-CVT",
     drivetrain: "AWD",
@@ -128,7 +130,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 165000,
     location: "Victoria Island, Lagos",
-    image: "/images/feature1.webp",
+    image: "/images/cars/mercedes-c300-amg-2023.jpg",
     category: "Executive Sedan",
     transmission: "9G-TRONIC",
     drivetrain: "RWD",
@@ -150,7 +152,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 170000,
     location: "Ikoyi, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/bmw-330i-m-sport-2023.jpg",
     category: "Executive Sedan",
     transmission: "8-Speed Steptronic",
     drivetrain: "RWD",
@@ -172,7 +174,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 155000,
     location: "Maitama, Abuja",
-    image: "/images/feature1.webp",
+    image: "/images/cars/lexus-es350-f-sport-2024.jpg",
     category: "Executive Sedan",
     transmission: "8-Speed Direct-Shift",
     drivetrain: "FWD",
@@ -194,7 +196,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 98000,
     location: "Ikeja GRA, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/honda-accord-hybrid-2023.jpg",
     category: "Electric & Hybrid",
     transmission: "e-CVT",
     drivetrain: "FWD",
@@ -216,7 +218,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2022,
     price_per_day: 140000,
     location: "Wuse II, Abuja",
-    image: "/images/feature1.webp",
+    image: "/images/cars/audi-a4-sline-2022.jpg",
     category: "Executive Sedan",
     transmission: "7-Speed S tronic",
     drivetrain: "AWD Quattro",
@@ -238,7 +240,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 185000,
     location: "Asokoro, Abuja",
-    image: "/images/feature3.webp",
+    image: "/images/cars/genesis-g80-2024.jpg",
     category: "Executive Sedan",
     transmission: "8-Speed Auto",
     drivetrain: "AWD",
@@ -260,7 +262,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 260000,
     location: "Banana Island, Ikoyi",
-    image: "/images/feature3.webp",
+    image: "/images/cars/mercedes-gle450-2024.jpg",
     category: "Luxury SUV",
     transmission: "9G-TRONIC",
     drivetrain: "4MATIC AWD",
@@ -282,7 +284,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 245000,
     location: "Victoria Island, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/range-rover-velar-2023.jpg",
     category: "Luxury SUV",
     transmission: "8-Speed Auto",
     drivetrain: "AWD",
@@ -304,7 +306,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 210000,
     location: "Maitama, Abuja",
-    image: "/images/feature3.webp",
+    image: "/images/cars/lexus-rx350h-2024.jpg",
     category: "Electric & Hybrid",
     transmission: "e-CVT",
     drivetrain: "AWD",
@@ -326,7 +328,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 320000,
     location: "Asokoro, Abuja",
-    image: "/images/feature3.webp",
+    image: "/images/cars/toyota-land-cruiser-300-2024.jpg",
     category: "Luxury SUV",
     transmission: "10-Speed Auto",
     drivetrain: "4WD",
@@ -348,7 +350,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 235000,
     location: "Lekki Phase 1, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/bmw-x5-xdrive40i-2023.jpg",
     category: "Luxury SUV",
     transmission: "8-Speed Sport Auto",
     drivetrain: "xDrive AWD",
@@ -370,7 +372,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 310000,
     location: "Victoria Island, Lagos",
-    image: "/images/feature3.webp",
+    image: "/images/cars/porsche-cayenne-coupe-2023.jpg",
     category: "Luxury SUV",
     transmission: "8-Speed Tiptronic S",
     drivetrain: "AWD",
@@ -392,7 +394,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 105000,
     location: "Yaba, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/toyota-rav4-adventure-2023.jpg",
     category: "Crossover",
     transmission: "8-Speed Auto",
     drivetrain: "AWD",
@@ -414,7 +416,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 95000,
     location: "Gbagada, Lagos",
-    image: "/images/feature1.webp",
+    image: "/images/cars/honda-crv-2023.jpg",
     category: "Crossover",
     transmission: "CVT Auto",
     drivetrain: "AWD",
@@ -436,7 +438,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 92000,
     location: "Port Harcourt GRA",
-    image: "/images/feature3.webp",
+    image: "/images/cars/hyundai-tucson-2024.jpg",
     category: "Crossover",
     transmission: "8-Speed Auto",
     drivetrain: "HTRAC AWD",
@@ -458,7 +460,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 90000,
     location: "Wuse II, Abuja",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/kia-sportage-xline-2024.jpg",
     category: "Crossover",
     transmission: "8-Speed Auto",
     drivetrain: "AWD",
@@ -480,7 +482,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 88000,
     location: "Bodija, Ibadan",
-    image: "/images/feature1.webp",
+    image: "/images/cars/mazda-cx5-2023.jpg",
     category: "Crossover",
     transmission: "6-Speed Skyactiv",
     drivetrain: "i-Activ AWD",
@@ -502,7 +504,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 86000,
     location: "Independence Layout, Enugu",
-    image: "/images/feature3.webp",
+    image: "/images/cars/peugeot-3008-gt-2023.jpg",
     category: "Crossover",
     transmission: "8-Speed EAT8",
     drivetrain: "FWD",
@@ -524,7 +526,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 78000,
     location: "Surulere, Lagos",
-    image: "/images/feature1.webp",
+    image: "/images/cars/honda-civic-sport-touring-2023.jpg",
     category: "City Commuter",
     transmission: "CVT w/ Paddles",
     drivetrain: "FWD",
@@ -546,7 +548,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 72000,
     location: "Ajah, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/hyundai-elantra-nline-2023.jpg",
     category: "City Commuter",
     transmission: "7-Speed DCT",
     drivetrain: "FWD",
@@ -568,7 +570,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2022,
     price_per_day: 68000,
     location: "Maryland, Lagos",
-    image: "/images/feature1.webp",
+    image: "/images/cars/kia-cerato-gtline-2022.jpg",
     category: "City Commuter",
     transmission: "6-Speed Auto",
     drivetrain: "FWD",
@@ -590,7 +592,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 115000,
     location: "Ikoyi, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/vw-golf-gti-mk8-2023.jpg",
     category: "City Commuter",
     transmission: "7-Speed DSG",
     drivetrain: "FWD w/ VAQ Diff",
@@ -612,7 +614,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 65000,
     location: "Festac Town, Lagos",
-    image: "/images/feature1.webp",
+    image: "/images/cars/toyota-yaris-cross-2023.jpg",
     category: "Electric & Hybrid",
     transmission: "e-CVT",
     drivetrain: "FWD",
@@ -634,7 +636,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 195000,
     location: "Victoria Island, Lagos",
-    image: "/images/feature3.webp",
+    image: "/images/cars/tesla-model-3-2024.jpg",
     category: "Electric & Hybrid",
     transmission: "Single-Speed Direct",
     drivetrain: "Dual-Motor AWD",
@@ -656,7 +658,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2024,
     price_per_day: 225000,
     location: "Ikoyi, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/tesla-model-y-2024.jpg",
     category: "Electric & Hybrid",
     transmission: "Single-Speed Direct",
     drivetrain: "Dual-Motor AWD",
@@ -678,7 +680,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 135000,
     location: "Port Harcourt GRA",
-    image: "/images/feature3.webp",
+    image: "/images/cars/ford-ranger-wildtrak-2023.jpg",
     category: "Pickup & Shuttle",
     transmission: "10-Speed Auto",
     drivetrain: "4x4 Selectable",
@@ -700,7 +702,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 130000,
     location: "Nassarawa GRA, Kano",
-    image: "/images/feature3.webp",
+    image: "/images/cars/toyota-hilux-adventure-2023.jpg",
     category: "Pickup & Shuttle",
     transmission: "6-Speed Auto",
     drivetrain: "4x4 Part-Time",
@@ -722,7 +724,7 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
     year: 2023,
     price_per_day: 250000,
     location: "Victoria Island, Lagos",
-    image: "/images/hero-bg.webp",
+    image: "/images/cars/mercedes-v250d-2023.jpg",
     category: "Pickup & Shuttle",
     transmission: "9G-TRONIC",
     drivetrain: "RWD",
@@ -739,9 +741,85 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
   },
 ];
 
+const catalogueByKey = new Map<string, DetailedCar>();
+const catalogueById = new Map<number, DetailedCar>();
+
+for (const item of DETAILED_CAR_CATALOGUE) {
+  catalogueByKey.set(
+    `${item.make.toLowerCase()}::${item.model.toLowerCase()}`,
+    item
+  );
+  catalogueById.set(item.id, item);
+}
+
+const LEGACY_SHARED_IMAGES = new Set([
+  "2022-corolla.jpg",
+  "2013-Toyota-Camry-SE-front-drivers-side-in-motion.png",
+  "Prado.jpg",
+  "toyota-highlander-hybrid-platinum-2023-08-exterior-rear-angle-scaled.webp",
+  "logo.png",
+  "hero-bg.webp",
+  "feature1.webp",
+  "feature3.webp",
+]);
+
+function isLegacyOrFallbackImage(imagePath?: string): boolean {
+  if (!imagePath) return true;
+  const basename = imagePath.split("?")[0].split("/").pop() || "";
+  return LEGACY_SHARED_IMAGES.has(basename);
+}
+
+export function findCatalogueMatch(car: {
+  id?: number;
+  make?: string;
+  model?: string;
+}): DetailedCar | undefined {
+  if (car.make && car.model) {
+    const key = `${car.make.toLowerCase().trim()}::${car.model.toLowerCase().trim()}`;
+    const byKey = catalogueByKey.get(key);
+    if (byKey) return byKey;
+  }
+  if (typeof car.id === "number") {
+    const byId = catalogueById.get(car.id);
+    if (byId && (!car.make || byId.make.toLowerCase() === car.make.toLowerCase())) {
+      return byId;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Resolves the best vehicle photograph for any car object (catalogue or API).
+ * Prefers the dedicated local `/images/cars/...` asset for matched catalogue vehicles
+ * and falls back to `resolveApiAssetUrl` for custom user-uploaded listings.
+ */
+export function resolveCarImage(
+  car: { id?: number; make?: string; model?: string; image?: string } | string | undefined,
+  fallback = "/images/cars/toyota-camry-se-2013.png"
+): string {
+  if (!car) return fallback;
+  if (typeof car === "string") {
+    if (car.startsWith("/images/")) return car;
+    return resolveApiAssetUrl(car, fallback);
+  }
+
+  const matched = findCatalogueMatch(car);
+  if (matched) {
+    if (!car.image || isLegacyOrFallbackImage(car.image) || car.image.includes("/car_images/")) {
+      return matched.image;
+    }
+  }
+
+  if (car.image?.startsWith("/images/")) {
+    return car.image;
+  }
+
+  return resolveApiAssetUrl(car.image, matched?.image || fallback);
+}
+
 /**
  * Merges live API car responses with the 32-vehicle curated catalogue so that:
- * 1. Matching cars from the API are enriched with technical specs (category, transmission, drivetrain, features).
+ * 1. Matching cars from the API are enriched with technical specs and their dedicated model photo.
  * 2. If the remote API has fewer than the full 32-car fleet, the remaining detailed catalogue entries are included seamlessly.
  */
 export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[] {
@@ -749,20 +827,12 @@ export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[
     return DETAILED_CAR_CATALOGUE;
   }
 
-  const catalogueByKey = new Map<string, DetailedCar>();
-  const catalogueById = new Map<number, DetailedCar>();
-
-  for (const item of DETAILED_CAR_CATALOGUE) {
-    catalogueByKey.set(`${item.make.toLowerCase()}::${item.model.toLowerCase()}`, item);
-    catalogueById.set(item.id, item);
-  }
-
   const seenKeys = new Set<string>();
   const seenIds = new Set<number>();
 
   const merged: DetailedCar[] = apiCars.map((car) => {
     const exactKey = `${car.make.toLowerCase()}::${car.model.toLowerCase()}`;
-    const matched = catalogueByKey.get(exactKey) || catalogueById.get(car.id);
+    const matched = findCatalogueMatch(car);
 
     seenIds.add(car.id);
     seenKeys.add(exactKey);
@@ -773,6 +843,7 @@ export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[
     return {
       ...matched,
       ...car,
+      image: resolveCarImage(car, matched?.image),
       price_per_day: Number(car.price_per_day),
       description:
         car.description && car.description.length > 40
@@ -792,5 +863,5 @@ export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[
 }
 
 export function getCatalogueCarById(id: number): DetailedCar | null {
-  return DETAILED_CAR_CATALOGUE.find((car) => car.id === id) || null;
+  return catalogueById.get(id) || null;
 }

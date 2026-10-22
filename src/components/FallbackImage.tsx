@@ -6,6 +6,7 @@ type FallbackImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt
   alt: string;
   src?: string;
   fallbackSrc?: string;
+  fetchPriority?: 'high' | 'low' | 'auto';
 };
 
 const FallbackImage = ({

@@ -7,18 +7,14 @@ import BookCarForm from "@/components/BookCarForm";
 import FallbackImage from "@/components/FallbackImage";
 import Loader from "@/components/Loader";
 import publicApi from "@/lib/publicApi";
-import { resolveApiAssetUrl } from "@/lib/config";
 import {
   DetailedCar,
+  findCatalogueMatch,
   getCatalogueCarById,
+  resolveCarImage,
 } from "@/lib/carCatalogue";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const resolveImage = (path?: string) => {
-  if (path?.startsWith("/images/")) return path;
-  return resolveApiAssetUrl(path, "/images/hero-bg.webp");
-};
 
 const CarDetailsPage = () => {
   const params = useParams<{ id: string }>();
@@ -34,14 +30,16 @@ const CarDetailsPage = () => {
       try {
         const response = await publicApi.get(`/cars/${params.id}/`);
         const apiCar = response.data;
+        const matched = findCatalogueMatch(apiCar) || catalogueMatch;
         setCar({
-          ...catalogueMatch,
+          ...matched,
           ...apiCar,
+          image: resolveCarImage(apiCar, matched?.image),
           price_per_day: Number(apiCar.price_per_day),
           description:
             apiCar.description && apiCar.description.length > 40
               ? apiCar.description
-              : catalogueMatch?.description || apiCar.description,
+              : matched?.description || apiCar.description,
         });
         setError(null);
       } catch (err) {
@@ -86,8 +84,9 @@ const CarDetailsPage = () => {
         <div className="lg:col-span-7 space-y-6">
           <div className="overflow-hidden rounded-2xl border border-border/80 bg-card p-2 shadow-surface">
             <FallbackImage
-              src={resolveImage(car.image)}
+              src={resolveCarImage(car)}
               alt={`${car.make} ${car.model}`}
+              fetchPriority="high"
               className="w-full h-80 sm:h-96 object-cover rounded-xl"
             />
           </div>

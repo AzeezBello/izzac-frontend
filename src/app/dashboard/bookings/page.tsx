@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import api from "../../../lib/api";
 import FallbackImage from "../../../components/FallbackImage";
-import { resolveApiAssetUrl } from "../../../lib/config";
+import { resolveCarImage } from "../../../lib/carCatalogue";
 import { useRequireAuth } from "../../../hooks/useAuth";
 import Loader from "../../../components/Loader";
 import { Badge } from "../../../components/ui/badge";
@@ -89,14 +89,15 @@ const BookingsPage = () => {
       )}
 
       <div className="space-y-4">
-        {bookings.map((booking) => (
+        {bookings.map((booking, index) => (
           <Card
             key={booking.id}
             className="p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-5 hover:border-stone-300 hover:shadow-elevated stagger-item"
           >
             <FallbackImage
-              src={resolveApiAssetUrl(booking.car.image)}
+              src={resolveCarImage(booking.car)}
               alt={`${booking.car.make} ${booking.car.model}`}
+              loading={index >= 2 ? "lazy" : undefined}
               className="w-full md:w-44 h-32 object-cover rounded-xl border border-border/60"
             />
             <div className="flex-1 space-y-1.5">

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import api from "../../lib/api";
 import FallbackImage from "../../components/FallbackImage";
-import { resolveApiAssetUrl } from "../../lib/config";
+import { resolveCarImage } from "../../lib/carCatalogue";
 import { useRequireAuth } from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
 import { Badge } from "../../components/ui/badge";
@@ -72,15 +72,17 @@ const HostDashboard = () => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cars.map((car) => (
+        {cars.map((car, index) => (
           <Card
             key={car.id}
             className="overflow-hidden flex flex-col hover:border-stone-300 hover:shadow-elevated stagger-item"
           >
             <div className="relative overflow-hidden bg-secondary aspect-[16/10]">
               <FallbackImage
-                src={resolveApiAssetUrl(car.image)}
+                src={resolveCarImage(car)}
                 alt={`${car.make} ${car.model}`}
+                fetchPriority={index === 0 ? "high" : undefined}
+                loading={index >= 3 ? "lazy" : undefined}
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-3 left-3">

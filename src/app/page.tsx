@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import publicApi from "../lib/publicApi";
 import FallbackImage from "../components/FallbackImage";
-import { resolveApiAssetUrl } from "../lib/config";
 import { hostJourney, riderJourney } from "../lib/productContent";
 import {
   CAR_CATEGORIES,
@@ -13,17 +12,13 @@ import {
   DETAILED_CAR_CATALOGUE,
   DetailedCar,
   mergeWithDetailedCatalogue,
+  resolveCarImage,
 } from "../lib/carCatalogue";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Alert, AlertDescription } from "../components/ui/alert";
-
-const imageUrl = (path?: string) => {
-  if (path?.startsWith("/images/")) return path;
-  return resolveApiAssetUrl(path, "/images/hero-bg.webp");
-};
 
 const HomePage = () => {
   const [cars, setCars] = useState<DetailedCar[]>(DETAILED_CAR_CATALOGUE);
@@ -290,8 +285,9 @@ const HomePage = () => {
                 <Card className="overflow-hidden h-full flex flex-col hover:-translate-y-0.5 hover:shadow-elevated hover:border-stone-300">
                   <div className="relative overflow-hidden bg-secondary aspect-[16/10]">
                     <FallbackImage
-                      src={imageUrl(car.image)}
+                      src={resolveCarImage(car)}
                       alt={`${car.make} ${car.model}`}
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 ease-out-expo group-hover:scale-[1.03]"
                     />
                     <div className="absolute top-3 left-3 flex items-center gap-1.5">

@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import publicApi from "../../lib/publicApi";
 import FallbackImage from "../../components/FallbackImage";
-import { resolveApiAssetUrl } from "../../lib/config";
 import {
   CAR_CATEGORIES,
   CarCategory,
   DETAILED_CAR_CATALOGUE,
   DetailedCar,
   mergeWithDetailedCatalogue,
+  resolveCarImage,
 } from "../../lib/carCatalogue";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -18,11 +18,6 @@ import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-
-const resolveImage = (path?: string) => {
-  if (path?.startsWith("/images/")) return path;
-  return resolveApiAssetUrl(path, "/images/hero-bg.webp");
-};
 
 const CarsPage = () => {
   const [cars, setCars] = useState<DetailedCar[]>(DETAILED_CAR_CATALOGUE);
@@ -164,7 +159,7 @@ const CarsPage = () => {
         </Alert>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCars.map((car) => (
+          {filteredCars.map((car, index) => (
             <Link
               key={car.id}
               href={`/cars/${car.id}`}
@@ -173,8 +168,10 @@ const CarsPage = () => {
               <Card className="overflow-hidden h-full flex flex-col hover:-translate-y-0.5 hover:shadow-elevated hover:border-stone-300">
                 <div className="relative overflow-hidden bg-secondary aspect-[16/10]">
                   <FallbackImage
-                    src={resolveImage(car.image)}
+                    src={resolveCarImage(car)}
                     alt={`${car.make} ${car.model}`}
+                    fetchPriority={index === 0 ? "high" : undefined}
+                    loading={index >= 3 ? "lazy" : undefined}
                     className="w-full h-full object-cover transition-transform duration-500 ease-out-expo group-hover:scale-[1.03]"
                   />
                   <div className="absolute top-3 left-3 flex items-center gap-1.5">
