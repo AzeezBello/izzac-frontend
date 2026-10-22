@@ -30,13 +30,13 @@ const footerSections = [
     ],
   },
   {
-    title: "Host & Account",
+    title: "Dashboards & Account",
     links: [
-      { href: "/host", label: "Host & Fleet Partners" },
-      { href: "/cars/list-car", label: "How Listing Works" },
-      { href: "/dashboard/add-car", label: "List a Car" },
-      { href: "/dashboard", label: "My Garage" },
-      { href: "/dashboard/bookings", label: "Bookings Workspace" },
+      { href: "/dashboard", label: "Overview Command Center" },
+      { href: "/dashboard/rider", label: "Rider & Driving Test" },
+      { href: "/dashboard/host", label: "Host Fleet Garage" },
+      { href: "/dashboard/bookings", label: "Bookings & Insurance" },
+      { href: "/user/dashboard", label: "Profile & Certificates" },
     ],
   },
 ];
@@ -47,7 +47,7 @@ const Footer = () => {
 
   return (
     <footer className="border-t border-border/80 bg-secondary/40 text-foreground">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-16">
+      <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-12 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-10">
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-2.5">
@@ -62,10 +62,10 @@ const Footer = () => {
               <span className="text-xl font-bold tracking-[-0.03em] text-foreground">
                 Izzac
               </span>
-              <Badge variant="emerald">Nigeria & Pan-African Mobility</Badge>
+              <Badge variant="emerald">Executive Mobility OS</Badge>
             </div>
             <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Enterprise car rental, vetted corporate chauffeur service, airport VIP meet & greet, and P2P fleet sharing built for Lagos, Abuja, Port Harcourt, and West/East African corridors.
+              Enterprise car rental, vetted corporate chauffeur service, mandatory trial-to-self-drive driver evaluation, verified motor insurance, and P2P fleet sharing built for Lagos, Abuja, Port Harcourt, and regional corridors.
             </p>
             <div className="flex flex-wrap items-center gap-2.5 pt-1 font-mono text-xs text-muted-foreground tabular-nums">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-card px-2.5 py-1">
@@ -80,7 +80,7 @@ const Footer = () => {
                   <circle cx="10" cy="10" r="7.5" />
                   <path d="M2.5 10h15M10 2.5c2.2 2.2 2.2 12.8 0 15M10 2.5c-2.2 2.2-2.2 12.8 0 15" />
                 </svg>
-                <span>NG · GH · KE Hubs</span>
+                <span>LOS · ABV · PHC · ACC · NBO Hubs</span>
               </span>
               <div className="inline-flex items-center rounded-md border border-border/80 bg-card p-0.5">
                 {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
@@ -103,7 +103,7 @@ const Footer = () => {
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <Tooltip
                 position="top"
-                content="Re-open the 4-step Nigerian & African mobility intro"
+                content="Re-open the 4-step executive mobility intro"
               >
                 <button
                   type="button"
@@ -155,7 +155,7 @@ const Footer = () => {
 
         <div className="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs text-muted-foreground">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="font-mono tabular-nums">© 2026 Izzac Mobility Africa.</span>
+            <span className="font-mono tabular-nums">© 2026 Izzac Mobility.</span>
             <span aria-hidden="true">·</span>
             <Link href="/" className="hover:text-foreground transition-colors duration-150">
               Home

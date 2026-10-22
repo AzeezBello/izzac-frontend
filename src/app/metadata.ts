@@ -4,11 +4,11 @@ import { SITE_NAME, SITE_URL } from "../lib/seo";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Chauffeur, Self-Drive & Corporate Car Rental in Nigeria | Izzac Mobility",
+    default: "Chauffeur, Self-Drive & Corporate Car Rental | Izzac Mobility",
     template: `%s`,
   },
   description:
-    "Book vetted chauffeur-driven sedans, luxury SUVs, Hilux 4x4 pickups, airport VIP transfers (LOS, ABV, PHC), and 22%-off monthly corporate fleets across Nigeria and Africa.",
+    "Book vetted chauffeur-driven sedans, luxury SUVs, Hilux 4x4 pickups, airport VIP transfers (LOS, ABV, PHC), and 22%-off monthly corporate fleets with verified motor insurance.",
   applicationName: SITE_NAME,
   alternates: {
     canonical: "/",
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Chauffeur, Self-Drive & Corporate Car Rental in Nigeria | Izzac Mobility",
+    title: "Chauffeur, Self-Drive & Corporate Car Rental | Izzac Mobility",
     description:
       "Book vetted chauffeur-driven sedans, luxury SUVs, Hilux 4x4 pickups, airport VIP transfers (LOS, ABV, PHC), and monthly corporate fleets across Lagos, Abuja, and Port Harcourt.",
     url: "/",
     siteName: SITE_NAME,
-    locale: "en_NG",
+    locale: "en_US",
     images: [
       {
         url: "/images/og-image.png",
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chauffeur, Self-Drive & Corporate Car Rental in Nigeria | Izzac Mobility",
+    title: "Chauffeur, Self-Drive & Corporate Car Rental | Izzac Mobility",
     description:
-      "Browse 32+ executive vehicles, configure chauffeur or self-drive mode, add Naija Road Shield, and book online across Nigeria.",
+      "Browse 32+ executive vehicles, configure chauffeur or self-drive mode, add Road & Tyre Shield and Motor Insurance, and book online.",
     images: ["/images/og-image.png"],
   },
 };

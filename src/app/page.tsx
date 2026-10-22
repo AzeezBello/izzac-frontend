@@ -6,6 +6,7 @@ import Image from "next/image";
 import publicApi from "../lib/publicApi";
 import FallbackImage from "../components/FallbackImage";
 import EmptyStateGuide from "../components/EmptyStateGuide";
+import DrivingEvaluationPanel from "../components/DrivingEvaluationPanel";
 import { useCurrency } from "../context/CurrencyContext";
 import { useOnboarding } from "../context/OnboardingContext";
 import {
@@ -84,20 +85,20 @@ const HomePage = () => {
   return (
     <div className="bg-background">
       {/* Taste-Skill Hero Discipline: Asymmetric 12-col split within initial viewport */}
-      <section className="max-w-6xl mx-auto px-4 md:px-6 pt-10 pb-14 md:pt-16 md:pb-20">
+      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-10 pb-14 md:pt-16 md:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="emerald">Nigeria & Pan-African Mobility OS</Badge>
+              <Badge variant="emerald">Executive Mobility & Fleet OS</Badge>
               <Badge variant="secondary">
-                Chauffeur · Self-Drive · Airport VIP · SuperFlex
+                Chauffeur Trial · Self-Drive Exam · Motor Insurance · SuperFlex
               </Badge>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-[3.3rem] font-bold text-foreground tracking-[-0.035em] leading-[1.06]">
               Book executive rides, airport protocol, or corporate fleets from one Izzac account.
             </h1>
-            <p className="text-muted-foreground text-base md:text-lg max-w-[60ch] leading-relaxed">
-              Engineered to outperform traditional global rentals in Nigeria and Africa: toggle between vetted corporate chauffeurs and NIN-verified self-drive, add MOPOL security protocol or prepaid full-tank fuel, and unlock up to 22% off monthly SuperFlex subscriptions.
+            <p className="text-muted-foreground text-base md:text-lg max-w-[66ch] leading-relaxed">
+              Engineered to outperform traditional car rentals: new riders start with a Chauffeur-Driven Trial before passing our Driving Test Evaluation to unlock Self-Drive, with NAICOM/NIID Motor Insurance and up to 22% off monthly SuperFlex subscriptions included.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Tooltip content="Inspect all 32+ executive sedans, SUVs, EVs & Hilux 4x4 pickups">
@@ -105,7 +106,7 @@ const HomePage = () => {
                   <Link href="/cars">Browse fleet</Link>
                 </Button>
               </Tooltip>
-              <Tooltip content="Compare our 6 Nigerian mobility services & SuperFlex rates vs. Europcar">
+              <Tooltip content="Compare our 6 mobility services, motor insurance & SuperFlex rates vs. Europcar">
                 <Button asChild variant="secondary" size="lg">
                   <Link href="/services">Explore services & B2B</Link>
                 </Button>
@@ -128,15 +129,15 @@ const HomePage = () => {
                   Drive Modes
                 </p>
                 <p className="font-mono text-sm font-semibold text-foreground mt-0.5 tabular-nums">
-                  Chauffeur + Self
+                  Chauffeur → Self
                 </p>
               </div>
               <div>
                 <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                  Airports
+                  Motor Insurance
                 </p>
                 <p className="font-mono text-sm font-semibold text-foreground mt-0.5 tabular-nums">
-                  LOS · ABV · PHC
+                  NIID Verified
                 </p>
               </div>
               <div>
@@ -174,7 +175,7 @@ const HomePage = () => {
                 <div className="absolute inset-x-3 bottom-3 rounded-lg border border-white/15 bg-[#0d1713]/90 px-3.5 py-2.5 text-xs text-stone-100 backdrop-blur-md space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="font-mono uppercase tracking-[0.14em] text-emerald-300">
-                      Direct African Mobility Loop
+                      Direct Executive Mobility Loop
                     </span>
                     <span className="font-mono tabular-nums text-stone-200">
                       {cars.length} Verified Vehicles
@@ -190,17 +191,17 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Nigerian & African Mobility Products Strip (Outperforming Europcar) */}
+      {/* Executive Mobility Products Strip (Outperforming Europcar) */}
       <section className="border-t border-border/80 bg-secondary/25 py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 space-y-8">
+        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div className="space-y-2">
               <Badge variant="emerald">Products & Services Rendered</Badge>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Built for Nigerian & African mobility—beyond standard car hire
+                Built for executive & corporate mobility—beyond standard car hire
               </h2>
-              <p className="text-muted-foreground text-sm md:text-base max-w-[62ch]">
-                Benchmarked against Europcar and upgraded with corporate chauffeurs, airport protocol, pothole & flood protection, and prepaid full-tank fuel delivery.
+              <p className="text-muted-foreground text-sm md:text-base max-w-[66ch]">
+                Benchmarked against Europcar and upgraded with corporate chauffeurs, self-drive qualification exams, NIID motor insurance, road protection, and prepaid full-tank fuel delivery.
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
@@ -287,14 +288,14 @@ const HomePage = () => {
       </section>
 
       {/* Live Catalogue Section with Hub, Service Mode & Category Filters */}
-      <section className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
+      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-16 md:py-24">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
           <div className="space-y-2">
             <Badge variant="secondary">
               Live Catalogue · {filteredCars.length} of {cars.length} Vehicles
             </Badge>
             <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
-              Available cars across Nigerian hubs
+              Available cars across major hubs
             </h2>
             <p className="text-muted-foreground text-sm md:text-base">
               Filter by city hub, service mode (Chauffeur, Self-Drive, Airport VIP), or vehicle category.
@@ -398,7 +399,7 @@ const HomePage = () => {
             <AlertDescription className="font-semibold">{error}</AlertDescription>
           </Alert>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCars.map((car) => {
               const superFlexDaily = Math.round(car.price_per_day * 0.78);
               return (
@@ -503,7 +504,7 @@ const HomePage = () => {
               <EmptyStateGuide
                 eyebrow="No Matching Fleet Units"
                 title="No vehicles match your current hub or category filter"
-                description="Try broadening your search across all Nigerian city hubs or explore our 6 mobility service pillars."
+                description="Try broadening your search across all city hubs or explore our 6 mobility service pillars."
                 primaryAction={{
                   label: "Reset All Filters",
                   onClick: () => {
@@ -540,9 +541,14 @@ const HomePage = () => {
         )}
       </section>
 
+      {/* Mandatory Chauffeur-Driven Trial, Self-Drive Evaluation & Motor Insurance */}
+      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pb-16">
+        <DrivingEvaluationPanel compact />
+      </section>
+
       {/* Impeccable + Taste-Skill: Architectural Dual-Ledger (Zero card-in-card nesting) */}
       <section className="border-y border-border/80 bg-secondary/35 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
+        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             {/* Dark Pine Ledger: Rider Journey */}
             <div className="lg:col-span-6 rounded-2xl bg-[#0d1713] text-stone-100 p-7 md:p-9 border border-emerald-950 shadow-elevated flex flex-col justify-between">
@@ -554,7 +560,7 @@ const HomePage = () => {
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-stone-50">
-                  From hub selection to confirmed chauffeur or self-drive trip
+                  From Chauffeur Trial to certified Self-Drive & NIID motor insurance
                 </h2>
 
                 <div className="mt-7 divide-y divide-white/10 border-t border-white/10">
@@ -590,7 +596,7 @@ const HomePage = () => {
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-foreground">
-                  Monetize single cars or commercial fleets across Nigeria
+                  Monetize single cars or commercial fleets across major hubs
                 </h2>
 
                 <div className="mt-7 divide-y divide-border/80 border-t border-border/80">
@@ -620,10 +626,10 @@ const HomePage = () => {
       </section>
 
       {/* Closing CTA Banner */}
-      <section className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-20">
+      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-16 md:py-20">
         <div className="rounded-2xl bg-[#0d1713] text-stone-100 p-8 md:p-12 border border-emerald-950 shadow-elevated flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           <div className="max-w-2xl space-y-3">
-            <Badge variant="dark">Ready for Nigerian & Pan-African Mobility?</Badge>
+            <Badge variant="dark">Ready for Executive Mobility?</Badge>
             <h2 className="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-stone-50">
               Experience enterprise rental standards tailored for Lagos, Abuja, Port Harcourt & beyond.
             </h2>

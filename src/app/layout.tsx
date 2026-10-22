@@ -34,7 +34,7 @@ const organizationJsonLd = {
       logo: `${SITE_URL}/logo-mark.svg`,
       image: `${SITE_URL}/images/og-image.png`,
       description:
-        "Executive chauffeur service, NIN-verified self-drive car rental, airport VIP meet & greet (LOS, ABV, PHC), and Corporate SuperFlex fleet subscriptions across Nigeria and Africa.",
+        "Executive chauffeur service, evaluated self-drive car rental, airport VIP meet & greet (LOS, ABV, PHC), verified motor insurance, and Corporate SuperFlex fleet subscriptions.",
       priceRange: "₦68,000 - ₦650,000",
       currenciesAccepted: "NGN, USD, GHS, KES",
       areaServed: [
@@ -54,7 +54,7 @@ const organizationJsonLd = {
       url: SITE_URL,
       name: SITE_NAME,
       publisher: { "@id": `${SITE_URL}/#organization` },
-      inLanguage: "en-NG",
+      inLanguage: "en-US",
     },
   ],
 };

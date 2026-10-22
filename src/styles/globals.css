@@ -114,6 +114,30 @@
   }
 }
 
+/* Modern Web Guidance (validate-input-after-interaction): defer error state until blur/submit */
+.validated-field-error {
+  display: none;
+  color: hsl(var(--destructive));
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+input.validated-input:user-invalid,
+input.validated-input.user-invalid-fallback {
+  border-color: hsl(var(--destructive));
+  background-color: hsl(4 74% 96%);
+}
+
+input.validated-input:user-invalid + .validated-field-error,
+input.validated-input.user-invalid-fallback + .validated-field-error {
+  display: block;
+}
+
+input.validated-input:user-valid,
+input.validated-input.user-valid-fallback {
+  border-color: hsl(var(--primary));
+}
+
 /* Modern Web Guidance (responsive-table): semantic sticky table that stacks on narrow containers */
 .comparison-table-wrapper {
   overflow: auto;
@@ -125,9 +149,9 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  --label-2: "Izzac (Nigeria & Africa OS)";
+  --label-2: "Izzac Mobility OS";
   --label-3: "Europcar Global Standard";
-  --label-4: "African Market Impact";
+  --label-4: "Rider & Fleet Impact";
 }
 
 .comparison-table thead {
@@ -196,6 +220,12 @@
 }
 
 @layer utilities {
+  .max-w-6xl,
+  .max-w-5xl {
+    max-width: 1760px !important;
+    width: 100%;
+  }
+
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }

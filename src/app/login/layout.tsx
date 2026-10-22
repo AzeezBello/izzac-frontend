@@ -4,7 +4,7 @@ import { buildPageMetadata } from "../../lib/seo";
 export const metadata = buildPageMetadata({
   title: "Log In to Your Rider & Host Account",
   description:
-    "Sign in to Izzac Mobility to manage your chauffeur and self-drive bookings, inspect your vehicle garage, and publish fleet listings across Nigeria.",
+    "Sign in to Izzac Mobility to manage your chauffeur and self-drive bookings, complete your driving test evaluation, and manage your host garage.",
   path: "/login",
 });
 

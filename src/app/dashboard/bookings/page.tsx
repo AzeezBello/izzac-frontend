@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import api from "../../../lib/api";
 import FallbackImage from "../../../components/FallbackImage";
 import Breadcrumbs from "../../../components/Breadcrumbs";
+import DashboardNav from "../../../components/DashboardNav";
 import EmptyStateGuide from "../../../components/EmptyStateGuide";
+import { useAuth } from "../../../context/AuthContext";
 import { useCurrency } from "../../../context/CurrencyContext";
 import { resolveCarImage } from "../../../lib/carCatalogue";
 import { useRequireAuth } from "../../../hooks/useAuth";
@@ -26,6 +28,8 @@ type Booking = {
   service_type?: string;
   pickup_mode?: string;
   protection_plan?: string;
+  insurance_plan?: string;
+  insurance_certificate_ref?: string;
   addons?: string[];
   flight_or_notes?: string;
   car: {
@@ -38,8 +42,8 @@ type Booking = {
 };
 
 const SERVICE_LABELS: Record<string, string> = {
-  self_drive: "Verified Self-Drive",
-  chauffeur: "Chauffeur-Driven Executive",
+  self_drive: "Evaluated Self-Drive",
+  chauffeur: "Chauffeur-Driven Trial / Executive",
   airport_transfer: "Airport VIP Meet & Greet",
   corporate_flex: "Corporate SuperFlex",
 };
@@ -52,9 +56,15 @@ const PICKUP_LABELS: Record<string, string> = {
 };
 
 const PROTECTION_LABELS: Record<string, string> = {
-  basic: "Basic Statutory Third-Party",
-  medium: "Naija Road & Tyre Shield",
+  basic: "Basic Statutory Waiver",
+  medium: "Road, Tyre & Flood Shield",
   premium: "Executive Zero-Excess + Standby Car",
+};
+
+const INSURANCE_LABELS: Record<string, string> = {
+  third_party_niid: "Statutory Third-Party (NIID)",
+  comprehensive_shield: "Comprehensive Motor Insurance",
+  zero_excess_all_risk: "All-Risk Zero-Excess + SRCC",
 };
 
 const ADDON_LABELS: Record<string, string> = {
@@ -70,6 +80,7 @@ const BookingsPage = () => {
   const { isAuthenticated, isLoading } = useRequireAuth(
     "/login?next=/dashboard/bookings"
   );
+  const { qualification } = useAuth();
   const { formatPrice } = useCurrency();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -108,23 +119,51 @@ const BookingsPage = () => {
     }
   };
 
+  const summary = useMemo(() => {
+    const active = bookings.filter((b) => b.status !== "canceled");
+    const totalValue = active.reduce(
+      (acc, b) => acc + Number(b.total_price || 0),
+      0
+    );
+    const chauffeurCount = active.filter(
+      (b) => b.service_type !== "self_drive"
+    ).length;
+    const selfDriveCount = active.filter(
+      (b) => b.service_type === "self_drive"
+    ).length;
+
+    return {
+      activeCount: active.length,
+      totalValue,
+      chauffeurCount,
+      selfDriveCount,
+    };
+  }, [bookings]);
+
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16 space-y-8 animate-enter-subtle">
+    <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 md:py-12 space-y-8 animate-enter-subtle">
       <Breadcrumbs
         items={[
-          { label: "My Garage", href: "/dashboard" },
-          { label: "Bookings" },
+          { label: "My Garage & Dashboards", href: "/dashboard" },
+          { label: "Bookings & NIID Insurance Ledger" },
         ]}
       />
 
+      <DashboardNav />
+
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-border/80">
         <div className="space-y-2">
-          <Badge variant="emerald">Trips & Service Ledger</Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="emerald">Trips & Motor Insurance Ledger</Badge>
+            <Badge variant="secondary">
+              Chauffeur Trial · Evaluated Self-Drive · Airport VIP
+            </Badge>
+          </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-            Your bookings
+            Your bookings & insurance certificates
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Review confirmed trips, chauffeur/self-drive modes, protection tiers, and host-side demand.
+          <p className="text-muted-foreground text-sm md:text-base max-w-[72ch]">
+            Review confirmed trips, chauffeur/self-drive modes, Road & Tyre Shield waivers, verified motor insurance certificates, and host-side demand.
           </p>
         </div>
 
@@ -149,8 +188,8 @@ const BookingsPage = () => {
       ) : !isAuthenticated ? (
         <EmptyStateGuide
           eyebrow="Authentication Required"
-          title="Sign in to view your Rider & Host Bookings"
-          description="Track confirmed chauffeur trips, airport VIP handovers, and reservations placed on your listed fleet."
+          title="Sign in to view your Rider & Host Bookings Ledger"
+          description="Track confirmed Chauffeur-Driven Trial trips, Evaluated Self-Drive reservations, motor insurance certificates, and reservations placed on your listed fleet."
           primaryAction={{
             label: "Sign in to Bookings",
             href: "/login?next=/dashboard/bookings",
@@ -166,14 +205,14 @@ const BookingsPage = () => {
                 "Switch between 'As rider' and 'For my cars' using the top tabs without logging out.",
             },
             {
-              title: "Full Add-On & Protection Breakdown",
+              title: "Verified Motor Insurance Certificates",
               description:
-                "Every reservation records your selected drive mode, Naija Road Shield tier, and prepaid fuel or MOPOL add-ons.",
+                "Every reservation generates a verifiable NIID-NG-2026 policy reference alongside your selected road protection tier.",
             },
             {
-              title: "Instant Online Cancellation",
+              title: "Chauffeur Trial to Self-Drive Progression",
               description:
-                "Need to adjust your schedule? Cancel active trips directly from your bookings workspace.",
+                "Complete your first Chauffeur-Driven Trial booking to unlock the 5-question Driving Test Evaluation for Self-Drive.",
             },
           ]}
         />
@@ -185,6 +224,65 @@ const BookingsPage = () => {
             </Alert>
           )}
 
+          {/* 4-Column Bookings & Insurance Telemetry Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            <Card className="p-5 space-y-1.5">
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                Active {viewMode === "rider" ? "Rider" : "Host"} Trips
+              </span>
+              <p className="font-mono text-2xl font-bold text-foreground tabular-nums">
+                {summary.activeCount} Confirmed
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {summary.chauffeurCount} Chauffeur/VIP · {summary.selfDriveCount}{" "}
+                Self-Drive
+              </p>
+            </Card>
+
+            <Card className="p-5 space-y-1.5">
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                Total Ledger Volume
+              </span>
+              <p className="font-mono text-2xl font-bold text-primary tabular-nums">
+                {formatPrice(summary.totalValue)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Includes vehicle tariff, protection, insurance & extras.
+              </p>
+            </Card>
+
+            <Card className="p-5 space-y-1.5">
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                Motor Insurance
+              </span>
+              <p className="text-xl font-bold text-foreground">
+                100% NIID Verified
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Active policy certificate issued on every reservation.
+              </p>
+            </Card>
+
+            <Card className="p-5 space-y-1.5">
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                Self-Drive Clearance
+              </span>
+              <p className="text-xl font-bold text-foreground">
+                {qualification.self_drive_eligible
+                  ? "Self-Drive Unlocked ✓"
+                  : "Chauffeur Trial Mode"}
+              </p>
+              <Link
+                href="/dashboard/rider#evaluation"
+                className="inline-block font-mono text-xs font-semibold text-primary hover:underline"
+              >
+                {qualification.self_drive_eligible
+                  ? `Cert: ${qualification.clearance_certificate}`
+                  : "Complete Trial & Driving Test →"}
+              </Link>
+            </Card>
+          </div>
+
           <div className="space-y-4">
             {bookings.map((booking, index) => (
               <Card
@@ -195,9 +293,9 @@ const BookingsPage = () => {
                   src={resolveCarImage(booking.car)}
                   alt={`${booking.car.make} ${booking.car.model} booked in ${booking.car.location}`}
                   loading={index >= 2 ? "lazy" : undefined}
-                  className="w-full md:w-44 h-32 object-cover rounded-xl border border-border/60 shrink-0"
+                  className="w-full md:w-48 h-36 object-cover rounded-xl border border-border/60 shrink-0"
                 />
-                <div className="flex-1 space-y-2">
+                <div className="flex-1 space-y-2.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-semibold text-foreground tracking-[-0.02em]">
                       {booking.car.make} {booking.car.model}
@@ -216,6 +314,11 @@ const BookingsPage = () => {
                           booking.service_type}
                       </Badge>
                     )}
+                    <Badge variant="emerald">
+                      {INSURANCE_LABELS[
+                        booking.insurance_plan || "comprehensive_shield"
+                      ] || booking.insurance_plan}
+                    </Badge>
                   </div>
 
                   <p className="text-muted-foreground text-sm">
@@ -226,6 +329,11 @@ const BookingsPage = () => {
                   </p>
 
                   <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
+                    {booking.insurance_certificate_ref && (
+                      <span className="rounded bg-[#0d1713] text-emerald-300 px-2.5 py-0.5 font-semibold tabular-nums">
+                        NIID Cert: {booking.insurance_certificate_ref}
+                      </span>
+                    )}
                     {booking.pickup_mode && (
                       <span className="rounded bg-secondary/80 px-2 py-0.5">
                         {PICKUP_LABELS[booking.pickup_mode] ||
@@ -258,7 +366,7 @@ const BookingsPage = () => {
                     <p className="font-mono text-base font-bold text-primary tabular-nums">
                       {formatPrice(booking.total_price)}{" "}
                       <span className="font-sans text-xs font-normal text-muted-foreground">
-                        total
+                        total (incl. insurance & protection)
                       </span>
                     </p>
                   </div>
@@ -291,13 +399,13 @@ const BookingsPage = () => {
                 }
                 title={
                   viewMode === "rider"
-                    ? "You haven’t booked your first trip yet"
+                    ? "You haven’t booked your Chauffeur-Driven Trial or first trip yet"
                     : "No reservations have been placed on your cars yet"
                 }
                 description={
                   viewMode === "rider"
-                    ? "Choose any executive sedan, SUV, EV, or 4x4 pickup and configure your preferred drive mode, protection tier, and dates."
-                    : "Make sure your vehicles are published in My Garage with competitive NGN daily tariffs and clear hub descriptions."
+                    ? "New riders start with a Chauffeur-Driven Trial booking (which includes Verified Motor Insurance) before unlocking the Self-Drive Driving Test Evaluation."
+                    : "Make sure your vehicles are published in Host Garage with competitive daily tariffs and clear hub descriptions."
                 }
                 primaryAction={
                   viewMode === "rider"
@@ -305,24 +413,24 @@ const BookingsPage = () => {
                     : { label: "Add a Car to Garage", href: "/dashboard/add-car" }
                 }
                 secondaryAction={{
-                  label: "Explore Services & B2B",
-                  href: "/services",
+                  label: "Open Driving Test Evaluation",
+                  href: "/dashboard/rider#evaluation",
                 }}
                 tips={[
                   {
-                    title: "Toggle Chauffeur or Self-Drive",
+                    title: "Start with Chauffeur-Driven Trial",
                     description:
-                      "Select Vetted Corporate Chauffeur (+₦25k/day) or NIN/FRSC-verified Self-Drive on any car dossier.",
+                      "Complete 1 Chauffeur-Driven, Airport VIP, or Corporate booking to complete Stage 01 of Self-Drive qualification.",
                   },
                   {
-                    title: "Add Airport VIP or Prepaid Fuel",
+                    title: "Pass the ≥80% Driving Test Evaluation",
                     description:
-                      "Skip filling station queues with Prepaid Full-Tank Fuel and book terminal pickup at LOS, ABV, or PHC.",
+                      "Verify your Driver's License + 11-digit ID and pass the 5-question Highway & Flood test to unlock Self-Drive.",
                   },
                   {
-                    title: "Unlock 10%–22% SuperFlex Savings",
+                    title: "Verified Motor Insurance Included",
                     description:
-                      "Bookings of 7+ days receive 10% off automatically; 30+ days unlock 22% Corporate SuperFlex pricing.",
+                      "Choose Statutory Third-Party (₦0), Comprehensive (+₦15k/d), or All-Risk Zero-Excess + SRCC (+₦28k/d) on every booking.",
                   },
                 ]}
               />

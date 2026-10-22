@@ -2,9 +2,9 @@ import { ReactNode } from "react";
 import { buildPageMetadata } from "../../../lib/seo";
 
 export const metadata = buildPageMetadata({
-  title: "Rider Mobility Hub & Trip Overview",
+  title: "Rider Mobility & Self-Drive Driving Test Evaluation Hub",
   description:
-    "Access your upcoming Nigerian and African trips, jump into the 32-vehicle catalogue, or transition into vehicle hosting from your rider dashboard.",
+    "Complete your Chauffeur-Driven Trial, take the 5-question Driving Test Evaluation to unlock Self-Drive, and review your insured bookings.",
   path: "/dashboard/rider",
 });
 

@@ -31,12 +31,12 @@ const ONBOARDING_STEPS = [
   {
     step: "01",
     badge: "Step 1 of 4 · Welcome to Izzac",
-    title: "Your Nigerian & Pan-African Mobility Operating System",
+    title: "Your Executive Mobility & Fleet Operating System",
     summary:
-      "Izzac upgrades global car rental models (like Europcar) specifically for Lagos, Abuja, Port Harcourt, and regional African corridors.",
+      "Izzac upgrades global car rental models (like Europcar) with mandatory Chauffeur-Driven trials, Self-Drive evaluation, and verified motor insurance.",
     bullets: [
-      "Toggle any vehicle between Vetted Corporate Chauffeur (+₦25k/day) and Verified Self-Drive.",
-      "Schedule flight-tracked Airport VIP Meet & Greet at MMIA Lagos (LOS), Abuja (ABV), and PH (PHC).",
+      "New riders start with a Chauffeur-Driven Trial trip (+₦25k/day) before taking the Driving Test Evaluation to unlock Self-Drive.",
+      "Schedule flight-tracked Airport VIP Meet & Greet at LOS, ABV, and PHC terminals.",
       "Use one unified account to both book executive rides and monetize your own vehicles.",
     ],
   },
@@ -45,23 +45,23 @@ const ONBOARDING_STEPS = [
     badge: "Step 2 of 4 · Currency & Regional Hubs",
     title: "Choose your preferred display currency",
     summary:
-      "All 32+ vehicles are natively priced in Nigerian Naira (₦ NGN), with instant live conversion for international and Pan-African teams.",
+      "All 32+ vehicles are natively priced in ₦ NGN, with instant live conversion for international and regional corporate teams.",
     bullets: [
-      "Switch anytime between ₦ NGN, $ USD, GH₵ GHS (Ghana), and KSh KES (Kenya).",
+      "Switch anytime between ₦ NGN, $ USD, GH₵ GHS, and KSh KES.",
       "Filter inventory by city hub: Lagos, Abuja, Port Harcourt, Kano, Ibadan, and Enugu.",
       "Automatic 10% Weekly (7+ days) and 22% Monthly SuperFlex (30+ days) discounts.",
     ],
   },
   {
     step: "03",
-    badge: "Step 3 of 4 · Nigerian Road & Fuel Protection",
+    badge: "Step 3 of 4 · Motor Insurance, Road & Fuel Protection",
     title: "Engineered for real road & fuel conditions",
     summary:
-      "Instead of generic European winter tyres or ski racks, Izzac equips every trip with practical African mobility protection and add-ons.",
+      "Instead of generic winter tyres or ski racks, Izzac equips every trip with NIID motor insurance, road protection, and executive add-ons.",
     bullets: [
-      "Naija Road, Tyre & Flood Shield covers pothole tyre/rim impact and windscreen chips.",
-      "Prepaid Full-Tank Fuel Provisioning lets you skip filling station queues completely.",
-      "Optional Mobile Police (MOPOL) / Protocol Security Escort and 5G Cabin Wi-Fi.",
+      "Every booking includes NAICOM/NIID Motor Insurance (Statutory Third-Party, Comprehensive, or Zero-Excess).",
+      "Road, Tyre & Flood Shield covers pothole tyre/rim impact and windscreen chips.",
+      "Prepaid Full-Tank Fuel Provisioning and optional Mobile Police (MOPOL) / Protocol Security Escort.",
     ],
   },
   {
@@ -91,7 +91,7 @@ const PRODUCT_TOUR_STOPS = [
   {
     id: 2,
     eyebrow: "Tour Stop 02 / 05 · Hub & Service Mode Filters",
-    title: "Filter by Nigerian City Hub & Mobility Service",
+    title: "Filter by City Hub & Mobility Service",
     description:
       "Narrow the 32-vehicle fleet by Lagos, Abuja, Port Harcourt, or Kano—and filter specifically for Chauffeur & Protocol, Airport VIP, or Interstate 4x4 units.",
     actionLabel: "Filter Lagos Fleet",
@@ -109,9 +109,9 @@ const PRODUCT_TOUR_STOPS = [
   {
     id: 4,
     eyebrow: "Tour Stop 04 / 05 · Vehicle Dossier & Configurator",
-    title: "Customize Chauffeur, Naija Road Shield & Prepaid Fuel",
+    title: "Customize Chauffeur, Motor Insurance & Prepaid Fuel",
     description:
-      "Open any vehicle page to configure dates, toggle Chauffeur vs. Self-Drive, select pothole/tyre shield, and add Prepaid Full-Tank Fuel.",
+      "Open any vehicle page to configure dates, toggle Chauffeur vs. Self-Drive, select NIID motor insurance, and add Prepaid Full-Tank Fuel.",
     actionLabel: "Inspect Sample Vehicle",
     actionHref: "/cars/3",
   },
@@ -249,11 +249,11 @@ export const OnboardingProvider = ({
           aria-label="First-time visitor onboarding guide"
           className="border-b border-emerald-900/30 bg-[#0d1713] text-stone-100 px-4 py-2.5 text-xs"
         >
-          <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="max-w-[1760px] mx-auto flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <Badge variant="dark">New to Izzac?</Badge>
               <span className="text-stone-200">
-                Take the 4-step Nigerian & African Mobility Onboarding or launch the interactive Product Tour.
+                Take the 4-step Executive Mobility Onboarding or launch the interactive Product Tour.
               </span>
             </div>
             <div className="flex items-center gap-2">

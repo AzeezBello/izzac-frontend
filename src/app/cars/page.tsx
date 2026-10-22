@@ -125,7 +125,7 @@ const CarsPage = () => {
   const itemListJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Izzac Mobility Nigerian & Pan-African Vehicle Fleet",
+    name: "Izzac Mobility Executive Vehicle Fleet",
     numberOfItems: filteredCars.length,
     itemListElement: filteredCars.slice(0, 12).map((car, idx) => ({
       "@type": "ListItem",
@@ -136,7 +136,7 @@ const CarsPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16 space-y-6">
+    <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-10 md:py-16 space-y-6">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
@@ -150,14 +150,14 @@ const CarsPage = () => {
               Browse · {filteredCars.length} of {cars.length} Cars
             </Badge>
             <Badge variant="secondary">
-              Chauffeur · Self-Drive · Airport VIP · SuperFlex
+              Chauffeur Trial · Self-Drive · Motor Insurance · SuperFlex
             </Badge>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-            Available Nigerian & Pan-African Fleet
+            Available Executive & Commercial Fleet
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base max-w-[58ch]">
-            Filter live listings by city hub (Lagos, Abuja, Port Harcourt, Kano), mobility service mode, or NGN budget, then configure chauffeur, road protection, and fuel extras on the car page.
+          <p className="text-muted-foreground text-sm md:text-base max-w-[68ch]">
+            Filter live listings by city hub (Lagos, Abuja, Port Harcourt, Kano), mobility service mode, or NGN budget, then configure your Chauffeur-Driven Trial, Self-Drive mode, and NIID Motor Insurance on the vehicle page.
           </p>
         </div>
 
@@ -297,7 +297,7 @@ const CarsPage = () => {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredCars.map((car, index) => {
             const superFlexDaily = Math.round(car.price_per_day * 0.78);
             return (

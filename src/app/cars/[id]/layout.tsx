@@ -17,14 +17,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return buildPageMetadata({
       title: `Vehicle Dossier #${id} — Chauffeur & Self-Drive Rental`,
       description:
-        "Inspect full vehicle specifications, daily NGN rates, chauffeur availability, and Nigerian road protection options on Izzac Mobility.",
+        "Inspect full vehicle specifications, daily rates, chauffeur availability, road protection, and motor insurance options on Izzac Mobility.",
       path: `/cars/${id}`,
     });
   }
 
   return buildPageMetadata({
     title: `Rent ${car.year} ${car.make} ${car.model} in ${car.location}`,
-    description: `${car.description} Book ${car.make} ${car.model} with vetted corporate chauffeur or verified self-drive from ₦${car.price_per_day.toLocaleString("en-NG")}/day in ${car.location}.`,
+    description: `${car.description} Book ${car.make} ${car.model} with vetted corporate chauffeur or evaluated self-drive from ₦${car.price_per_day.toLocaleString("en-NG")}/day in ${car.location}.`,
     path: `/cars/${car.id}`,
     ogImage: car.image,
     ogAlt: `${car.year} ${car.make} ${car.model} available in ${car.location} on Izzac Mobility`,

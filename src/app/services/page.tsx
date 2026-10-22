@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import DrivingEvaluationPanel from "../../components/DrivingEvaluationPanel";
 import { useCurrency } from "../../context/CurrencyContext";
 import { SITE_NAME, SITE_URL } from "../../lib/seo";
 import {
   AFRICAN_REGIONAL_HUBS,
   BOOKING_ADDON_OPTIONS,
   EUROPCAR_COMPETITOR_BENCHMARK,
+  INSURANCE_PLAN_OPTIONS,
   IZZAC_PRIVILEGE_TIERS,
   PROTECTION_PLAN_OPTIONS,
   SERVICE_PILLARS,
@@ -67,7 +69,7 @@ const ServicesPage = () => {
   const [selectedTierId, setSelectedTierId] = useState("sedan");
   const [selectedDays, setSelectedDays] = useState(30);
   const [withChauffeur, setWithChauffeur] = useState(true);
-  const [withNaijaShield, setWithNaijaShield] = useState(true);
+  const [withRoadShield, setWithRoadShield] = useState(true);
   const [fleetCount, setFleetCount] = useState(1);
 
   const activeTier = useMemo(
@@ -84,7 +86,7 @@ const ServicesPage = () => {
     const discountSavings = Math.round(rawVehicleTotal * discountRate);
     const discountedVehicleTotal = rawVehicleTotal - discountSavings;
     const chauffeurTotal = withChauffeur ? 25000 * selectedDays * fleetCount : 0;
-    const shieldTotal = withNaijaShield ? 12000 * selectedDays * fleetCount : 0;
+    const shieldTotal = withRoadShield ? 12000 * selectedDays * fleetCount : 0;
     const grandTotal = discountedVehicleTotal + chauffeurTotal + shieldTotal;
     const effectiveDailyPerCar = Math.round(
       grandTotal / (selectedDays * fleetCount)
@@ -100,19 +102,19 @@ const ServicesPage = () => {
       grandTotal,
       effectiveDailyPerCar,
     };
-  }, [activeTier, selectedDays, withChauffeur, withNaijaShield, fleetCount]);
+  }, [activeTier, selectedDays, withChauffeur, withRoadShield, fleetCount]);
 
   const servicesJsonLd = {
     "@context": "https://schema.org",
     "@type": "Service",
     serviceType:
-      "Corporate Chauffeur, Self-Drive Car Rental, Airport VIP Meet & Greet & SuperFlex Subscriptions",
+      "Corporate Chauffeur, Self-Drive Car Rental, Motor Insurance, Airport VIP Meet & Greet & SuperFlex Subscriptions",
     provider: {
       "@type": "AutoRental",
       name: SITE_NAME,
       url: SITE_URL,
     },
-    areaServed: ["Nigeria", "Ghana", "Kenya"],
+    areaServed: ["Lagos", "Abuja", "Port Harcourt", "Accra", "Nairobi"],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Izzac Mobility Service Pillars",
@@ -134,19 +136,19 @@ const ServicesPage = () => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
       />
       {/* Asymmetric 12-Col Editorial Hero */}
-      <section className="max-w-6xl mx-auto px-4 md:px-6 pt-10 pb-16 md:pt-14 md:pb-24 space-y-6">
+      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-10 pb-16 md:pt-14 md:pb-24 space-y-6">
         <Breadcrumbs items={[{ label: "Services & B2B" }]} />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="emerald">Nigeria & Pan-African Mobility Suite</Badge>
+              <Badge variant="emerald">Executive & Corporate Mobility Suite</Badge>
               <Badge variant="secondary">Europcar Competitive Upgrade</Badge>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-foreground tracking-[-0.035em] leading-[1.06]">
-              Global rental discipline, engineered for Nigerian roads & executive realities.
+              Global rental discipline, engineered for real roads & executive realities.
             </h1>
-            <p className="text-muted-foreground text-base md:text-lg max-w-[60ch] leading-relaxed">
-              We benchmarked global leaders like Europcar and redesigned every product and service around how mobility actually works in Lagos, Abuja, Port Harcourt, Accra, and Nairobi: vetted corporate chauffeurs, MOPOL security protocol, prepaid full-tank fuel, pothole & flood protection, and 22%-off Monthly SuperFlex subscriptions.
+            <p className="text-muted-foreground text-base md:text-lg max-w-[66ch] leading-relaxed">
+              We benchmarked global leaders like Europcar and redesigned every product and service around how mobility actually works in Lagos, Abuja, Port Harcourt, Accra, and Nairobi: mandatory Chauffeur-Driven trials, Self-Drive qualification exams, NIID Motor Insurance, MOPOL security protocol, prepaid full-tank fuel, and 22%-off Monthly SuperFlex subscriptions.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Tooltip content="Filter 32+ vehicles by city hub and mobility service">
@@ -159,7 +161,7 @@ const ServicesPage = () => {
                   <a href="#calculator">Corporate & monthly calculator</a>
                 </Button>
               </Tooltip>
-              <Tooltip content="See how Izzac outperforms Europcar on 8 African mobility dimensions">
+              <Tooltip content="See how Izzac outperforms Europcar on 8 executive mobility dimensions">
                 <Button asChild variant="outline" size="lg">
                   <a href="#benchmark">Izzac vs. Europcar</a>
                 </Button>
@@ -218,14 +220,14 @@ const ServicesPage = () => {
                 <div className="absolute inset-x-3 bottom-3 rounded-lg border border-white/15 bg-[#0d1713]/90 p-3.5 text-xs text-stone-100 backdrop-blur-md space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-mono uppercase tracking-[0.14em] text-emerald-300">
-                      African Executive Standard
+                      Executive Fleet Standard
                     </span>
                     <span className="font-mono tabular-nums text-stone-200">
                       6 Mobility Pillars
                     </span>
                   </div>
                   <p className="text-stone-300 text-[11px] leading-snug">
-                    Chauffeur Drive · NIN/FRSC Self-Drive · Airport VIP · SuperFlex B2B · Hilux 4x4 · P2P Fleet Hosting
+                    Chauffeur Trial · Certified Self-Drive · Airport VIP · SuperFlex B2B · Hilux 4x4 · P2P Fleet Hosting
                   </p>
                 </div>
               </div>
@@ -236,12 +238,12 @@ const ServicesPage = () => {
 
       {/* 6 Core Mobility Products & Services (Asymmetric 12-Col Bento Grid) */}
       <section className="border-y border-border/80 bg-secondary/35 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 space-y-10">
+        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-10">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div className="space-y-2">
               <Badge variant="emerald">Products & Services Portfolio</Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-                Six mobility products tailored for Nigeria & Africa
+                Six mobility products tailored for executive & commercial fleets
               </h2>
               <p className="text-muted-foreground max-w-[62ch] text-sm md:text-base">
                 Every service pillar integrates directly into the live vehicle catalogue and checkout configurator—no offline quote forms required.
@@ -322,7 +324,7 @@ const ServicesPage = () => {
       {/* Interactive Corporate & SuperFlex Subscription Calculator */}
       <section
         id="calculator"
-        className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24 scroll-mt-20"
+        className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-16 md:py-24 scroll-mt-20"
       >
         <div className="rounded-2xl bg-[#0d1713] text-stone-100 p-6 sm:p-8 md:p-11 border border-emerald-950 shadow-elevated">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
@@ -333,7 +335,7 @@ const ServicesPage = () => {
                   Corporate Fleet & Monthly SuperFlex Estimator
                 </h2>
                 <p className="text-stone-300 text-sm md:text-base leading-relaxed">
-                  Compare short-term daily rentals against Izzac’s automatic Weekly (-10%) and Monthly SuperFlex (-22%) subscription discounts—complete with corporate chauffeur and Naija Road Shield options.
+                  Compare short-term daily rentals against Izzac’s automatic Weekly (-10%) and Monthly SuperFlex (-22%) subscription discounts—complete with corporate chauffeur and Road Shield options.
                 </p>
               </div>
 
@@ -419,13 +421,13 @@ const ServicesPage = () => {
                   <label className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-xs text-stone-200 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={withNaijaShield}
-                      onChange={(e) => setWithNaijaShield(e.target.checked)}
+                      checked={withRoadShield}
+                      onChange={(e) => setWithRoadShield(e.target.checked)}
                       className="h-4 w-4 rounded"
                     />
                     <div>
                       <p className="font-semibold text-stone-100">
-                        Naija Road Shield
+                        Road & Tyre Shield
                       </p>
                       <p className="font-mono text-[11px] text-emerald-300 tabular-nums">
                         +{formatPrice(12000)}/day
@@ -499,7 +501,7 @@ const ServicesPage = () => {
 
                 {estimate.shieldTotal > 0 && (
                   <div className="flex items-center justify-between text-stone-300">
-                    <span>Naija Road, Tyre & Flood Shield</span>
+                    <span>Road, Tyre & Flood Shield</span>
                     <span>+{formatPrice(estimate.shieldTotal)}</span>
                   </div>
                 )}
@@ -533,17 +535,83 @@ const ServicesPage = () => {
         </div>
       </section>
 
-      {/* Tiered Protection Packages & African Mobility Extras */}
+      {/* Mandatory Chauffeur-Driven Trial, Self-Drive Evaluation & NAICOM/NIID Motor Insurance */}
+      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pb-16 space-y-10">
+        <DrivingEvaluationPanel compact />
+
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Badge variant="emerald">NAICOM & NIID Motor Insurance</Badge>
+            <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
+              Motor insurance policies issued with every reservation
+            </h2>
+            <p className="text-muted-foreground text-sm md:text-base max-w-[66ch]">
+              Every booking automatically generates a verifiable NIID insurance certificate reference, with optional upgrades to Comprehensive Collision + Flood or Executive Zero-Excess All-Risk + SRCC cover.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 rounded-2xl border border-border/90 bg-card shadow-surface divide-y lg:divide-y-0 lg:divide-x divide-border/80 overflow-hidden">
+            {INSURANCE_PLAN_OPTIONS.map((ins) => (
+              <div
+                key={ins.code}
+                className="p-6 md:p-8 flex flex-col justify-between space-y-5"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge
+                      variant={
+                        ins.code === "comprehensive_shield"
+                          ? "emerald"
+                          : "secondary"
+                      }
+                    >
+                      {ins.badge}
+                    </Badge>
+                    <span className="font-mono text-sm font-bold text-primary tabular-nums">
+                      {ins.dailyRateNgn === 0
+                        ? "Included (₦0/d)"
+                        : `+${formatPrice(ins.dailyRateNgn)} /day`}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground tracking-[-0.02em]">
+                    {ins.name}
+                  </h3>
+                  <p className="font-mono text-xs text-muted-foreground tabular-nums">
+                    Underwriter: {ins.underwriter} · Limit:{" "}
+                    {formatPrice(ins.coverageLimitNgn)}
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {ins.summary}
+                  </p>
+                </div>
+
+                <ul className="pt-4 border-t border-border/70 space-y-2 text-xs text-foreground/90">
+                  {ins.coverageItems.map((item, idx) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <span className="font-mono font-semibold text-primary tabular-nums">
+                        0{idx + 1}
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Tiered Protection Packages & Executive Mobility Extras */}
       <section className="border-y border-border/80 bg-secondary/30 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 space-y-14">
+        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-14">
           <div className="space-y-8">
             <div className="space-y-2">
               <Badge variant="emerald">Protection & Risk Mitigation</Badge>
               <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Protection tiers built for Nigerian road conditions
+                Protection tiers built for real road conditions
               </h2>
-              <p className="text-muted-foreground text-sm md:text-base max-w-[62ch]">
-                Standard global rental waivers often exclude pothole tyre damage, rims, and flood corridors. Izzac’s protection tiers address real West and East African road risks transparently.
+              <p className="text-muted-foreground text-sm md:text-base max-w-[66ch]">
+                Standard global rental waivers often exclude pothole tyre damage, rims, and flood corridors. Izzac’s protection tiers address real urban and highway road risks transparently.
               </p>
             </div>
 
@@ -591,12 +659,12 @@ const ServicesPage = () => {
             </div>
           </div>
 
-          {/* African Mobility Add-Ons (Replacing European Ski Racks & Snow Chains) */}
+          {/* Executive Mobility Add-Ons */}
           <div className="space-y-6">
             <div className="space-y-2">
               <Badge variant="secondary">Localized Extras & Add-Ons</Badge>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Every booking can be equipped with African executive extras
+                Every booking can be equipped with executive extras
               </h2>
               <p className="text-muted-foreground text-sm md:text-base max-w-[62ch]">
                 Instead of snow chains or ski racks, configure your reservation with prepaid fuel, executive security escort, 5G cabin Wi-Fi, or interstate travel clearance.
@@ -631,15 +699,15 @@ const ServicesPage = () => {
       {/* Modern Web Guidance (responsive-table): Semantic Competitor Benchmark Table */}
       <section
         id="benchmark"
-        className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24 space-y-8 scroll-mt-20"
+        className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-16 md:py-24 space-y-8 scroll-mt-20"
       >
         <div className="space-y-2">
           <Badge variant="emerald">Competitive Benchmark</Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-            How Izzac improves on Europcar for Nigeria & Africa
+            How Izzac improves on Europcar for executive & corporate mobility
           </h2>
           <p className="text-muted-foreground text-sm md:text-base max-w-[64ch]">
-            We retained the best parts of Europcar’s international structure—transparent protection tiers, multi-duration discounts, and airport hubs—while re-architecting the product for African infrastructure and security realities.
+            We retained the best parts of Europcar’s international structure—transparent protection tiers, multi-duration discounts, and airport hubs—while re-architecting the product for real road infrastructure, chauffeur trials, and security realities.
           </p>
         </div>
 
@@ -651,7 +719,7 @@ const ServicesPage = () => {
         >
           <table className="comparison-table text-left text-sm">
             <caption id="competitor-benchmark-caption" className="sr-only">
-              Comparison of Izzac Nigeria and Africa mobility services versus Europcar global rental standard
+              Comparison of Izzac executive mobility services versus Europcar global rental standard
             </caption>
             <thead>
               <tr className="border-b border-border bg-secondary/80 font-mono text-xs uppercase tracking-[0.12em] text-foreground">
@@ -659,13 +727,13 @@ const ServicesPage = () => {
                   Capability / Dimension
                 </th>
                 <th scope="col" className="p-4 font-semibold text-primary">
-                  Izzac (Nigeria & Africa OS)
+                  Izzac Mobility OS
                 </th>
                 <th scope="col" className="p-4 font-semibold text-muted-foreground">
                   Europcar Global Standard
                 </th>
                 <th scope="col" className="p-4 font-semibold">
-                  African Market Impact
+                  Operational Impact
                 </th>
               </tr>
             </thead>
@@ -696,12 +764,12 @@ const ServicesPage = () => {
 
       {/* Regional Hubs & Izzac Privilege Loyalty Program */}
       <section className="border-t border-border/80 bg-secondary/35 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 space-y-16">
+        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-16">
           <div className="space-y-6">
             <div className="space-y-2">
               <Badge variant="emerald">Regional Coverage & Airport Desks</Badge>
               <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Active Nigerian & Pan-African Mobility Hubs
+                Active City & Airport Mobility Hubs
               </h2>
             </div>
 
@@ -746,7 +814,7 @@ const ServicesPage = () => {
             <div className="space-y-2">
               <Badge variant="secondary">Izzac Privilege Rewards</Badge>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Loyalty perks built for frequent Nigerian & African flyers
+                Loyalty perks built for frequent executive & corporate flyers
               </h2>
               <p className="text-muted-foreground text-sm md:text-base max-w-[62ch]">
                 Inspired by Europcar Privilege and upgraded with domestic airport lounge access, free 5G cabin Wi-Fi, and guaranteed December peak-season fleet allocation.

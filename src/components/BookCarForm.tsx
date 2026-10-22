@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import api from "../lib/api";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +10,8 @@ import { getApiErrorMessage } from "../lib/errors";
 import {
   AddonCode,
   BOOKING_ADDON_OPTIONS,
+  INSURANCE_PLAN_OPTIONS,
+  InsurancePlanCode,
   PICKUP_MODE_OPTIONS,
   PickupModeCode,
   PROTECTION_PLAN_OPTIONS,
@@ -29,6 +32,7 @@ import {
 import { Alert, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
+import { Tooltip } from "./ui/tooltip";
 
 type BookCarFormProps = {
   carId: number;
@@ -40,30 +44,46 @@ type BookCarFormProps = {
 const BookCarForm = ({
   carId,
   pricePerDay,
-  defaultChauffeur = false,
+  defaultChauffeur = true,
   hubAirport,
 }: BookCarFormProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, qualification, markChauffeurTrialCompleted } =
+    useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  // New users default to Chauffeur-Driven mode for their mandatory trial period
   const [serviceType, setServiceType] = useState<ServiceTypeCode>(
-    defaultChauffeur ? "chauffeur" : "self_drive"
+    qualification.self_drive_eligible && !defaultChauffeur
+      ? "self_drive"
+      : "chauffeur"
   );
   const [pickupMode, setPickupMode] = useState<PickupModeCode>("hub_station");
   const [protectionPlan, setProtectionPlan] =
     useState<ProtectionPlanCode>("medium");
+  const [insurancePlan, setInsurancePlan] = useState<InsurancePlanCode>(
+    "comprehensive_shield"
+  );
   const [selectedAddons, setSelectedAddons] = useState<AddonCode[]>([]);
   const [flightOrNotes, setFlightOrNotes] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Keep new users in Chauffeur-Driven mode until Self-Drive qualification is unlocked
+  useEffect(() => {
+    if (!qualification.self_drive_eligible && serviceType === "self_drive") {
+      setServiceType("chauffeur");
+    }
+  }, [qualification.self_drive_eligible, serviceType]);
+
   const toggleAddon = (code: AddonCode) => {
     setSelectedAddons((prev) =>
-      prev.includes(code) ? prev.filter((item) => item !== code) : [...prev, code]
+      prev.includes(code)
+        ? prev.filter((item) => item !== code)
+        : [...prev, code]
     );
   };
 
@@ -80,8 +100,10 @@ const BookCarForm = ({
     const days = dayCount || 1;
     const baseTotal = Number(pricePerDay) * days;
     const discountRate = days >= 30 ? 0.22 : days >= 7 ? 0.1 : 0;
-    const discountedBase = Math.round(baseTotal * (1 - discountRate) * 100) / 100;
-    const discountSavings = Math.round((baseTotal - discountedBase) * 100) / 100;
+    const discountedBase =
+      Math.round(baseTotal * (1 - discountRate) * 100) / 100;
+    const discountSavings =
+      Math.round((baseTotal - discountedBase) * 100) / 100;
 
     const serviceObj =
       SERVICE_TYPE_OPTIONS.find((s) => s.code === serviceType) ||
@@ -98,17 +120,28 @@ const BookCarForm = ({
       PROTECTION_PLAN_OPTIONS[0];
     const protectionFee = protectionObj.dailyRateNgn * days;
 
+    const insuranceObj =
+      INSURANCE_PLAN_OPTIONS.find((i) => i.code === insurancePlan) ||
+      INSURANCE_PLAN_OPTIONS[0];
+    const insuranceFee = insuranceObj.dailyRateNgn * days;
+
     let addonFee = 0;
     for (const code of selectedAddons) {
       const addon = BOOKING_ADDON_OPTIONS.find((a) => a.code === code);
       if (addon) {
-        addonFee += addon.billing === "daily" ? addon.amountNgn * days : addon.amountNgn;
+        addonFee +=
+          addon.billing === "daily" ? addon.amountNgn * days : addon.amountNgn;
       }
     }
 
     const total =
       Math.round(
-        (discountedBase + serviceFee + pickupFee + protectionFee + addonFee) *
+        (discountedBase +
+          serviceFee +
+          pickupFee +
+          protectionFee +
+          insuranceFee +
+          addonFee) *
           100
       ) / 100;
 
@@ -121,6 +154,8 @@ const BookCarForm = ({
       serviceFee,
       pickupFee,
       protectionFee,
+      insuranceFee,
+      insuranceObj,
       addonFee,
       total,
     };
@@ -130,13 +165,33 @@ const BookCarForm = ({
     serviceType,
     pickupMode,
     protectionPlan,
+    insurancePlan,
     selectedAddons,
   ]);
+
+  const handleSelectServiceType = (code: ServiceTypeCode) => {
+    if (code === "self_drive" && !qualification.self_drive_eligible) {
+      setError(
+        "New User Policy: You must complete a Chauffeur-Driven trial period and pass the FRSC/NIN Driving Test Evaluation before selecting Self-Drive."
+      );
+      setServiceType("chauffeur");
+      return;
+    }
+    setError(null);
+    setServiceType(code);
+  };
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       router.push(`/login?next=/cars/${carId}`);
+      return;
+    }
+
+    if (serviceType === "self_drive" && !qualification.self_drive_eligible) {
+      setError(
+        "Self-Drive Locked: Please complete your Chauffeur-Driven trial booking first, then pass the Driving Test Evaluation."
+      );
       return;
     }
 
@@ -162,11 +217,30 @@ const BookCarForm = ({
         service_type: serviceType,
         pickup_mode: pickupMode,
         protection_plan: protectionPlan,
+        insurance_plan: insurancePlan,
         addons: selectedAddons,
         flight_or_notes: flightOrNotes.trim(),
       });
+
+      if (
+        serviceType === "chauffeur" ||
+        serviceType === "airport_transfer" ||
+        serviceType === "corporate_flex"
+      ) {
+        markChauffeurTrialCompleted();
+      }
+
+      const cert =
+        data.insurance_certificate_ref ||
+        `NIID-NG-${new Date().getFullYear()}-${carId}`;
       setMessage(
-        `Booking confirmed! Total ${formatPrice(data.total_price)} (${serviceType.replace("_", " ")})`
+        `Booking confirmed! Total ${formatPrice(
+          data.total_price
+        )} · Insurance Policy ${cert} (${
+          serviceType === "chauffeur"
+            ? "Chauffeur Trial Completed — You can now take the Driving Test Evaluation!"
+            : serviceType.replace("_", " ")
+        })`
       );
     } catch (error: unknown) {
       setError(getApiErrorMessage(error, "Could not complete your booking."));
@@ -181,7 +255,7 @@ const BookCarForm = ({
         <div className="flex items-baseline justify-between gap-2">
           <div>
             <Badge variant="emerald" className="mb-1.5">
-              Instant Mobility Configurator
+              Instant Mobility & Insurance Configurator
             </Badge>
             <CardTitle className="text-lg">Reserve this vehicle</CardTitle>
           </div>
@@ -198,7 +272,7 @@ const BookCarForm = ({
           </div>
         </div>
         <CardDescription>
-          Configure trip dates, chauffeur/self-drive mode, Nigerian road protection, and airport or fuel extras.
+          Configure trip dates, chauffeur trial or evaluated self-drive mode, NAICOM/NIID motor insurance, and road protection.
         </CardDescription>
       </CardHeader>
 
@@ -248,19 +322,72 @@ const BookCarForm = ({
             </div>
           </div>
 
-          {/* Step 2: Drive & Service Mode (Modern Web Guidance: child-state-based-styling) */}
-          <fieldset className="space-y-2">
-            <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              02 · Drive & Service Mode
-            </legend>
+          {/* Step 2: Drive & Service Mode (Enforces Chauffeur Trial before Self-Drive Evaluation) */}
+          <fieldset className="space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                02 · Drive Mode (Chauffeur Trial vs. Evaluated Self-Drive)
+              </legend>
+              <Badge
+                variant={
+                  qualification.self_drive_eligible ? "emerald" : "secondary"
+                }
+              >
+                {qualification.self_drive_eligible
+                  ? "Self-Drive Certified ✓"
+                  : "Chauffeur Trial Active"}
+              </Badge>
+            </div>
+
+            {!qualification.self_drive_eligible && (
+              <div className="rounded-xl border border-emerald-900/25 bg-[#0d1713] p-3.5 text-xs text-stone-200 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
+                    New User Self-Drive Policy
+                  </span>
+                  <span className="font-mono text-[10px] text-stone-400 tabular-nums">
+                    {qualification.chauffeur_trial_completed
+                      ? "Step 1/2 Done · Take Driving Test"
+                      : "Step 0/2 · Trial Required"}
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-300 leading-relaxed">
+                  New accounts must complete a{" "}
+                  <strong className="text-stone-100">
+                    Chauffeur-Driven trial period
+                  </strong>{" "}
+                  first, then pass the{" "}
+                  <strong className="text-stone-100">
+                    5-question FRSC/NIN Driving Test Evaluation
+                  </strong>{" "}
+                  to unlock Self-Drive.
+                </p>
+                <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                  <Link
+                    href="/dashboard/rider#evaluation"
+                    className="rounded-md bg-primary px-2.5 py-1 font-mono text-[11px] font-semibold text-primary-foreground hover:bg-emerald-700 transition-colors"
+                  >
+                    {qualification.chauffeur_trial_completed
+                      ? "Take Driving Test Evaluation →"
+                      : "Open Trial & Driving Test Center →"}
+                  </Link>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {SERVICE_TYPE_OPTIONS.map((option) => {
+                const isSelfDriveLocked =
+                  option.code === "self_drive" &&
+                  !qualification.self_drive_eligible;
                 const isSelected = serviceType === option.code;
                 return (
                   <label
                     key={option.code}
                     className={`selectable-option-card ${
                       isSelected ? "is-active" : ""
+                    } ${
+                      isSelfDriveLocked ? "opacity-75" : ""
                     } rounded-xl p-2.5 cursor-pointer flex items-start gap-2.5`}
                   >
                     <input
@@ -268,16 +395,25 @@ const BookCarForm = ({
                       name="service_type"
                       value={option.code}
                       checked={isSelected}
-                      onChange={() => setServiceType(option.code)}
+                      onChange={() => handleSelectServiceType(option.code)}
                       className="option-control mt-0.5 h-3.5 w-3.5 shrink-0"
                     />
-                    <div className="text-xs leading-snug">
-                      <p className="font-semibold text-foreground">
-                        {option.shortLabel}
-                      </p>
+                    <div className="text-xs leading-snug flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className="font-semibold text-foreground">
+                          {option.shortLabel}
+                        </p>
+                        {option.code === "self_drive" && (
+                          <span className="font-mono text-[10px] font-semibold text-primary">
+                            {qualification.self_drive_eligible
+                              ? "Unlocked ✓"
+                              : "Requires Trial + Test"}
+                          </span>
+                        )}
+                      </div>
                       <p className="font-mono text-[11px] text-primary tabular-nums">
                         {option.dailyRateNgn === 0
-                          ? "Included"
+                          ? "Included after evaluation"
                           : `+${formatPrice(option.dailyRateNgn)}/day`}
                       </p>
                     </div>
@@ -313,10 +449,65 @@ const BookCarForm = ({
             </select>
           </div>
 
-          {/* Step 4: Protection Package */}
+          {/* Step 4: Mandatory NAICOM / NIID Motor Insurance */}
+          <fieldset className="space-y-2">
+            <div className="flex items-center justify-between">
+              <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                04 · Motor Insurance Policy (NAICOM / NIID Verified)
+              </legend>
+              <Tooltip content="Every booking issues a verifiable NIID motor insurance certificate">
+                <span className="font-mono text-[10px] font-semibold text-primary cursor-help">
+                  NIID Certificate Included ⓘ
+                </span>
+              </Tooltip>
+            </div>
+            <div className="space-y-2">
+              {INSURANCE_PLAN_OPTIONS.map((ins) => {
+                const isSelected = insurancePlan === ins.code;
+                return (
+                  <label
+                    key={ins.code}
+                    className={`selectable-option-card ${
+                      isSelected ? "is-active" : ""
+                    } rounded-xl p-3 cursor-pointer flex items-start gap-2.5`}
+                  >
+                    <input
+                      type="radio"
+                      name="insurance_plan"
+                      value={ins.code}
+                      checked={isSelected}
+                      onChange={() => setInsurancePlan(ins.code)}
+                      className="option-control mt-0.5 h-3.5 w-3.5 shrink-0"
+                    />
+                    <div className="flex-1 text-xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold text-foreground">
+                          {ins.name}
+                        </span>
+                        <span className="font-mono font-bold text-primary tabular-nums shrink-0">
+                          {ins.dailyRateNgn === 0
+                            ? "Included"
+                            : `+${formatPrice(ins.dailyRateNgn)}/day`}
+                        </span>
+                      </div>
+                      <p className="font-mono text-[10px] text-muted-foreground mt-0.5 tabular-nums">
+                        {ins.underwriter} · Up to{" "}
+                        {formatPrice(ins.coverageLimitNgn)} cover
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+                        {ins.summary}
+                      </p>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          {/* Step 5: Road & Tyre Protection Package */}
           <fieldset className="space-y-2">
             <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              04 · Nigerian Road & Liability Protection
+              05 · Road, Pothole & Standby Relief Shield
             </legend>
             <div className="space-y-2">
               {PROTECTION_PLAN_OPTIONS.map((plan) => {
@@ -357,10 +548,10 @@ const BookCarForm = ({
             </div>
           </fieldset>
 
-          {/* Step 5: African Market Add-Ons */}
+          {/* Step 6: Executive Add-Ons */}
           <fieldset className="space-y-2">
             <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              05 · Executive & Local Extras (Optional)
+              06 · Executive & Local Extras (Optional)
             </legend>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {BOOKING_ADDON_OPTIONS.map((addon) => {
@@ -393,7 +584,7 @@ const BookCarForm = ({
             </div>
           </fieldset>
 
-          {/* Step 6: Flight Number / Corporate LPO Notes */}
+          {/* Step 7: Flight Number / Corporate LPO Notes */}
           <div className="space-y-1">
             <Label htmlFor="flight-notes" className="text-xs">
               Flight number, delivery hotel, or corporate LPO ref (optional)
@@ -442,9 +633,20 @@ const BookCarForm = ({
               </div>
             )}
 
+            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
+              <span>
+                Motor insurance ({fareBreakdown.insuranceObj.badge})
+              </span>
+              <span>
+                {fareBreakdown.insuranceFee === 0
+                  ? "Included"
+                  : `+${formatPrice(fareBreakdown.insuranceFee)}`}
+              </span>
+            </div>
+
             {fareBreakdown.protectionFee > 0 && (
               <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-                <span>Road & liability protection ({fareBreakdown.days}d)</span>
+                <span>Road & tyre shield ({fareBreakdown.days}d)</span>
                 <span>+{formatPrice(fareBreakdown.protectionFee)}</span>
               </div>
             )}
@@ -488,7 +690,7 @@ const BookCarForm = ({
             className="w-full"
           >
             {submitting
-              ? "Confirming reservation..."
+              ? "Confirming reservation & NIID insurance..."
               : `Book now · ${formatPrice(fareBreakdown.total)}`}
           </Button>
         </form>

@@ -15,6 +15,7 @@ const navItems = [
   { href: "/services", label: "Services & B2B" },
   { href: "/host", label: "Host" },
   { href: "/dashboard", label: "My garage" },
+  { href: "/dashboard/rider", label: "Rider & Driving Test" },
   { href: "/dashboard/bookings", label: "Bookings" },
 ];
 
@@ -26,7 +27,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/75">
-      <div className="max-w-6xl mx-auto flex h-16 items-center justify-between px-4 md:px-6 gap-4">
+      <div className="w-full max-w-[1760px] mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10 gap-4">
         <div className="flex items-center gap-7">
           <Link
             href="/"
@@ -45,12 +46,8 @@ const Header = () => {
             <span className="text-lg font-bold tracking-[-0.03em] text-foreground">
               Izzac
             </span>
-            <span className="hidden xl:inline-flex items-center rounded border border-border/80 bg-secondary/70 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              NG · Africa Mobility
-            </span>
           </Link>
 
-          {/* Emil Kowalski restraint rule: high-frequency nav links avoid sluggish transitions */}
           <nav
             aria-label="Main navigation"
             className="hidden md:flex items-center gap-1"
@@ -80,7 +77,7 @@ const Header = () => {
         <div className="flex items-center gap-2">
           {/* Guided Product Tour & Onboarding Triggers with Tooltips */}
           <div className="hidden xl:flex items-center gap-1.5">
-            <Tooltip content="Open 4-step Nigerian & African mobility onboarding">
+            <Tooltip content="Open 4-step executive mobility onboarding">
               <button
                 type="button"
                 onClick={openOnboarding}
@@ -100,7 +97,7 @@ const Header = () => {
             </Tooltip>
           </div>
 
-          {/* Multi-Currency Switcher for Nigerian Naira, USD, Ghana Cedi & Kenyan Shilling */}
+          {/* Multi-Currency Switcher */}
           <div className="hidden sm:flex items-center">
             <Tooltip content="Switch display rates between NGN, USD, GHS & KES">
               <div>
@@ -124,7 +121,7 @@ const Header = () => {
             </Tooltip>
           </div>
 
-          <Tooltip content="Publish your car and earn recurring NGN host payouts">
+          <Tooltip content="Publish your car and earn recurring host payouts">
             <Button
               asChild
               variant="outline"
@@ -137,10 +134,13 @@ const Header = () => {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-secondary/50 px-2.5 py-1 font-mono text-xs text-foreground">
+              <Link
+                href="/user/dashboard"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-secondary/50 px-2.5 py-1 font-mono text-xs text-foreground hover:bg-secondary transition-colors"
+              >
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Hi, {user?.username}
-              </span>
+              </Link>
               <Button variant="ghost" size="sm" onClick={logout}>
                 Log out
               </Button>

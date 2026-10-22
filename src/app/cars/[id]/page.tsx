@@ -132,7 +132,7 @@ const CarDetailsPage = () => {
           href="/services"
           className="font-mono text-xs text-primary hover:underline"
         >
-          View Chauffeur, Airport VIP & Naija Shield details →
+          View Chauffeur Trial, Self-Drive Exam & Motor Insurance details →
         </Link>
       </div>
 
@@ -224,11 +224,11 @@ const CarDetailsPage = () => {
             </div>
           </div>
 
-          {/* Nigerian & African Mobility Readiness Ledger */}
+          {/* Mobility Readiness Ledger */}
           <div className="rounded-2xl border border-border/80 bg-card p-6 shadow-surface space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-foreground">
-                Supported Nigerian & African Mobility Modes
+                Supported Executive Mobility Modes
               </h2>
               {car.terrainReadiness && (
                 <Badge variant="secondary">{car.terrainReadiness}</Badge>

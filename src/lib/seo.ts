@@ -19,7 +19,7 @@ export function buildPageMetadata({
   description,
   path,
   ogImage = "/images/og-image.png",
-  ogAlt = "Izzac Mobility — Chauffeur, Self-Drive, Airport VIP & Corporate Car Rental in Nigeria and Africa",
+  ogAlt = "Izzac Mobility — Chauffeur, Self-Drive, Airport VIP & Corporate Car Rental",
 }: PageSeoOptions): Metadata {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   const fullTitle = `${title} | ${SITE_NAME}`;
@@ -35,7 +35,7 @@ export function buildPageMetadata({
       description,
       url: cleanPath,
       siteName: SITE_NAME,
-      locale: "en_NG",
+      locale: "en_US",
       type: "website",
       images: [
         {

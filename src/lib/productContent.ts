@@ -36,6 +36,11 @@ export type PickupModeCode =
 
 export type ProtectionPlanCode = "basic" | "medium" | "premium";
 
+export type InsurancePlanCode =
+  | "third_party_niid"
+  | "comprehensive_shield"
+  | "zero_excess_all_risk";
+
 export type AddonCode =
   | "security_escort"
   | "prepaid_fuel"
@@ -43,6 +48,25 @@ export type AddonCode =
   | "interstate_pass"
   | "extra_driver"
   | "child_seat";
+
+export type InsurancePlanOption = {
+  code: InsurancePlanCode;
+  name: string;
+  underwriter: string;
+  badge: string;
+  dailyRateNgn: number;
+  coverageLimitNgn: number;
+  summary: string;
+  coverageItems: string[];
+};
+
+export type DrivingTestQuestion = {
+  id: string;
+  question: string;
+  options: { id: string; label: string }[];
+  correctOptionId: string;
+  explanation: string;
+};
 
 export type ServicePillar = {
   code: ServiceTypeCode | "commercial_shuttle" | "host_marketplace";
@@ -111,39 +135,39 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     code: "chauffeur",
     eyebrow: "01 · Executive Chauffeur & Convoy",
     title: "Chauffeur-Driven Mobility & Security Protocol",
-    subtitle: "Nigeria's #1 preferred executive transit mode",
+    subtitle: "Preferred executive & trial transit mode",
     dailySurchargeNgn: 25000,
     priceTag: "+₦25,000 /day",
     description:
-      "Every listing can be booked with a vetted, uniformed corporate chauffeur trained in defensive driving, Lagos Island/Mainland traffic routing, and Abuja diplomatic protocol.",
+      "Every listing can be booked with a vetted, uniformed corporate chauffeur trained in defensive driving, urban traffic routing, and diplomatic protocol.",
     highlights: [
-      "12-hour daily shift with English & local-language speaking corporate driver",
+      "12-hour daily shift with English & multi-lingual corporate driver",
       "Optional armed Mobile Police (MOPOL) or unarmed protocol escort detail",
       "Zero driver liability for renter in dense urban traffic or checkpoints",
     ],
     europcarUpgradeNote:
-      "Improves on Europcar's European self-drive default by making vetted chauffeur-drive a first-class, instant-book toggle on every vehicle.",
+      "Improves on Europcar's self-drive default by making vetted chauffeur-drive a first-class, instant-book toggle on every vehicle.",
     href: "/cars?service=Chauffeur+%26+Protocol",
     cta: "Browse chauffeur fleet",
   },
   {
     code: "self_drive",
-    eyebrow: "02 · Instant Digital Self-Drive",
-    title: "Verified Self-Drive (NIN & FRSC Fast-Track)",
-    subtitle: "Paperless handover in gated hubs & estates",
+    eyebrow: "02 · Graduated Self-Drive & Driving Test",
+    title: "Evaluated Self-Drive (Post-Chauffeur Trial + Exam)",
+    subtitle: "Chauffeur Trial Period → Driving Test Evaluation → Self-Drive Unlock",
     dailySurchargeNgn: 0,
-    priceTag: "Included in base rate",
+    priceTag: "Unlocked after Trial + Test",
     description:
-      "Prefer the wheel yourself? Complete one-time NIN and FRSC driver's license verification online and unlock paperless pickup with zero airport counter queues.",
+      "To protect high-value vehicles, all new users begin with a Chauffeur-Driven trial period, then pass our License/ID Driving Test Evaluation to unlock independent Self-Drive.",
     highlights: [
-      "Digital pre-trip inspection ledger with timestamped photo telemetry",
-      "Flexible daily, weekly (-10%), and monthly (-22%) self-drive rates",
-      "Available across Victoria Island, Lekki, Ikeja GRA, Maitama, and Wuse II",
+      "Step 1: Complete your initial Chauffeur-Driven trial trip to establish account trust",
+      "Step 2: Pass the 5-question Highway Code, flood-corridor & road readiness evaluation",
+      "Step 3: Unlock paperless Self-Drive backed by Verified Motor Insurance",
     ],
     europcarUpgradeNote:
-      "Replaces Europcar's physical credit-card deposit blocks and slow counter paperwork with instant Nigerian NIN/BVN & digital escrow verification.",
-    href: "/cars?service=Verified+Self-Drive",
-    cta: "Book self-drive",
+      "Replaces Europcar's high-friction credit-card deposit blocks with a graduated Chauffeur Trial + Driving Test Evaluation that protects hosts and rewards safe drivers.",
+    href: "/dashboard/rider#evaluation",
+    cta: "Take driving test evaluation",
   },
   {
     code: "airport_transfer",
@@ -160,7 +184,7 @@ export const SERVICE_PILLARS: ServicePillar[] = [
       "Optional VIP lounge fast-track & luggage protocol assistance",
     ],
     europcarUpgradeNote:
-      "Eliminates the trek to remote rental car lots in tropical heat or rain—your chilled vehicle meets you directly at the terminal exit.",
+      "Eliminates the trek to remote rental car lots in heat or rain—your chilled vehicle meets you directly at the terminal exit.",
     href: "/cars?service=Airport+VIP+Transfer",
     cta: "Schedule airport pickup",
   },
@@ -172,11 +196,11 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     dailySurchargeNgn: 15000,
     priceTag: "Save 10% Weekly · 22% Monthly",
     description:
-      "Built for multinationals, oil & gas operators, fintechs, embassies, and diaspora returnees who need multi-week or monthly vehicles with full maintenance included.",
+      "Built for enterprises, energy operators, fintechs, embassies, and executives who need multi-week or monthly vehicles with full maintenance included.",
     highlights: [
       "Automatic 10% Weekly Saver (7+ days) & 22% Monthly SuperFlex (30+ days) discounts",
       "Guaranteed 2-hour replacement vehicle in Lagos, Abuja & Port Harcourt if servicing is needed",
-      "Consolidated NGN/USD VAT invoicing, corporate LPO billing, and Paystack/wire settlement",
+      "Consolidated VAT invoicing, corporate LPO billing, and instant card/wire settlement",
     ],
     europcarUpgradeNote:
       "Outperforms Europcar's rigid 12–36 month corporate leases with instant online monthly subscriptions and 2-hour local replacement SLAs.",
@@ -191,14 +215,14 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     dailySurchargeNgn: 0,
     priceTag: "From ₦130,000 /day",
     description:
-      "Instead of generic European box vans unsuited to African highways, Izzac deploys high-clearance 4x4 double-cab pickups and luxury executive vans.",
+      "Instead of generic light box vans unsuited to demanding highways, Izzac deploys high-clearance 4x4 double-cab pickups and luxury executive vans.",
     highlights: [
       "Toyota Hilux Adventure 4x4 & Ford Ranger Wildtrak Bi-Turbo for field & escort duty",
       "Mercedes-Benz V250d Avantgarde 7-seater lounge vans for board roadshows & delegations",
-      "Pre-cleared Interstate Corridor Pass with nationwide AA Rescue breakdown cover",
+      "Pre-cleared Interstate Corridor Pass with 24/7 AA Rescue breakdown cover",
     ],
     europcarUpgradeNote:
-      "Replaces European light Luton vans with heavy-duty 4x4 turbo-diesel pickups and executive shuttles built for Nigerian interstate terrain.",
+      "Replaces light Luton vans with heavy-duty 4x4 turbo-diesel pickups and executive shuttles built for interstate terrain.",
     href: "/cars?category=Pickup+%26+Shuttle",
     cta: "View pickups & shuttles",
   },
@@ -206,15 +230,15 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     code: "host_marketplace",
     eyebrow: "06 · Dual-Role Fleet Marketplace",
     title: "Host & Commercial Partner Fleet Monetization",
-    subtitle: "Turn idle vehicles into high-yield NGN/USD cashflow",
+    subtitle: "Turn idle vehicles into high-yield recurring cashflow",
     dailySurchargeNgn: 0,
     priceTag: "Earn ₦1.2M–₦4.5M /mo",
     description:
-      "Unlike Europcar's closed franchise inventory, Izzac empowers verified Nigerian car owners and fleet operators to list vehicles and manage bookings from one account.",
+      "Unlike Europcar's closed franchise inventory, Izzac empowers verified car owners and fleet operators to list vehicles and manage bookings from one account.",
     highlights: [
-      "List as Chauffeur-Only (your driver or Izzac's) or Verified Self-Drive",
+      "List as Chauffeur-Only (your driver or Izzac's) or Evaluated Self-Drive",
       "Direct garage & reservation workspace with instant host/rider view switching",
-      "Protected against inflation with dynamic daily pricing and corporate demand",
+      "Protected with dynamic daily pricing, guest driving evaluation, and motor insurance",
     ],
     europcarUpgradeNote:
       "Combines enterprise rental reliability with decentralized P2P supply so riders get newer trims and hosts build recurring wealth.",
@@ -232,10 +256,10 @@ export const SERVICE_TYPE_OPTIONS: {
 }[] = [
   {
     code: "self_drive",
-    label: "Verified Self-Drive (NIN / FRSC)",
+    label: "Evaluated Self-Drive (Post-Trial + Exam)",
     shortLabel: "Self-Drive",
     dailyRateNgn: 0,
-    description: "Drive yourself after instant digital license & NIN verification.",
+    description: "Drive yourself after completing Chauffeur Trial & Driving Test.",
   },
   {
     code: "chauffeur",
@@ -287,31 +311,195 @@ export const PICKUP_MODE_OPTIONS: PickupModeOption[] = [
   },
 ];
 
+export const INSURANCE_PLAN_OPTIONS: InsurancePlanOption[] = [
+  {
+    code: "third_party_niid",
+    name: "Statutory Third-Party Motor Insurance (NIID Verified)",
+    underwriter: "Leadway Assurance / AXA Mansard Partner Pool",
+    badge: "Mandatory Baseline",
+    dailyRateNgn: 0,
+    coverageLimitNgn: 3000000,
+    summary:
+      "Statutory National Motor Insurance Database (NIID) third-party bodily injury and property damage cover up to ₦3,000,000.",
+    coverageItems: [
+      "Live NIID policy certificate issued per booking for highway verification",
+      "Up to ₦3,000,000 third-party property damage & bodily injury liability",
+      "Renter remains liable for own-vehicle collision damage unless upgraded",
+    ],
+  },
+  {
+    code: "comprehensive_shield",
+    name: "Comprehensive Motor + Pothole, Tyre & Flood Insurance",
+    underwriter: "AXA Mansard / Leadway Comprehensive Pool",
+    badge: "Recommended Insurance",
+    dailyRateNgn: 15000,
+    coverageLimitNgn: 45000000,
+    summary:
+      "Full accidental collision cover up to ₦45M plus pothole tyre/rim burst, windscreen chips, and flood-corridor protection (80% excess waiver).",
+    coverageItems: [
+      "Comprehensive own-damage & collision cover up to ₦45,000,000",
+      "Covers pothole tyre sidewall/rim damage, windscreen chips & flood recovery",
+      "80% reduction in renter deductible + 24/7 claims & rescue coordination",
+    ],
+  },
+  {
+    code: "zero_excess_all_risk",
+    name: "Executive Zero-Excess All-Risk + SRCC Insurance",
+    underwriter: "Leadway Executive Fleet Syndicate",
+    badge: "Zero Deductible",
+    dailyRateNgn: 28000,
+    coverageLimitNgn: 150000000,
+    summary:
+      "₦0 excess liability, comprehensive collision/theft/fire up to ₦150M, Strike/Riot/Civil Commotion (SRCC) extension, and 2-hour replacement car.",
+    coverageItems: [
+      "₦0 excess / deductible on collision, theft, fire & vandalism claims",
+      "Includes Strike, Riot & Civil Commotion (SRCC) + ₦2.5M Personal Accident medical cover",
+      "Guaranteed 2-hour replacement vehicle SLA in Lagos, Abuja & Port Harcourt",
+    ],
+  },
+];
+
+export const SELF_DRIVE_TRIAL_STAGES = [
+  {
+    stage: "Stage 01",
+    title: "Mandatory Chauffeur-Driven Trial Period",
+    subtitle: "Required for all new Izzac accounts",
+    description:
+      "Every new user starts in Chauffeur-Driven mode for their initial trial booking. Our vetted driver handles navigation while our operations team verifies your identity, punctuality, and trip conduct.",
+  },
+  {
+    stage: "Stage 02",
+    title: "Driver License, ID & Driving Test Evaluation",
+    subtitle: "80% minimum passing score + 2+ years experience",
+    description:
+      "Once your Chauffeur Trial Period is recorded, complete our 5-question Highway Code, wet-season flood protocol, and defensive driving evaluation alongside License & 11-digit ID verification.",
+  },
+  {
+    stage: "Stage 03",
+    title: "Verified Self-Drive + Active Motor Insurance",
+    subtitle: "Instant paperless key handover unlocked",
+    description:
+      "Receive your digital Izzac Self-Drive Clearance Certificate (IZZAC-SD) and book any eligible vehicle in Self-Drive mode backed by NIID-verified Comprehensive or Zero-Excess Motor Insurance.",
+  },
+];
+
+export const DRIVING_TEST_QUESTIONS: DrivingTestQuestion[] = [
+  {
+    id: "q1",
+    question:
+      "1. Under the Highway Code, what is the maximum legal speed limit for a passenger car on a multi-lane expressway in dry conditions?",
+    options: [
+      { id: "a", label: "80 km/h" },
+      { id: "b", label: "100 km/h" },
+      { id: "c", label: "130 km/h" },
+    ],
+    correctOptionId: "b",
+    explanation:
+      "Highway Code regulations set the maximum expressway speed limit for private passenger cars at 100 km/h.",
+  },
+  {
+    id: "q2",
+    question:
+      "2. When approaching a flooded urban or expressway corridor during heavy rain, what is the mandatory Izzac self-drive protocol?",
+    options: [
+      {
+        id: "a",
+        label: "Accelerate at high RPM through deep standing water",
+      },
+      {
+        id: "b",
+        label:
+          "Never enter water above tyre hub/exhaust level; halt safely and reroute or contact Izzac 24/7 Operations",
+      },
+      {
+        id: "c",
+        label: "Switch off hazard lights and tailgate the vehicle ahead",
+      },
+    ],
+    correctOptionId: "b",
+    explanation:
+      "Driving into standing water above hub height risks engine hydrolock; stopping and rerouting keeps both driver and Comprehensive Flood Insurance valid.",
+  },
+  {
+    id: "q3",
+    question:
+      "3. What is the minimum safe following distance behind another vehicle on a high-speed bridge or airport expressway in wet weather?",
+    options: [
+      {
+        id: "a",
+        label: "At least a 4-second gap (double the dry 2-second rule)",
+      },
+      { id: "b", label: "One car length at 90 km/h" },
+      { id: "c", label: "Half a second if ABS is active" },
+    ],
+    correctOptionId: "a",
+    explanation:
+      "Heavy rain and surface oil film double stopping distances; a minimum 4-second gap is mandatory.",
+  },
+  {
+    id: "q4",
+    question:
+      "4. Before taking a self-drive vehicle outside your pickup metro hub (e.g., Lagos to Ibadan or Abuja to Kaduna), what clearance is required?",
+    options: [
+      { id: "a", label: "No notification is needed" },
+      {
+        id: "b",
+        label:
+          "Active Interstate Corridor Clearance Pass on the booking + verified NIID Motor Insurance certificate",
+      },
+      { id: "c", label: "Disconnecting the vehicle GPS telemetry unit" },
+    ],
+    correctOptionId: "b",
+    explanation:
+      "All cross-corridor movements require an active Interstate Corridor Pass and NIID insurance certificate for highway checkpoints and AA Rescue coverage.",
+  },
+  {
+    id: "q5",
+    question:
+      "5. In the event of a minor traffic incident or pothole tyre burst, what is the first required action under your Motor Insurance policy?",
+    options: [
+      {
+        id: "a",
+        label: "Use an unapproved roadside mechanic without reporting",
+      },
+      {
+        id: "b",
+        label:
+          "Move to a safe spot, activate hazards, capture timestamped photos, and alert Izzac 24/7 Rescue & Insurance Desk immediately",
+      },
+      { id: "c", label: "Abandon the vehicle unlocked on the highway" },
+    ],
+    correctOptionId: "b",
+    explanation:
+      "Immediate timestamped reporting activates your motor insurance cover and dispatches authorized tyre/flatbed support.",
+  },
+];
+
 export const PROTECTION_PLAN_OPTIONS: ProtectionPlanOption[] = [
   {
     code: "basic",
-    name: "Basic Statutory & FRSC Compliance",
+    name: "Basic Statutory & Roadworthiness Compliance",
     badge: "Included",
     dailyRateNgn: 0,
     summary:
       "NIID-verified third-party liability insurance, valid vehicle papers, and 24/7 phone support.",
     coverageItems: [
       "NIID statutory third-party liability cover",
-      "Complete FRSC & VIO roadworthiness documentation pack",
+      "Complete roadworthiness documentation pack",
       "Standard security deposit & damage deductible applies",
     ],
   },
   {
     code: "medium",
-    name: "Naija Road, Tyre & Flood Shield",
-    badge: "Most Popular in NG",
+    name: "Road, Tyre & Flood Shield",
+    badge: "Most Popular",
     dailyRateNgn: 12000,
     summary:
-      "Engineered for Nigerian road realities: covers pothole tyre/rim damage, windscreen chips, and reduces excess by 50%.",
+      "Engineered for real-world road conditions: covers pothole tyre/rim damage, windscreen chips, and reduces excess by 50%.",
     coverageItems: [
       "100% tyre sidewall, rim & pothole impact protection",
       "Windscreen, headlamp & wing-mirror chip waiver",
-      "Rainy-season flood & water-logged corridor recovery assistance",
+      "Wet-season flood & water-logged corridor recovery assistance",
     ],
   },
   {
@@ -350,17 +538,17 @@ export const BOOKING_ADDON_OPTIONS: BookingAddonOption[] = [
   },
   {
     code: "wifi_hotspot",
-    name: "5G In-Car Wi-Fi Router (Starlink / MTN 5G)",
+    name: "5G In-Car Wi-Fi Router (Starlink / 5G)",
     badge: "Mobile Office",
     billing: "daily",
     amountNgn: 8500,
     description:
-      "Unlimited high-speed cabin Wi-Fi for up to 8 devices so executives work uninterrupted in Lagos or Abuja traffic.",
+      "Unlimited high-speed cabin Wi-Fi for up to 8 devices so executives work uninterrupted on the move.",
   },
   {
     code: "interstate_pass",
     name: "Interstate Corridor Clearance & AA Rescue",
-    badge: "Cross-State",
+    badge: "Cross-Corridor",
     billing: "flat",
     amountNgn: 35000,
     description:
@@ -388,22 +576,40 @@ export const BOOKING_ADDON_OPTIONS: BookingAddonOption[] = [
 
 export const EUROPCAR_COMPETITOR_BENCHMARK: CompetitorBenchmarkRow[] = [
   {
+    capability: "Graduated Self-Drive & Driving Test Evaluation",
+    izzacAdvantage:
+      "New users complete a Chauffeur-Driven trial period first, then pass the License/ID Driving Test Evaluation (80%+) to unlock Self-Drive.",
+    europcarStandard:
+      "Hands keys to any first-time renter with a credit card deposit hold, exposing fleet owners to unvetted road risk.",
+    africanMarketImpact:
+      "Eliminates vehicle diversion and reckless driving while rewarding safe drivers with zero-deposit paperless Self-Drive.",
+  },
+  {
+    capability: "Verified Motor Insurance & Road Protection",
+    izzacAdvantage:
+      "Every trip includes an NIID-verified Third-Party policy with 1-click upgrades to Comprehensive Pothole/Flood Insurance (+₦15k/d) or Zero-Excess All-Risk + SRCC (+₦28k/d).",
+    europcarStandard:
+      "Standard CDW frequently excludes potholes, tyre bursts, rims, underbody, and civil commotion in fine print.",
+    africanMarketImpact:
+      "Provides legally verifiable insurance certificates at highway checkpoints plus real pothole and flood cover.",
+  },
+  {
     capability: "Drive Mode & Chauffeur Integration",
     izzacAdvantage:
-      "Instant toggle between Verified Self-Drive and Vetted Corporate Chauffeur (+₦25k/day) on every car.",
+      "Instant toggle between Evaluated Self-Drive and Vetted Corporate Chauffeur (+₦25k/day) on every car.",
     europcarStandard:
-      "Built around European self-drive counters; chauffeur bookings require separate manual quotes.",
+      "Built around self-drive counters; chauffeur bookings require separate manual quotes.",
     africanMarketImpact:
-      "Over 75% of Nigerian corporate, diplomatic, and diaspora riders prefer a route-savvy local driver.",
+      "Over 75% of corporate, diplomatic, and executive riders prefer a route-savvy local driver.",
   },
   {
     capability: "Executive Security & Protocol Add-Ons",
     izzacAdvantage:
       "On-demand MOPOL / protocol security escort, convoy coordination, and biometric/armored-ready SUVs.",
     europcarStandard:
-      "Offers European seasonal extras (ski racks, snow chains, winter tyres) irrelevant to West/East Africa.",
+      "Offers seasonal extras (ski racks, snow chains, winter tyres) unsuited to executive urban & highway transit.",
     africanMarketImpact:
-      "Essential for oil & gas executives, diplomats, VIP events, and interstate highway movements.",
+      "Essential for energy executives, diplomats, VIP events, and interstate highway movements.",
   },
   {
     capability: "Fuel Scarcity & Queue Protection",
@@ -412,16 +618,16 @@ export const EUROPCAR_COMPETITOR_BENCHMARK: CompetitorBenchmarkRow[] = [
     europcarStandard:
       "Standard full-to-full policy with penalty surcharges if renter cannot refuel before return.",
     africanMarketImpact:
-      "Eliminates trip delays during periodic PMS supply bottlenecks in Lagos, Abuja, and regional hubs.",
+      "Eliminates trip delays during periodic fuel station bottlenecks across major hubs.",
   },
   {
     capability: "Road, Pothole & Rainy-Season Protection",
     izzacAdvantage:
-      "Naija Road Shield explicitly covers pothole tyre/rim damage, windscreen chips, and flood recovery.",
+      "Road, Tyre & Flood Shield explicitly covers pothole tyre/rim damage, windscreen chips, and flood recovery.",
     europcarStandard:
       "Standard CDW often excludes tyres, rims, underbody, and water-logged road incidents in fine print.",
     africanMarketImpact:
-      "Protects renters from surprise deductions caused by uneven roads or tropical downpours.",
+      "Protects renters from surprise deductions caused by uneven roads or heavy downpours.",
   },
   {
     capability: "Duration Discounts & Monthly SuperFlex",
@@ -430,7 +636,7 @@ export const EUROPCAR_COMPETITOR_BENCHMARK: CompetitorBenchmarkRow[] = [
     europcarStandard:
       "Long-term corporate rates locked behind offline B2B account managers and rigid credit checks.",
     africanMarketImpact:
-      "Gives SMEs, startups, and diaspora visitors instant asset-light fleet access without 28%+ bank auto loans.",
+      "Gives enterprises, startups, and visiting teams instant asset-light fleet access without high-interest auto loans.",
   },
   {
     capability: "Currency & Local Payment Rails",
@@ -439,7 +645,7 @@ export const EUROPCAR_COMPETITOR_BENCHMARK: CompetitorBenchmarkRow[] = [
     europcarStandard:
       "Prices often quoted in EUR/USD with steep FX conversion spreads and international credit card holds.",
     africanMarketImpact:
-      "Transparent local Naira pricing for domestic riders alongside USD clarity for international teams.",
+      "Transparent local currency pricing for domestic riders alongside USD clarity for international teams.",
   },
   {
     capability: "Fleet Supply & Vehicle Freshness",
@@ -455,20 +661,20 @@ export const EUROPCAR_COMPETITOR_BENCHMARK: CompetitorBenchmarkRow[] = [
 export const AFRICAN_REGIONAL_HUBS: RegionalHub[] = [
   {
     city: "Lagos (Island & Mainland)",
-    country: "Nigeria",
+    country: "West Corridor",
     airportCode: "LOS",
     airportName: "Murtala Muhammed Int'l & MMA2",
     corridors: "Victoria Island · Ikoyi · Lekki Phase 1 · Ikeja GRA · Surulere · Yaba",
     servicesAvailable: [
       "Airport VIP Meet & Greet",
       "Chauffeur & MOPOL Convoy",
-      "Verified Self-Drive",
+      "Evaluated Self-Drive",
       "2-Hr Standby Relief Car",
     ],
   },
   {
-    city: "Abuja (Federal Capital Territory)",
-    country: "Nigeria",
+    city: "Abuja (Central Capital District)",
+    country: "Capital Hub",
     airportCode: "ABV",
     airportName: "Nnamdi Azikiwe Int'l Airport",
     corridors: "Maitama · Asokoro · Wuse II · Central Business District · Jabi",
@@ -481,10 +687,10 @@ export const AFRICAN_REGIONAL_HUBS: RegionalHub[] = [
   },
   {
     city: "Port Harcourt (Energy Corridor)",
-    country: "Nigeria",
+    country: "South Hub",
     airportCode: "PHC",
     airportName: "Port Harcourt Int'l Airport (Omagwa)",
-    corridors: "Old & New GRA · Trans-Amadi · Onne Oil & Gas Free Zone",
+    corridors: "Old & New GRA · Trans-Amadi · Onne Energy Free Zone",
     servicesAvailable: [
       "Hilux 4x4 & Field Pickups",
       "MOPOL Escort Integration",
@@ -494,7 +700,7 @@ export const AFRICAN_REGIONAL_HUBS: RegionalHub[] = [
   },
   {
     city: "Kano, Ibadan & Enugu",
-    country: "Nigeria",
+    country: "Regional Hubs",
     airportCode: "KAN / ENU / IBA",
     airportName: "Mallam Aminu Kano · Akanu Ibiam · Ibadan Corridor",
     corridors: "Nassarawa GRA Kano · Bodija Ibadan · Independence Layout Enugu",
@@ -505,13 +711,13 @@ export const AFRICAN_REGIONAL_HUBS: RegionalHub[] = [
     ],
   },
   {
-    city: "Accra & Nairobi (Pan-African Partner Desks)",
-    country: "Ghana & Kenya",
+    city: "Accra & Nairobi (Partner Desks)",
+    country: "International Hubs",
     airportCode: "ACC / NBO",
     airportName: "Kotoka Int'l (Accra) · Jomo Kenyatta Int'l (Nairobi)",
     corridors: "Airport Residential & Cantonments (Accra) · Westlands & Karen (Nairobi)",
     servicesAvailable: [
-      "ECOWAS & East Africa Cross-Hub Booking",
+      "Cross-Hub Executive Booking",
       "Multi-Currency Billing (GH₵ / KSh / $)",
       "Executive Airport Transfers",
     ],
@@ -524,7 +730,7 @@ export const IZZAC_PRIVILEGE_TIERS: PrivilegeTier[] = [
     threshold: "Instant upon sign-up (0+ days)",
     discount: "10% off 7+ day weekly bookings",
     perks: [
-      "One-time digital NIN/FRSC verification badge for paperless pickups",
+      "One-time digital License/ID verification badge for paperless pickups",
       "Free flight-delay protection on all Airport Meet & Greet bookings",
       "Single unified account for both booking rides and hosting vehicles",
     ],
@@ -535,7 +741,7 @@ export const IZZAC_PRIVILEGE_TIERS: PrivilegeTier[] = [
     discount: "15% off multi-day + Free 5G Cabin Wi-Fi",
     perks: [
       "Complimentary vehicle class upgrade (e.g., Sedan to Crossover SUV) when available",
-      "Priority vehicle allocation during peak December ('Detty December') & Sallah/Easter periods",
+      "Priority vehicle allocation during peak holiday & conference periods",
       "Dedicated WhatsApp & phone concierge with 2-hour replacement vehicle guarantee",
     ],
   },
@@ -545,7 +751,7 @@ export const IZZAC_PRIVILEGE_TIERS: PrivilegeTier[] = [
     discount: "22% Monthly SuperFlex + Protocol Perks",
     perks: [
       "Complimentary VIP Domestic Lounge pass at MMA2 Lagos & Abuja terminals",
-      "Consolidated monthly NGN/USD corporate invoicing with 14-day net LPO terms",
+      "Consolidated monthly corporate invoicing with 14-day net LPO terms",
       "Priority access to flagship fleet (Land Cruiser 300 GR Sport, GLE 450, V250d Avantgarde)",
     ],
   },
@@ -554,9 +760,9 @@ export const IZZAC_PRIVILEGE_TIERS: PrivilegeTier[] = [
 export const platformFeatureCards: FeatureCard[] = [
   {
     eyebrow: "Discovery",
-    title: "Browse 32+ Nigeria-ready vehicles",
+    title: "Browse 32+ executive & field vehicles",
     description:
-      "Filter by city hub (Lagos, Abuja, PH, Kano), service mode (Chauffeur, Self-Drive, Airport VIP), or daily NGN/USD budget.",
+      "Filter by city hub (Lagos, Abuja, PH, Kano), service mode (Chauffeur, Self-Drive, Airport VIP), or daily budget.",
     href: "/cars",
     cta: "Browse fleet",
   },
@@ -570,9 +776,9 @@ export const platformFeatureCards: FeatureCard[] = [
   },
   {
     eyebrow: "Smart Booking",
-    title: "Configure protection, fuel & Wi-Fi live",
+    title: "Configure insurance, road shield & fuel live",
     description:
-      "Select Naija Road & Tyre Shield, prepaid full-tank fuel, and 5G cabin Wi-Fi with instant itemized pricing.",
+      "Select Verified Motor Insurance, Road & Tyre Shield, prepaid full-tank fuel, and 5G cabin Wi-Fi with instant itemized pricing.",
     href: "/cars",
     cta: "Start booking",
   },
@@ -580,7 +786,7 @@ export const platformFeatureCards: FeatureCard[] = [
     eyebrow: "Corporate SuperFlex",
     title: "Save up to 22% on weekly & monthly plans",
     description:
-      "Automatic 10% weekly and 22% monthly discounts with standby replacement vehicles for businesses and diaspora stays.",
+      "Automatic 10% weekly and 22% monthly discounts with standby replacement vehicles for businesses and extended stays.",
     href: "/services#calculator",
     cta: "Calculate savings",
   },
@@ -588,7 +794,7 @@ export const platformFeatureCards: FeatureCard[] = [
     eyebrow: "Hosting",
     title: "Monetize your vehicle or commercial fleet",
     description:
-      "Publish your car for chauffeur-driven or verified self-drive bookings and earn recurring NGN revenue.",
+      "Publish your car for chauffeur-driven or evaluated self-drive bookings and earn recurring host revenue.",
     href: "/dashboard/add-car",
     cta: "List your car",
   },
@@ -596,7 +802,7 @@ export const platformFeatureCards: FeatureCard[] = [
     eyebrow: "Dashboards",
     title: "Track rider & host reservations in one place",
     description:
-      "Review confirmed trips, service modes, protection tiers, and host-side demand from your unified workspace.",
+      "Review confirmed trips, service modes, insurance certificates, and host-side demand from your unified workspace.",
     href: "/dashboard/bookings",
     cta: "Open bookings",
   },
@@ -604,24 +810,24 @@ export const platformFeatureCards: FeatureCard[] = [
 
 export const riderJourney: JourneyStep[] = [
   {
-    title: "Choose your city hub & service mode",
+    title: "Start with your Chauffeur-Driven trial trip",
     description:
-      "Filter live inventory across Lagos, Abuja, Port Harcourt, Kano, Ibadan, or Enugu for Chauffeur-Driven, Self-Drive, or Airport VIP transfer.",
+      "All new accounts begin with a Chauffeur-Driven trial booking in Lagos, Abuja, Port Harcourt, or Kano so our team verifies your profile and trip conduct.",
   },
   {
-    title: "Inspect Nigeria-tuned specs & road readiness",
+    title: "Pass the License/ID Driving Test Evaluation",
     description:
-      "Review ground clearance, AC performance, nearest airport desk (LOS, ABV, PHC), and equipment before selecting dates.",
+      "Complete our 5-question Highway Code, flood-corridor, and defensive driving evaluation (80%+ passing score) to unlock Evaluated Self-Drive.",
   },
   {
-    title: "Customize protection & African mobility extras",
+    title: "Select Verified Motor Insurance & Road Shield",
     description:
-      "Add Naija Road & Tyre Shield, Prepaid Full-Tank Fuel (skip fuel queues), 5G Cabin Wi-Fi, or Executive Security Escort.",
+      "Choose Statutory Third-Party (NIID), Comprehensive Pothole & Flood Insurance (+₦15k/day), or Executive Zero-Excess All-Risk + SRCC (+₦28k/day).",
   },
   {
-    title: "Confirm & track from your bookings ledger",
+    title: "Confirm & track with live policy certificates",
     description:
-      "Lock in instant daily, weekly (-10%), or monthly SuperFlex (-22%) pricing and manage every trip from your dashboard.",
+      "Lock in daily, weekly (-10%), or monthly SuperFlex (-22%) pricing with an auto-issued NIID insurance certificate reference on every booking.",
   },
 ];
 
@@ -629,22 +835,22 @@ export const hostJourney: JourneyStep[] = [
   {
     title: "Onboard as an individual owner or fleet partner",
     description:
-      "Use the host portal to register your account and decide whether your vehicle will operate Chauffeur-Driven, Self-Drive, or both.",
+      "Use the host portal to register your account and decide whether your vehicle will operate Chauffeur-Driven, Evaluated Self-Drive, or both.",
   },
   {
-    title: "Publish a complete Nigeria-ready listing",
+    title: "Publish a complete executive listing",
     description:
-      "Set your daily NGN rate, city hub (e.g. Victoria Island, Lekki, Maitama), vehicle specs, and upload high-resolution photos.",
+      "Set your daily rate, city hub (e.g. Victoria Island, Lekki, Maitama), vehicle specs, and upload high-resolution photos.",
   },
   {
     title: "Manage your garage & corporate availability",
     description:
-      "Keep track of all vehicles in your garage and tap into high-yield corporate, airport transfer, and diaspora demand.",
+      "Keep track of all vehicles in your garage and tap into high-yield corporate, airport transfer, and executive demand.",
   },
   {
-    title: "Monitor host-side bookings & service add-ons",
+    title: "Monitor host-side bookings & insurance certificates",
     description:
-      "Switch your bookings dashboard into host view to inspect upcoming dates, drive modes, protection tiers, and earnings.",
+      "Switch your bookings dashboard into host view to inspect upcoming dates, drive modes, motor insurance certificates, and earnings.",
   },
 ];
 
@@ -653,7 +859,7 @@ export const hostFeatureCards: FeatureCard[] = [
     eyebrow: "Chauffeur or Self-Drive",
     title: "Protect your asset with chauffeur-inclusive hosting",
     description:
-      "In Nigeria, many owners prefer a trusted driver behind the wheel. Pair your car with your own vetted driver or Izzac's corporate chauffeur pool.",
+      "Many owners prefer a trusted driver behind the wheel. Pair your car with your own vetted driver or Izzac's corporate chauffeur pool.",
     href: "/dashboard/add-car",
     cta: "Create a listing",
   },
@@ -662,11 +868,11 @@ export const hostFeatureCards: FeatureCard[] = [
     title: "Manage single vehicles or multi-car commercial fleets",
     description:
       "Your garage dashboard centralizes every sedan, SUV, and 4x4 pickup you operate across Lagos, Abuja, and Port Harcourt.",
-    href: "/dashboard",
-    cta: "Open garage",
+    href: "/dashboard/host",
+    cta: "Open host garage",
   },
   {
-    eyebrow: "Corporate & Diaspora Demand",
+    eyebrow: "Corporate & Executive Demand",
     title: "Capture weekly, monthly & airport transfer bookings",
     description:
       "Unlike traditional car hire desks, your listing automatically participates in Izzac's Airport VIP, Chauffeur, and Monthly SuperFlex channels.",
@@ -687,11 +893,11 @@ export const hostWorkflow: WorkflowStage[] = [
   {
     title: "Before you publish",
     description:
-      "Prepare your vehicle for Nigerian executive and commuter standards so it commands top daily and monthly occupancy.",
+      "Prepare your vehicle for executive and commuter standards so it commands top daily and monthly occupancy.",
     items: [
-      "Verify chilled AC, tyres, NIID insurance, and FRSC roadworthiness papers",
-      "Decide between Chauffeur-Driven, Verified Self-Drive, or dual-mode availability",
-      "Set competitive daily NGN pricing (weekly -10% & monthly -22% apply automatically)",
+      "Verify chilled AC, tyres, NIID motor insurance, and roadworthiness papers",
+      "Decide between Chauffeur-Driven, Evaluated Self-Drive, or dual-mode availability",
+      "Set competitive daily pricing (weekly -10% & monthly -22% apply automatically)",
     ],
   },
   {
@@ -699,7 +905,7 @@ export const hostWorkflow: WorkflowStage[] = [
     description:
       "Your vehicle is indexed across City Hubs, Airport Transfer desks, and Corporate SuperFlex searches.",
     items: [
-      "Riders can add Chauffeur service, Naija Road Shield, and Prepaid Fuel at checkout",
+      "Riders can add Chauffeur service, Motor Insurance, Road Shield, and Prepaid Fuel at checkout",
       "Airport flight-tracking & doorstep delivery fees are calculated transparently",
       "Automatic overlap protection prevents double-booking across dates",
     ],
@@ -707,10 +913,10 @@ export const hostWorkflow: WorkflowStage[] = [
   {
     title: "During & after trips",
     description:
-      "Track every reservation, service mode, and protection package from your unified workspace.",
+      "Track every reservation, service mode, and motor insurance policy from your unified workspace.",
     items: [
       "Monitor active and upcoming reservations in Host Bookings mode",
-      "Protected by tiered renter coverage and AA Rescue roadside support",
+      "Protected by tiered motor insurance, guest driving tests, and 24/7 roadside support",
       "Scale from a single car to a multi-city commercial fleet on one account",
     ],
   },
@@ -720,17 +926,17 @@ export const hostFaqs: FaqItem[] = [
   {
     question: "Can I list my car as Chauffeur-Driven only instead of Self-Drive?",
     answer:
-      "Yes. Unlike European platforms that force self-drive handovers, Izzac is built for the Nigerian market—you can supply your own trusted driver or tap into Izzac's vetted corporate chauffeur pool.",
+      "Yes. Unlike platforms that force self-drive handovers, you can supply your own trusted driver or tap into Izzac's vetted corporate chauffeur pool—and any Self-Drive guest must first complete a Chauffeur Trial and pass our ≥80% Driving Test.",
   },
   {
     question: "How does Izzac improve on traditional franchises like Europcar for hosts and fleet owners?",
     answer:
-      "Europcar operates a closed franchise fleet. Izzac opens enterprise-grade booking channels (Airport VIP Meet & Greet, Corporate Monthly SuperFlex, and Executive Convoy bookings) to verified private owners and local fleet operators.",
+      "Europcar operates a closed franchise fleet. Izzac opens enterprise-grade booking channels (Airport VIP Meet & Greet, Corporate Monthly SuperFlex, and Executive Convoy bookings) to verified private owners and fleet operators.",
   },
   {
-    question: "How are potholes, tyre damage, and Nigerian road hazards handled?",
+    question: "How are potholes, tyre damage, and motor insurance handled?",
     answer:
-      "Riders can select Naija Road, Tyre & Flood Shield (+₦12,000/day) or Executive Zero-Excess Protection (+₦25,000/day) at checkout, backed by 24/7 AA Rescue recovery.",
+      "Every booking includes NIID-verified Motor Insurance (Third-Party, Comprehensive +₦15k/day, or All-Risk Zero-Excess +₦28k/day) plus optional Road, Tyre & Flood Shield (+₦12,000/day), backed by 24/7 AA Rescue recovery.",
   },
   {
     question: "What cities and airport hubs are supported?",
