@@ -1,84 +1,138 @@
-// src/app/list-car/page.tsx
 "use client";
 
-import Link from 'next/link';
-import { useAuth } from '../../../context/AuthContext';
-import { hostFeatureCards, hostJourney } from '../../../lib/productContent';
+import Link from "next/link";
+import { useAuth } from "../../../context/AuthContext";
+import { hostFeatureCards, hostJourney } from "../../../lib/productContent";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
+import { Card } from "../../../components/ui/card";
+
+const bentoSpans = [
+  "md:col-span-7",
+  "md:col-span-5",
+  "md:col-span-5",
+  "md:col-span-7",
+];
 
 const ListCarPage = () => {
   const { isAuthenticated, isLoading } = useAuth();
-  const primaryHref = !isLoading && isAuthenticated ? '/dashboard/add-car' : '/signup?role=host';
-  const primaryLabel = !isLoading && isAuthenticated ? 'Go to add car' : 'Create host account';
+  const primaryHref =
+    !isLoading && isAuthenticated ? "/dashboard/add-car" : "/signup?role=host";
+  const primaryLabel =
+    !isLoading && isAuthenticated ? "Go to add car" : "Create host account";
 
   return (
-    <div className="bg-gradient-to-b from-emerald-50 via-white to-white">
-      <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-16">
-        <div className="max-w-3xl">
-          <p className="text-emerald-700 font-semibold uppercase tracking-[0.22em] text-xs mb-3">List a car</p>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+    <div className="bg-background">
+      <section className="max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-14 md:pt-16 md:pb-20">
+        <div className="max-w-3xl space-y-5">
+          <Badge variant="emerald">List a car</Badge>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-[-0.035em] leading-[1.08]">
             Launch your listing with the same tools hosts use across the full app.
           </h1>
-          <p className="text-gray-600 mt-4 text-lg">
+          <p className="text-muted-foreground text-base md:text-lg max-w-[60ch] leading-relaxed">
             This page now acts as the public entry to hosting: it explains listing creation, garage management,
             and host-side bookings before sending you into the protected add-car flow.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            <Link href={primaryHref} className="px-5 py-3 rounded-lg bg-emerald-600 text-white font-semibold text-center hover:bg-emerald-700 transition">
-              {primaryLabel}
-            </Link>
-            <Link href="/host" className="px-5 py-3 rounded-lg border border-emerald-600 text-emerald-700 font-semibold text-center hover:bg-emerald-50 transition">
-              Explore host features
-            </Link>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Button asChild size="lg">
+              <Link href={primaryHref}>{primaryLabel}</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/host">Explore host features</Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-          {hostFeatureCards.map((feature) => (
-            <div key={feature.title} className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-700 font-semibold">{feature.eyebrow}</p>
-              <h2 className="text-xl font-semibold text-gray-900 mt-3">{feature.title}</h2>
-              <p className="text-sm text-gray-600 mt-2 leading-6">{feature.description}</p>
-              <Link href={feature.href} className="inline-flex mt-4 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
-                {feature.cta}
-              </Link>
-            </div>
+      {/* Taste-Skill: Asymmetric 12-col Bento Grid */}
+      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+          {hostFeatureCards.map((feature, index) => (
+            <Card
+              key={feature.title}
+              className={`${bentoSpans[index % bentoSpans.length]} p-6 md:p-7 flex flex-col justify-between hover:border-stone-300 hover:shadow-elevated stagger-item`}
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary">{feature.eyebrow}</Badge>
+                  <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                    0{index + 1}
+                  </span>
+                </div>
+                <h2 className="text-xl font-semibold text-foreground tracking-[-0.02em] pt-1">
+                  {feature.title}
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-[54ch]">
+                  {feature.description}
+                </p>
+              </div>
+              <div className="pt-5">
+                <Link
+                  href={feature.href}
+                  className="group inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-emerald-900 transition-colors duration-150"
+                >
+                  <span>{feature.cta}</span>
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform duration-150 ease-out-quart group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
+                </Link>
+              </div>
+            </Card>
           ))}
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-12">
-        <div className="rounded-[2rem] bg-gray-900 text-white p-6 md:p-8">
-          <p className="text-emerald-300 font-semibold uppercase tracking-[0.22em] text-xs mb-3">Host journey</p>
-          <h2 className="text-3xl font-bold">What happens after you decide to list</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-6">
+      {/* Impeccable: Flattened architectural dark ledger (no card-in-card nesting) */}
+      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
+        <div className="rounded-2xl bg-[#0d1713] text-stone-100 p-7 md:p-10 border border-emerald-950 shadow-elevated">
+          <div className="space-y-2 pb-8 border-b border-white/10">
+            <Badge variant="dark">Host journey</Badge>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-stone-50 pt-1">
+              What happens after you decide to list
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/10 pt-6">
             {hostJourney.map((step, index) => (
-              <div key={step.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm font-semibold text-emerald-300">Step {index + 1}</p>
-                <h3 className="text-lg font-semibold mt-2">{step.title}</h3>
-                <p className="text-sm text-gray-200 mt-2">{step.description}</p>
+              <div
+                key={step.title}
+                className="py-5 md:py-2 md:px-6 first:pt-0 md:first:pl-0 last:pb-0 md:last:pr-0 space-y-2"
+              >
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300 tabular-nums">
+                  Step {index + 1}
+                </p>
+                <h3 className="text-lg font-semibold text-stone-50 tracking-[-0.015em]">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-stone-300/90 leading-relaxed">
+                  {step.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
-        <div className="rounded-[2rem] border border-emerald-100 bg-emerald-50 p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Ready to move from interest to inventory?</h2>
-            <p className="text-gray-600 mt-3">
+      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+        <div className="rounded-2xl border border-border/90 bg-secondary/50 p-7 md:p-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="max-w-2xl space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-[-0.025em]">
+              Ready to move from interest to inventory?
+            </h2>
+            <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
               If you are signed in, head straight to the add-car page. If not, create a host account first and then publish your listing.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link href={primaryHref} className="px-5 py-3 rounded-lg bg-emerald-600 text-white font-semibold text-center hover:bg-emerald-700 transition">
-              {primaryLabel}
-            </Link>
-            <Link href="/dashboard/bookings" className="px-5 py-3 rounded-lg border border-gray-300 text-gray-900 font-semibold text-center hover:bg-white transition">
-              See host bookings
-            </Link>
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Button asChild size="lg">
+              <Link href={primaryHref}>{primaryLabel}</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/dashboard/bookings">See host bookings</Link>
+            </Button>
           </div>
         </div>
       </section>

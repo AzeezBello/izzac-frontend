@@ -1,8 +1,10 @@
-// src/components/UserBookings.tsx
 "use client";
 
-import { useEffect, useState } from 'react';
-import api from '../lib/api';
+import { useEffect, useState } from "react";
+import api from "../lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Alert, AlertDescription } from "./ui/alert";
 
 type Booking = {
   id: number;
@@ -18,36 +20,51 @@ const UserBookings = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await api.get<Booking[]>('/bookings/');
+        const response = await api.get<Booking[]>("/bookings/");
         setBookings(response.data);
       } catch (err) {
-        console.error('Failed to fetch bookings:', err);
-        setError('Failed to fetch bookings.');
+        console.error("Failed to fetch bookings:", err);
+        setError("Failed to fetch bookings.");
       }
     };
     fetchBookings();
   }, []);
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Your Bookings</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      {bookings.length > 0 ? (
-        <ul>
-          {bookings.map((booking) => (
-            <li key={booking.id} className="p-4 border rounded mb-2">
-              Car: {booking.car.make} {booking.car.model}
-              <br />
-              Start Date: {booking.start_date}
-              <br />
-              End Date: {booking.end_date}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No bookings found.</p>
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl">Your Bookings</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {bookings.length > 0 ? (
+          <ul className="divide-y divide-border/80">
+            {bookings.map((booking) => (
+              <li
+                key={booking.id}
+                className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+              >
+                <div>
+                  <p className="font-semibold text-foreground">
+                    Car: {booking.car.make} {booking.car.model}
+                  </p>
+                  <p className="font-mono text-xs text-muted-foreground tabular-nums">
+                    Start Date: {booking.start_date} · End Date: {booking.end_date}
+                  </p>
+                </div>
+                <Badge variant="emerald">Active</Badge>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground">No bookings found.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

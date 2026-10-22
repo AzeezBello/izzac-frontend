@@ -1,23 +1,36 @@
-// src/app/login/page.tsx
 "use client";
 
-import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Loader from '../../components/Loader';
-import { useAuth } from '../../context/AuthContext';
+import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import Loader from "../../components/Loader";
+import { useAuth } from "../../context/AuthContext";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { Alert, AlertDescription } from "../../components/ui/alert";
 
 const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams?.get('next');
+  const nextPath = searchParams?.get("next");
   const { login, isAuthenticated, isLoading } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.push(nextPath || '/dashboard');
+      router.push(nextPath || "/dashboard");
     }
   }, [isAuthenticated, isLoading, nextPath, router]);
 
@@ -26,50 +39,84 @@ const LoginContent = () => {
     const result = await login(username, password);
 
     if (result.success) {
-      router.push(nextPath || '/dashboard');
+      router.push(nextPath || "/dashboard");
     } else {
-      setError(result.message || 'Unable to log in right now.');
+      setError(result.message || "Unable to log in right now.");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 md:px-6 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
-      <p className="text-gray-600 mb-6">Log in to manage your cars and bookings.</p>
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            placeholder="yourusername"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            required
-          />
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          className="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:bg-emerald-700 transition disabled:opacity-60"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Signing in...' : 'Sign in'}
-        </button>
-      </form>
+    <div className="max-w-md mx-auto px-4 md:px-6 py-14 md:py-20 animate-enter-subtle">
+      <Card className="shadow-elevated">
+        <CardHeader className="space-y-2 pb-5">
+          <div>
+            <Badge variant="emerald">Session Access</Badge>
+          </div>
+          <CardTitle className="text-3xl font-bold tracking-[-0.03em]">
+            Welcome back
+          </CardTitle>
+          <CardDescription>
+            Log in to manage your cars and bookings.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                placeholder="yourusername"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+        </CardContent>
+
+        <CardFooter className="border-t border-border/70 pt-4 text-xs text-muted-foreground justify-between">
+          <span>New to Izzac?</span>
+          <Link
+            href="/signup"
+            className="font-semibold text-primary hover:underline"
+          >
+            Create an account →
+          </Link>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

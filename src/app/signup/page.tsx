@@ -1,23 +1,37 @@
 "use client";
 
-import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Loader from '../../components/Loader';
-import { useAuth } from '../../context/AuthContext';
+import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import Loader from "../../components/Loader";
+import { useAuth } from "../../context/AuthContext";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { Alert, AlertDescription } from "../../components/ui/alert";
 
 const SignupContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams?.get('role');
+  const role = searchParams?.get("role");
   const { register, isAuthenticated, isLoading } = useAuth();
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   }, [isAuthenticated, router]);
 
@@ -26,64 +40,102 @@ const SignupContent = () => {
     const result = await register(username, email, password);
 
     if (result.success) {
-      router.push(role === 'host' ? '/dashboard/host' : '/dashboard');
+      router.push(role === "host" ? "/dashboard/host" : "/dashboard");
     } else {
-      setError(result.message || 'Unable to sign you up right now.');
+      setError(result.message || "Unable to sign you up right now.");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 md:px-6 py-12">
-      <h1 className="text-3xl font-bold mb-2 text-gray-900">Create your account</h1>
-      <p className="text-gray-600 mb-6">
-        {role === 'host' ? 'List your car and start earning.' : 'Book trusted rides in minutes.'}
-      </p>
-      <form onSubmit={handleSignup} className="space-y-4">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            placeholder="yourusername"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="block w-full p-2 border rounded-md border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="block w-full p-2 border rounded-md border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="block w-full p-2 border rounded-md border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            required
-          />
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          className="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition disabled:opacity-60"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Creating account...' : 'Create account'}
-        </button>
-      </form>
+    <div className="max-w-md mx-auto px-4 md:px-6 py-14 md:py-20 animate-enter-subtle">
+      <Card className="shadow-elevated">
+        <CardHeader className="space-y-2 pb-5">
+          <div>
+            <Badge variant="emerald">
+              {role === "host" ? "Host Onboarding" : "Unified Account"}
+            </Badge>
+          </div>
+          <CardTitle className="text-3xl font-bold tracking-[-0.03em]">
+            Create your account
+          </CardTitle>
+          <CardDescription>
+            {role === "host"
+              ? "List your car and start earning."
+              : "Book trusted rides in minutes."}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                placeholder="yourusername"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating account..." : "Create account"}
+            </Button>
+          </form>
+        </CardContent>
+
+        <CardFooter className="border-t border-border/70 pt-4 text-xs text-muted-foreground justify-between">
+          <span>Already have an account?</span>
+          <Link
+            href="/login"
+            className="font-semibold text-primary hover:underline"
+          >
+            Sign in →
+          </Link>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

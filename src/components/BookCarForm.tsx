@@ -1,10 +1,16 @@
 "use client";
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import api from '../lib/api';
-import { useAuth } from '../context/AuthContext';
-import { getApiErrorMessage } from '../lib/errors';
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import api from "../lib/api";
+import { useAuth } from "../context/AuthContext";
+import { getApiErrorMessage } from "../lib/errors";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Separator } from "./ui/separator";
 
 type BookCarFormProps = {
   carId: number;
@@ -14,19 +20,25 @@ type BookCarFormProps = {
 const BookCarForm = ({ carId, pricePerDay }: BookCarFormProps) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const estimatedTotal = useMemo(() => {
+  const dayCount = useMemo(() => {
     if (!startDate || !endDate) return null;
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const dayCount = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    return dayCount > 0 ? dayCount * Number(pricePerDay) : null;
-  }, [startDate, endDate, pricePerDay]);
+    const days =
+      Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    return days > 0 ? days : null;
+  }, [startDate, endDate]);
+
+  const estimatedTotal = useMemo(() => {
+    if (!dayCount) return null;
+    return dayCount * Number(pricePerDay);
+  }, [dayCount, pricePerDay]);
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,9 +47,13 @@ const BookCarForm = ({ carId, pricePerDay }: BookCarFormProps) => {
       return;
     }
 
-    const dayCount = Math.floor((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    if (dayCount <= 0) {
-      setError('End date must be after start date.');
+    const days =
+      Math.floor(
+        (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+          (1000 * 60 * 60 * 24)
+      ) + 1;
+    if (days <= 0) {
+      setError("End date must be after start date.");
       return;
     }
 
@@ -46,61 +62,104 @@ const BookCarForm = ({ carId, pricePerDay }: BookCarFormProps) => {
     setMessage(null);
 
     try {
-      const { data } = await api.post('/bookings/', {
+      const { data } = await api.post("/bookings/", {
         car_id: carId,
         start_date: startDate,
         end_date: endDate,
       });
       setMessage(`Booking confirmed! Total $${data.total_price}`);
     } catch (error: unknown) {
-      setError(getApiErrorMessage(error, 'Could not complete your booking.'));
+      setError(getApiErrorMessage(error, "Could not complete your booking."));
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleBooking} className="space-y-3 border border-gray-100 p-4 rounded-xl shadow-sm">
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="start">Start date</label>
-        <input
-          id="start"
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="end">End date</label>
-        <input
-          id="end"
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-          required
-        />
-      </div>
+    <Card className="border-border/90 shadow-elevated">
+      <CardHeader className="pb-4">
+        <div className="flex items-baseline justify-between gap-2">
+          <CardTitle className="text-lg">Reserve this vehicle</CardTitle>
+          <p className="font-mono text-lg font-bold text-primary tabular-nums">
+            ${pricePerDay}{" "}
+            <span className="font-sans text-xs font-normal text-muted-foreground">
+              /day
+            </span>
+          </p>
+        </div>
+        <CardDescription>
+          Select trip dates for instant fare calculation and confirmation.
+        </CardDescription>
+      </CardHeader>
 
-      {estimatedTotal && (
-        <p className="text-sm text-gray-700">
-          Estimated total: <span className="font-semibold text-emerald-700">${estimatedTotal}</span>
-        </p>
-      )}
+      <CardContent>
+        <form onSubmit={handleBooking} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="space-y-1.5">
+              <Label htmlFor="start">Start date</Label>
+              <Input
+                id="start"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="font-mono text-xs tabular-nums"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="end">End date</Label>
+              <Input
+                id="end"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="font-mono text-xs tabular-nums"
+                required
+              />
+            </div>
+          </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {message && <p className="text-sm text-emerald-700 font-semibold">{message}</p>}
+          {estimatedTotal && dayCount && (
+            <div className="rounded-xl bg-secondary/70 px-4 py-3 space-y-2 animate-enter-subtle">
+              <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
+                <span>
+                  ${pricePerDay} × {dayCount} {dayCount === 1 ? "day" : "days"}
+                </span>
+                <span>${estimatedTotal}</span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between text-sm font-semibold text-foreground tabular-nums">
+                <span>Estimated total</span>
+                <span className="font-mono text-primary">${estimatedTotal}</span>
+              </div>
+            </div>
+          )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:bg-emerald-700 transition disabled:opacity-60"
-      >
-        {submitting ? 'Booking...' : 'Book now'}
-      </button>
-    </form>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {message && (
+            <Alert variant="emerald">
+              <AlertDescription className="font-semibold text-primary">
+                {message}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <Button
+            type="submit"
+            disabled={submitting}
+            size="lg"
+            className="w-full"
+          >
+            {submitting ? "Booking..." : "Book now"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

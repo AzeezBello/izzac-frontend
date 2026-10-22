@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import api from '../../lib/api';
-import FallbackImage from '../../components/FallbackImage';
-import { resolveApiAssetUrl } from '../../lib/config';
-import { useRequireAuth } from '../../hooks/useAuth';
-import Loader from '../../components/Loader';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import api from "../../lib/api";
+import FallbackImage from "../../components/FallbackImage";
+import { resolveApiAssetUrl } from "../../lib/config";
+import { useRequireAuth } from "../../hooks/useAuth";
+import Loader from "../../components/Loader";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
+import { Card } from "../../components/ui/card";
+import { Alert, AlertDescription } from "../../components/ui/alert";
 
 type Car = {
   id: number;
@@ -21,18 +25,20 @@ type Car = {
 const HostDashboard = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, isLoading } = useRequireAuth('/login?next=/dashboard');
+  const { isAuthenticated, isLoading } = useRequireAuth(
+    "/login?next=/dashboard"
+  );
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
     const fetchCars = async () => {
       try {
-        const response = await api.get('/cars/my/');
+        const response = await api.get("/cars/my/");
         setCars(response.data);
       } catch (error) {
-        console.error('Failed to fetch cars:', error);
-        setError('Unable to load your cars right now.');
+        console.error("Failed to fetch cars:", error);
+        setError("Unable to load your cars right now.");
       }
     };
 
@@ -43,34 +49,77 @@ const HostDashboard = () => {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="uppercase text-emerald-700 font-semibold text-xs">Host</p>
-          <h1 className="text-3xl font-bold text-gray-900">Your garage</h1>
-          <p className="text-gray-600 text-sm">Manage the cars you share on Izzac.</p>
+    <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-16 space-y-8 animate-enter-subtle">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-border/80">
+        <div className="space-y-2">
+          <Badge variant="emerald">Host</Badge>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
+            Your garage
+          </h1>
+          <p className="text-muted-foreground text-sm md:text-base">
+            Manage the cars you share on Izzac.
+          </p>
         </div>
-        <Link href="/dashboard/add-car" className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
-          Add a car
-        </Link>
+        <Button asChild size="default">
+          <Link href="/dashboard/add-car">Add a car</Link>
+        </Button>
       </div>
 
-      {error && <p className="text-red-600">{error}</p>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cars.map((car) => (
-          <div key={car.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-            <FallbackImage src={resolveApiAssetUrl(car.image)} alt={`${car.make} ${car.model}`} className="w-full h-44 object-cover" />
-            <div className="p-4 space-y-1">
-              <h2 className="text-xl font-semibold text-gray-900">{car.make} {car.model}</h2>
-              <p className="text-gray-600 text-sm">{car.year} • {car.location}</p>
-              <p className="text-emerald-700 font-bold">${car.price_per_day} <span className="text-sm text-gray-500 font-medium">/day</span></p>
+          <Card
+            key={car.id}
+            className="overflow-hidden flex flex-col hover:border-stone-300 hover:shadow-elevated stagger-item"
+          >
+            <div className="relative overflow-hidden bg-secondary aspect-[16/10]">
+              <FallbackImage
+                src={resolveApiAssetUrl(car.image)}
+                alt={`${car.make} ${car.model}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-3 left-3">
+                <Badge
+                  variant="outline"
+                  className="bg-card/90 backdrop-blur-sm tabular-nums"
+                >
+                  {car.year}
+                </Badge>
+              </div>
             </div>
-          </div>
+            <div className="p-5 space-y-1.5">
+              <div className="flex items-baseline justify-between gap-2">
+                <h2 className="text-lg font-semibold text-foreground tracking-[-0.02em]">
+                  {car.make} {car.model}
+                </h2>
+                <p className="font-mono text-base font-bold text-primary tabular-nums">
+                  ${car.price_per_day}{" "}
+                  <span className="font-sans text-xs font-normal text-muted-foreground">
+                    /day
+                  </span>
+                </p>
+              </div>
+              <p className="font-mono text-xs text-muted-foreground tabular-nums">
+                {car.year} • {car.location}
+              </p>
+            </div>
+          </Card>
         ))}
+
         {cars.length === 0 && !error && (
-          <div className="col-span-full text-center text-gray-500 py-10">
-            You have not listed any cars yet. <Link href="/dashboard/add-car" className="text-emerald-700 font-semibold">Add your first car.</Link>
+          <div className="col-span-full rounded-2xl border border-dashed border-border py-14 px-6 text-center text-muted-foreground">
+            You have not listed any cars yet.{" "}
+            <Link
+              href="/dashboard/add-car"
+              className="text-primary font-semibold hover:underline"
+            >
+              Add your first car.
+            </Link>
           </div>
         )}
       </div>

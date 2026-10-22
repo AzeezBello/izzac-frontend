@@ -1,13 +1,12 @@
-// src/app/host/page.tsx
 "use client";
 
-import HostFeatures from '../../components/HostPage/HostFeatures';
-import ProtectionComparison from '../../components/HostPage/ProtectionComparison';
-import HostFaq from '../../components/HostPage/HostFaq';
+import HostFeatures from "../../components/HostPage/HostFeatures";
+import ProtectionComparison from "../../components/HostPage/ProtectionComparison";
+import HostFaq from "../../components/HostPage/HostFaq";
 
 const HostPage = () => {
   return (
-    <div className="bg-gradient-to-b from-emerald-50 via-white to-white">
+    <div className="bg-background">
       <HostFeatures />
       <ProtectionComparison />
       <HostFaq />
@@ -16,4 +15,3 @@ const HostPage = () => {
 };
 
 export default HostPage;
-
