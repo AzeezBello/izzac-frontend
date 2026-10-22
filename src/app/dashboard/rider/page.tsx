@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Breadcrumbs from "../../../components/Breadcrumbs";
 import { useRequireAuth } from "../../../hooks/useAuth";
 import Loader from "../../../components/Loader";
 import { riderJourney } from "../../../lib/productContent";
@@ -8,24 +9,28 @@ import { Badge } from "../../../components/ui/badge";
 import { Card } from "../../../components/ui/card";
 
 const RiderDashboard = () => {
-  const { isAuthenticated, isLoading } = useRequireAuth(
+  const { isLoading } = useRequireAuth(
     "/login?next=/dashboard/rider"
   );
 
-  if (isLoading) return <Loader />;
-  if (!isAuthenticated) return null;
-
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 space-y-8 animate-enter-subtle">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-16 space-y-8 animate-enter-subtle">
+      <Breadcrumbs
+        items={[
+          { label: "My Garage", href: "/dashboard" },
+          { label: "Rider Workspace" },
+        ]}
+      />
       <div className="space-y-2 pb-6 border-b border-border/80">
         <Badge variant="emerald">Rider</Badge>
         <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-          Welcome back
+          Rider mobility workspace
         </h1>
         <p className="text-muted-foreground text-sm md:text-base max-w-[58ch]">
           Review your bookings, browse more cars, and move through the full rider flow from one place.
         </p>
       </div>
+      {isLoading && <Loader />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Link

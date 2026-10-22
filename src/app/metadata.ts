@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
+import { SITE_NAME, SITE_URL } from "../lib/seo";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://izzac.vercel.app"
-  ),
-  title: "Izzac | Browse, Book, and Host Cars",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Chauffeur, Self-Drive & Corporate Car Rental in Nigeria | Izzac Mobility",
+    template: `%s`,
+  },
   description:
-    "Izzac is a peer-to-peer car-sharing platform for browsing executive listings, booking trips, creating host listings, and managing rider and host dashboards.",
+    "Book vetted chauffeur-driven sedans, luxury SUVs, Hilux 4x4 pickups, airport VIP transfers (LOS, ABV, PHC), and 22%-off monthly corporate fleets across Nigeria and Africa.",
+  applicationName: SITE_NAME,
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/site.webmanifest",
   icons: {
     icon: [
@@ -21,24 +27,27 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Izzac | Peer-to-Peer Mobility",
+    title: "Chauffeur, Self-Drive & Corporate Car Rental in Nigeria | Izzac Mobility",
     description:
-      "Browse, book, host, and manage executive vehicles from one unified Izzac account.",
+      "Book vetted chauffeur-driven sedans, luxury SUVs, Hilux 4x4 pickups, airport VIP transfers (LOS, ABV, PHC), and monthly corporate fleets across Lagos, Abuja, and Port Harcourt.",
+    url: "/",
+    siteName: SITE_NAME,
+    locale: "en_NG",
     images: [
       {
         url: "/images/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Izzac — Peer-to-Peer Mobility across Lagos, Abuja, and Port Harcourt",
+        alt: "Izzac Mobility — Executive SUV and sedan fleet across Lagos, Abuja, and Port Harcourt",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Izzac | Peer-to-Peer Mobility",
+    title: "Chauffeur, Self-Drive & Corporate Car Rental in Nigeria | Izzac Mobility",
     description:
-      "Browse, book, host, and manage executive vehicles from one unified Izzac account.",
+      "Browse 32+ executive vehicles, configure chauffeur or self-drive mode, add Naija Road Shield, and book online across Nigeria.",
     images: ["/images/og-image.png"],
   },
 };

@@ -22,8 +22,7 @@ const UserBookings = () => {
       try {
         const response = await api.get<Booking[]>("/bookings/");
         setBookings(response.data);
-      } catch (err) {
-        console.error("Failed to fetch bookings:", err);
+      } catch {
         setError("Failed to fetch bookings.");
       }
     };

@@ -4,6 +4,9 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ReactNode } from "react";
 import { AuthProvider } from "../context/AuthContext";
+import { CurrencyProvider } from "../context/CurrencyContext";
+import { OnboardingProvider } from "../context/OnboardingContext";
+import { SITE_NAME, SITE_URL } from "../lib/seo";
 export { metadata } from "./metadata";
 
 const geistSans = localFont({
@@ -20,15 +23,62 @@ const geistMono = localFont({
   display: "swap",
 });
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AutoRental",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo-mark.svg`,
+      image: `${SITE_URL}/images/og-image.png`,
+      description:
+        "Executive chauffeur service, NIN-verified self-drive car rental, airport VIP meet & greet (LOS, ABV, PHC), and Corporate SuperFlex fleet subscriptions across Nigeria and Africa.",
+      priceRange: "₦68,000 - ₦650,000",
+      currenciesAccepted: "NGN, USD, GHS, KES",
+      areaServed: [
+        { "@type": "City", name: "Lagos" },
+        { "@type": "City", name: "Abuja" },
+        { "@type": "City", name: "Port Harcourt" },
+        { "@type": "City", name: "Kano" },
+        { "@type": "City", name: "Ibadan" },
+        { "@type": "City", name: "Enugu" },
+        { "@type": "City", name: "Accra" },
+        { "@type": "City", name: "Nairobi" },
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en-NG",
+    },
+  ],
+};
+
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <head />
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
         <AuthProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          <CurrencyProvider>
+            <OnboardingProvider>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </OnboardingProvider>
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>

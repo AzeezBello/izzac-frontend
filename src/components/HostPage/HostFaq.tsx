@@ -32,8 +32,25 @@ const quickLinks = [
 ];
 
 const HostFaq = () => {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: hostFaqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <section className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24 text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
         <div className="lg:col-span-5 space-y-5">
           <Badge variant="emerald">Host FAQ</Badge>

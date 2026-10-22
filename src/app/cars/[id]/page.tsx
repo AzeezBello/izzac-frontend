@@ -5,10 +5,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import BookCarForm from "@/components/BookCarForm";
 import FallbackImage from "@/components/FallbackImage";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import Loader from "@/components/Loader";
+import { useCurrency } from "@/context/CurrencyContext";
 import publicApi from "@/lib/publicApi";
+import { SITE_URL } from "@/lib/seo";
 import {
   DetailedCar,
+  enrichCarWithAfricanMobility,
   findCatalogueMatch,
   getCatalogueCarById,
   resolveCarImage,
@@ -18,36 +22,48 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const CarDetailsPage = () => {
   const params = useParams<{ id: string }>();
-  const [car, setCar] = useState<DetailedCar | null>(null);
+  const { formatPrice } = useCurrency();
+  const initialId = Number(params?.id);
+  const initialCatalogueCar = !Number.isNaN(initialId)
+    ? getCatalogueCarById(initialId)
+    : undefined;
+
+  const [car, setCar] = useState<DetailedCar | null>(
+    initialCatalogueCar || null
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!params?.id) return;
     const numericId = Number(params.id);
     const catalogueMatch = getCatalogueCarById(numericId);
+    if (catalogueMatch) {
+      setCar((prev) => prev || catalogueMatch);
+    }
 
     const fetchCar = async () => {
       try {
         const response = await publicApi.get(`/cars/${params.id}/`);
         const apiCar = response.data;
         const matched = findCatalogueMatch(apiCar) || catalogueMatch;
-        setCar({
-          ...matched,
-          ...apiCar,
-          image: resolveCarImage(apiCar, matched?.image),
-          price_per_day: Number(apiCar.price_per_day),
-          description:
-            apiCar.description && apiCar.description.length > 40
-              ? apiCar.description
-              : matched?.description || apiCar.description,
-        });
+        setCar(
+          enrichCarWithAfricanMobility({
+            ...matched,
+            ...apiCar,
+            image: resolveCarImage(apiCar, matched?.image),
+            price_per_day: Number(apiCar.price_per_day),
+            description:
+              apiCar.description && apiCar.description.length > 40
+                ? apiCar.description
+                : matched?.description || apiCar.description,
+          })
+        );
         setError(null);
-      } catch (err) {
+      } catch {
         if (catalogueMatch) {
           setCar(catalogueMatch);
           setError(null);
         } else {
-          console.error("Failed to fetch car details:", err);
           setError("Car not found or an error occurred.");
         }
       }
@@ -58,7 +74,16 @@ const CarDetailsPage = () => {
 
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto px-4 md:px-6 py-12">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-12 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Browse Fleet", href: "/cars" },
+            { label: "Vehicle Not Found" },
+          ]}
+        />
+        <h1 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
+          Vehicle dossier unavailable
+        </h1>
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -68,27 +93,65 @@ const CarDetailsPage = () => {
 
   if (!car) return <Loader />;
 
+  const weeklyDailyRate = Math.round(car.price_per_day * 0.9);
+  const monthlyDailyRate = Math.round(car.price_per_day * 0.78);
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: `${car.year} ${car.make} ${car.model}`,
+    description: car.description,
+    image: `${SITE_URL}${resolveCarImage(car)}`,
+    brand: {
+      "@type": "Brand",
+      name: car.make,
+    },
+    offers: {
+      "@type": "Offer",
+      url: `${SITE_URL}/cars/${car.id}`,
+      priceCurrency: "NGN",
+      price: car.price_per_day,
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14 space-y-8 animate-enter-subtle">
-      <div>
+    <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14 space-y-6 animate-enter-subtle">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Breadcrumbs
+          items={[
+            { label: "Browse Fleet", href: "/cars" },
+            { label: `${car.make} ${car.model}` },
+          ]}
+        />
         <Link
-          href="/cars"
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition-colors duration-150"
+          href="/services"
+          className="font-mono text-xs text-primary hover:underline"
         >
-          <span aria-hidden="true">←</span>
-          <span>Back to live catalogue</span>
+          View Chauffeur, Airport VIP & Naija Shield details →
         </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
         <div className="lg:col-span-7 space-y-6">
           <div className="overflow-hidden rounded-2xl border border-border/80 bg-card p-2 shadow-surface">
-            <FallbackImage
-              src={resolveCarImage(car)}
-              alt={`${car.make} ${car.model}`}
-              fetchPriority="high"
-              className="w-full h-80 sm:h-96 object-cover rounded-xl"
-            />
+            <div className="relative">
+              <FallbackImage
+                src={resolveCarImage(car)}
+                alt={`${car.year} ${car.make} ${car.model} available in ${car.location}`}
+                fetchPriority="high"
+                className="w-full h-80 sm:h-96 object-cover rounded-xl"
+              />
+              {car.hubAirport && (
+                <div className="absolute bottom-3 left-3 rounded-lg border border-white/15 bg-[#0d1713]/85 px-3 py-1.5 font-mono text-xs text-stone-100 backdrop-blur-md">
+                  Hub: <span className="text-emerald-300">{car.hubAirport}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Architectural tabular telemetry strip */}
@@ -104,11 +167,10 @@ const CarDetailsPage = () => {
             </div>
             <div className="p-4">
               <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                Year
+                Year & Spec
               </p>
               <p className="font-mono text-sm font-semibold text-foreground mt-1 tabular-nums">
-                <span className="sr-only">Year: </span>
-                {car.year}
+                {car.year} · {car.seats || 5} Seats
               </p>
             </div>
             <div className="p-4">
@@ -124,11 +186,64 @@ const CarDetailsPage = () => {
                 Daily Rate
               </p>
               <p className="font-mono text-sm font-bold text-primary mt-1 tabular-nums">
-                ${car.price_per_day}{" "}
+                {formatPrice(car.price_per_day)}{" "}
                 <span className="font-sans text-xs font-normal text-muted-foreground">
                   /day
                 </span>
               </p>
+            </div>
+          </div>
+
+          {/* Duration Subscription Tiers Strip (Daily vs Weekly -10% vs Monthly SuperFlex -22%) */}
+          <div className="rounded-2xl border border-border/80 bg-secondary/45 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
+                Flexible Duration & Corporate SuperFlex Pricing
+              </span>
+              <Badge variant="emerald">Auto-Applied by Dates</Badge>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs tabular-nums">
+              <div className="rounded-xl border border-border/80 bg-card p-3">
+                <p className="text-muted-foreground">1–6 Days (Standard)</p>
+                <p className="text-sm font-bold text-foreground mt-1">
+                  {formatPrice(car.price_per_day)} /day
+                </p>
+              </div>
+              <div className="rounded-xl border border-border/80 bg-card p-3">
+                <p className="text-primary font-semibold">7–29 Days (-10% Weekly)</p>
+                <p className="text-sm font-bold text-foreground mt-1">
+                  {formatPrice(weeklyDailyRate)} /day
+                </p>
+              </div>
+              <div className="rounded-xl border border-primary/40 bg-card p-3">
+                <p className="text-primary font-semibold">30+ Days (-22% SuperFlex)</p>
+                <p className="text-sm font-bold text-primary mt-1">
+                  {formatPrice(monthlyDailyRate)} /day
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Nigerian & African Mobility Readiness Ledger */}
+          <div className="rounded-2xl border border-border/80 bg-card p-6 shadow-surface space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-foreground">
+                Supported Nigerian & African Mobility Modes
+              </h2>
+              {car.terrainReadiness && (
+                <Badge variant="secondary">{car.terrainReadiness}</Badge>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(car.serviceModes || []).map((mode) => (
+                <span
+                  key={mode}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-secondary/60 px-3 py-1.5 font-mono text-xs font-medium text-foreground"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  {mode}
+                </span>
+              ))}
             </div>
           </div>
 
@@ -168,6 +283,9 @@ const CarDetailsPage = () => {
               {car.category && (
                 <Badge variant="secondary">{car.category}</Badge>
               )}
+              {car.chauffeurRecommended && (
+                <Badge variant="outline">Chauffeur Recommended</Badge>
+              )}
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
               {car.make} {car.model}
@@ -177,7 +295,12 @@ const CarDetailsPage = () => {
             </p>
           </div>
 
-          <BookCarForm carId={car.id} pricePerDay={car.price_per_day} />
+          <BookCarForm
+            carId={car.id}
+            pricePerDay={car.price_per_day}
+            defaultChauffeur={car.chauffeurRecommended}
+            hubAirport={car.hubAirport}
+          />
         </div>
       </div>
     </div>

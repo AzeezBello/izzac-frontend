@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import Loader from "../../components/Loader";
+import { useRouter } from "next/navigation";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -15,20 +15,25 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 
-const SignupContent = () => {
+const SignupPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const role = searchParams?.get("role");
   const { register, isAuthenticated, isLoading } = useAuth();
+  const [role, setRole] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setRole(params.get("role"));
+    }
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -48,7 +53,8 @@ const SignupContent = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 md:px-6 py-14 md:py-20 animate-enter-subtle">
+    <div className="max-w-md mx-auto px-4 md:px-6 py-12 md:py-16 space-y-5 animate-enter-subtle">
+      <Breadcrumbs items={[{ label: "Create Account" }]} />
       <Card className="shadow-elevated">
         <CardHeader className="space-y-2 pb-5">
           <div className="flex items-center justify-between">
@@ -57,19 +63,19 @@ const SignupContent = () => {
             </Badge>
             <Image
               src="/logo-mark.svg"
-              alt="Izzac logo"
+              alt="Izzac Mobility crest logo"
               width={28}
               height={28}
               className="h-7 w-7 rounded-md shadow-surface"
             />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-[-0.03em]">
+          <h1 className="text-3xl font-bold tracking-[-0.03em] text-card-foreground leading-tight">
             Create your account
-          </CardTitle>
+          </h1>
           <CardDescription>
             {role === "host"
-              ? "List your car and start earning."
-              : "Book trusted rides in minutes."}
+              ? "List your car and start earning recurring NGN payouts."
+              : "Book chauffeur-driven or verified self-drive rides in minutes."}
           </CardDescription>
         </CardHeader>
 
@@ -82,7 +88,7 @@ const SignupContent = () => {
                 name="username"
                 type="text"
                 autoComplete="username"
-                placeholder="yourusername"
+                placeholder="e.g. chinedu_fleet"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -96,7 +102,7 @@ const SignupContent = () => {
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder="name@company.ng"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -147,11 +153,5 @@ const SignupContent = () => {
     </div>
   );
 };
-
-const SignupPage = () => (
-  <Suspense fallback={<Loader />}>
-    <SignupContent />
-  </Suspense>
-);
 
 export default SignupPage;

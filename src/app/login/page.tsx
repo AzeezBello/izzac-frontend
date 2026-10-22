@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import Loader from "../../components/Loader";
+import { useRouter } from "next/navigation";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -15,19 +15,24 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 
-const LoginContent = () => {
+const LoginPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextPath = searchParams?.get("next");
   const { login, isAuthenticated, isLoading } = useAuth();
+  const [nextPath, setNextPath] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setNextPath(params.get("next"));
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -47,24 +52,25 @@ const LoginContent = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 md:px-6 py-14 md:py-20 animate-enter-subtle">
+    <div className="max-w-md mx-auto px-4 md:px-6 py-12 md:py-16 space-y-5 animate-enter-subtle">
+      <Breadcrumbs items={[{ label: "Log in" }]} />
       <Card className="shadow-elevated">
         <CardHeader className="space-y-2 pb-5">
           <div className="flex items-center justify-between">
             <Badge variant="emerald">Session Access</Badge>
             <Image
               src="/logo-mark.svg"
-              alt="Izzac logo"
+              alt="Izzac Mobility crest logo"
               width={28}
               height={28}
               className="h-7 w-7 rounded-md shadow-surface"
             />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-[-0.03em]">
+          <h1 className="text-3xl font-bold tracking-[-0.03em] text-card-foreground leading-tight">
             Welcome back
-          </CardTitle>
+          </h1>
           <CardDescription>
-            Log in to manage your cars and bookings.
+            Log in to manage your cars, chauffeur trips, and corporate bookings.
           </CardDescription>
         </CardHeader>
 
@@ -77,7 +83,7 @@ const LoginContent = () => {
                 name="username"
                 type="text"
                 autoComplete="username"
-                placeholder="yourusername"
+                placeholder="e.g. tunde_executive"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -128,11 +134,5 @@ const LoginContent = () => {
     </div>
   );
 };
-
-const LoginPage = () => (
-  <Suspense fallback={<Loader />}>
-    <LoginContent />
-  </Suspense>
-);
 
 export default LoginPage;

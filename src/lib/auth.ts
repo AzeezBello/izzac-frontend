@@ -10,7 +10,6 @@ export const login = async (username: string, password: string) => {
     localStorage.setItem('refreshToken', refresh);
     return { success: true };
   } catch (error: unknown) {
-    console.error('Login failed:', error);
     return { success: false, message: getApiErrorMessage(error, 'Login error') };
   }
 };

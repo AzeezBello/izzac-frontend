@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
+import Breadcrumbs from "../Breadcrumbs";
 import { hostFeatureCards } from "../../lib/productContent";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import { Tooltip } from "../ui/tooltip";
 
 const bentoSpans = [
   "md:col-span-7",
@@ -14,7 +16,8 @@ const bentoSpans = [
 
 const HostFeatures = () => {
   return (
-    <section className="max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-16 md:pt-16 md:pb-24">
+    <section className="max-w-6xl mx-auto px-4 md:px-6 pt-10 pb-16 md:pt-14 md:pb-24 space-y-6">
+      <Breadcrumbs items={[{ label: "Host & Fleet Partners" }]} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
         <div className="lg:col-span-7 space-y-6">
           <Badge variant="emerald">Host on Izzac</Badge>
@@ -26,12 +29,16 @@ const HostFeatures = () => {
             account creation, protected listing creation, photo uploads, garage management, and host-side booking visibility.
           </p>
           <div className="flex flex-wrap items-center gap-3 pt-1">
-            <Button asChild size="lg">
-              <Link href="/signup?role=host">Start hosting</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/dashboard/add-car">Add a car</Link>
-            </Button>
+            <Tooltip content="Create your unified Rider & Host account in 30 seconds">
+              <Button asChild size="lg">
+                <Link href="/signup?role=host">Start hosting</Link>
+              </Button>
+            </Tooltip>
+            <Tooltip content="Open the vehicle publishing form in My Garage">
+              <Button asChild variant="outline" size="lg">
+                <Link href="/dashboard/add-car">Add a car</Link>
+              </Button>
+            </Tooltip>
           </div>
         </div>
 
@@ -75,9 +82,9 @@ const HostFeatures = () => {
                   0{index + 1}
                 </span>
               </div>
-              <h3 className="text-xl font-semibold text-foreground tracking-[-0.02em] pt-1">
+              <h2 className="text-xl font-semibold text-foreground tracking-[-0.02em] pt-1">
                 {feature.title}
-              </h3>
+              </h2>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-[56ch]">
                 {feature.description}
               </p>

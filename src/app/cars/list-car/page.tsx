@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import Breadcrumbs from "../../../components/Breadcrumbs";
 import { useAuth } from "../../../context/AuthContext";
 import { hostFeatureCards, hostJourney } from "../../../lib/productContent";
 import { Badge } from "../../../components/ui/badge";
@@ -24,7 +25,13 @@ const ListCarPage = () => {
 
   return (
     <div className="bg-background">
-      <section className="max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-14 md:pt-16 md:pb-20">
+      <section className="max-w-6xl mx-auto px-4 md:px-6 pt-10 pb-14 md:pt-14 md:pb-20 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Browse Fleet", href: "/cars" },
+            { label: "List a Car" },
+          ]}
+        />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           <div className="lg:col-span-7 space-y-5">
             <Badge variant="emerald">List a car</Badge>

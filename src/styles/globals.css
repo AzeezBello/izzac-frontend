@@ -17,6 +17,7 @@
     /* Single high-conviction botanical emerald accent (<80% saturation lock) */
     --primary: 161 72% 24%;
     --primary-foreground: 45 33% 98%;
+    --brand-color: hsl(161 72% 24%);
 
     --secondary: 45 16% 93.5%;
     --secondary-foreground: 155 22% 14%;
@@ -40,9 +41,10 @@
     --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* Modern Web Guidance: intrinsic size animation opt-in */
+    /* Modern Web Guidance: intrinsic size animation opt-in & brand form controls */
     interpolate-size: allow-keywords;
     color-scheme: light;
+    accent-color: var(--brand-color);
   }
 
   * {
@@ -58,16 +60,138 @@
   body {
     @apply bg-background text-foreground font-sans selection:bg-emerald-900 selection:text-stone-50;
     font-feature-settings: "rlig" 1, "calt" 1;
+    accent-color: var(--brand-color);
   }
 
-  /* Modern Web Guidance & Impeccable typeset rules: balanced headings & pretty body copy */
+  /* Modern Web Guidance (improve-text-layout-and-legibility): balanced headings & pretty body copy */
   h1, h2, h3, h4 {
     text-wrap: balance;
     letter-spacing: -0.025em;
   }
 
-  p {
+  p, li, blockquote {
     text-wrap: pretty;
+  }
+}
+
+/* Modern Web Guidance (child-state-based-styling): style option cards based on child :checked state */
+.selectable-option-card {
+  --option-bg: hsl(var(--card));
+  --option-border: hsl(var(--border));
+  --option-ring: transparent;
+  background-color: var(--option-bg);
+  border: 1px solid var(--option-border);
+  box-shadow: 0 0 0 1px var(--option-ring);
+  transition: background-color 150ms var(--ease-out-quart),
+    border-color 150ms var(--ease-out-quart),
+    box-shadow 150ms var(--ease-out-quart);
+}
+
+.selectable-option-card:has(.option-control:checked) {
+  --option-bg: hsl(156 32% 95%);
+  --option-border: hsl(var(--primary));
+  --option-ring: hsl(var(--primary) / 0.25);
+}
+
+.selectable-option-card:has(.option-control:focus-visible) {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+@supports not selector(:has(*)) {
+  .selectable-option-card.is-active {
+    --option-bg: hsl(156 32% 95%);
+    --option-border: hsl(var(--primary));
+    --option-ring: hsl(var(--primary) / 0.25);
+  }
+}
+
+/* Modern Web Guidance (brand-consistent-forms): progressive enhancement fallback when accent-color is unsupported */
+@supports not (accent-color: var(--brand-color)) {
+  form input[type="checkbox"].option-control,
+  form input[type="radio"].option-control {
+    accent-color: #11694b;
+  }
+}
+
+/* Modern Web Guidance (responsive-table): semantic sticky table that stacks on narrow containers */
+.comparison-table-wrapper {
+  overflow: auto;
+  max-inline-size: 100%;
+  container-type: inline-size;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  --label-2: "Izzac (Nigeria & Africa OS)";
+  --label-3: "Europcar Global Standard";
+  --label-4: "African Market Impact";
+}
+
+.comparison-table thead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+}
+
+.comparison-table tbody th {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background-color: hsl(var(--card));
+}
+
+@container (width < 640px) {
+  .comparison-table,
+  .comparison-table thead,
+  .comparison-table tbody,
+  .comparison-table tr,
+  .comparison-table th,
+  .comparison-table td {
+    display: block;
+  }
+
+  .comparison-table thead {
+    display: none;
+  }
+
+  .comparison-table tbody tr {
+    margin-block-end: 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  .comparison-table tbody th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    background-color: hsl(var(--secondary));
+  }
+
+  .comparison-table td::before {
+    display: block;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: hsl(var(--primary));
+    margin-block-end: 0.25rem;
+  }
+
+  .comparison-table td:nth-child(2)::before {
+    content: var(--label-2) ": ";
+  }
+
+  .comparison-table td:nth-child(3)::before {
+    content: var(--label-3) ": ";
+  }
+
+  .comparison-table td:nth-child(4)::before {
+    content: var(--label-4) ": ";
   }
 }
 

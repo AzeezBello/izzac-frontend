@@ -8,6 +8,40 @@ export type CarCategory =
   | "Electric & Hybrid"
   | "Pickup & Shuttle";
 
+export type MobilityServiceMode =
+  | "Chauffeur & Protocol"
+  | "Verified Self-Drive"
+  | "Airport VIP Transfer"
+  | "Corporate SuperFlex"
+  | "Interstate & Escort Ready";
+
+export type NigerianCityHub =
+  | "All Hubs"
+  | "Lagos"
+  | "Abuja"
+  | "Port Harcourt"
+  | "Kano"
+  | "Ibadan"
+  | "Enugu";
+
+export const NIGERIAN_CITY_HUBS: NigerianCityHub[] = [
+  "All Hubs",
+  "Lagos",
+  "Abuja",
+  "Port Harcourt",
+  "Kano",
+  "Ibadan",
+  "Enugu",
+];
+
+export const MOBILITY_SERVICE_MODES: MobilityServiceMode[] = [
+  "Chauffeur & Protocol",
+  "Verified Self-Drive",
+  "Airport VIP Transfer",
+  "Corporate SuperFlex",
+  "Interstate & Escort Ready",
+];
+
 export type DetailedCar = {
   id: number;
   make: string;
@@ -23,6 +57,11 @@ export type DetailedCar = {
   fuelType?: string;
   seats?: number;
   features?: string[];
+  hubAirport?: string;
+  cityHub?: Exclude<NigerianCityHub, "All Hubs">;
+  terrainReadiness?: string;
+  serviceModes?: MobilityServiceMode[];
+  chauffeurRecommended?: boolean;
 };
 
 export const CAR_CATEGORIES: CarCategory[] = [
@@ -741,6 +780,75 @@ export const DETAILED_CAR_CATALOGUE: DetailedCar[] = [
   },
 ];
 
+export function enrichCarWithAfricanMobility(car: DetailedCar): DetailedCar {
+  const loc = (car.location || "").toLowerCase();
+  let cityHub: Exclude<NigerianCityHub, "All Hubs"> = "Lagos";
+  let hubAirport = "LOS · MMIA Lagos";
+
+  if (loc.includes("abuja") || loc.includes("maitama") || loc.includes("wuse") || loc.includes("asokoro")) {
+    cityHub = "Abuja";
+    hubAirport = "ABV · Nnamdi Azikiwe Int'l";
+  } else if (loc.includes("port harcourt")) {
+    cityHub = "Port Harcourt";
+    hubAirport = "PHC · Port Harcourt Int'l";
+  } else if (loc.includes("kano") || loc.includes("nassarawa")) {
+    cityHub = "Kano";
+    hubAirport = "KAN · Mallam Aminu Kano";
+  } else if (loc.includes("ibadan") || loc.includes("bodija")) {
+    cityHub = "Ibadan";
+    hubAirport = "IBA · Lagos–Ibadan Corridor";
+  } else if (loc.includes("enugu")) {
+    cityHub = "Enugu";
+    hubAirport = "ENU · Akanu Ibiam Int'l";
+  }
+
+  const category = car.category || "Executive Sedan";
+  const isSuvOrPickup =
+    category === "Luxury SUV" ||
+    category === "Pickup & Shuttle" ||
+    category === "Crossover";
+  const isLuxuryOrExec =
+    category === "Luxury SUV" ||
+    category === "Executive Sedan" ||
+    category === "Pickup & Shuttle" ||
+    Number(car.price_per_day) >= 150000;
+
+  const serviceModes: MobilityServiceMode[] = [
+    "Chauffeur & Protocol",
+    "Verified Self-Drive",
+    "Airport VIP Transfer",
+    "Corporate SuperFlex",
+  ];
+  if (isSuvOrPickup || Number(car.price_per_day) >= 120000) {
+    serviceModes.push("Interstate & Escort Ready");
+  }
+
+  let terrainReadiness = "Island & Urban Expressway";
+  if (category === "Pickup & Shuttle") {
+    terrainReadiness = "Heavy-Duty Interstate & Field 4x4";
+  } else if (category === "Luxury SUV") {
+    terrainReadiness = "High-Clearance VIP & Convoy Spec";
+  } else if (category === "Crossover") {
+    terrainReadiness = "All-Road & Rain-Corridor AWD";
+  } else if (category === "Electric & Hybrid") {
+    terrainReadiness = "Fuel-Saver Hybrid / EV Cabin";
+  }
+
+  return {
+    ...car,
+    cityHub: car.cityHub || cityHub,
+    hubAirport: car.hubAirport || hubAirport,
+    terrainReadiness: car.terrainReadiness || terrainReadiness,
+    serviceModes: car.serviceModes || serviceModes,
+    chauffeurRecommended:
+      car.chauffeurRecommended ?? isLuxuryOrExec,
+  };
+}
+
+for (let i = 0; i < DETAILED_CAR_CATALOGUE.length; i++) {
+  DETAILED_CAR_CATALOGUE[i] = enrichCarWithAfricanMobility(DETAILED_CAR_CATALOGUE[i]);
+}
+
 const catalogueByKey = new Map<string, DetailedCar>();
 const catalogueById = new Map<number, DetailedCar>();
 
@@ -840,7 +948,7 @@ export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[
       seenKeys.add(`${matched.make.toLowerCase()}::${matched.model.toLowerCase()}`);
     }
 
-    return {
+    return enrichCarWithAfricanMobility({
       ...matched,
       ...car,
       image: resolveCarImage(car, matched?.image),
@@ -849,7 +957,7 @@ export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[
         car.description && car.description.length > 40
           ? car.description
           : matched?.description || car.description,
-    };
+    });
   });
 
   for (const item of DETAILED_CAR_CATALOGUE) {
@@ -863,5 +971,6 @@ export function mergeWithDetailedCatalogue(apiCars: DetailedCar[]): DetailedCar[
 }
 
 export function getCatalogueCarById(id: number): DetailedCar | null {
-  return catalogueById.get(id) || null;
+  const found = catalogueById.get(id);
+  return found ? enrichCarWithAfricanMobility(found) : null;
 }
