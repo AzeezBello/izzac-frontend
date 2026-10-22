@@ -39,10 +39,13 @@ const HostFeatures = () => {
           <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-2.5 shadow-elevated">
             <div className="relative overflow-hidden rounded-xl">
               <Image
-                src="/images/hero-bg.webp"
-                alt="Host dashboard overview"
-                width={900}
-                height={900}
+                src="/images/feature1.webp"
+                alt="Curated host fleet of luxury vehicles inside a contemporary stone pavilion"
+                width={1600}
+                height={1000}
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                priority
+                fetchPriority="high"
                 className="w-full h-72 md:h-80 object-cover transition-transform duration-500 ease-out-expo hover:scale-[1.02]"
               />
               <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-lg border border-white/15 bg-[#0d1713]/85 px-3.5 py-2.5 text-xs text-stone-100 backdrop-blur-md">

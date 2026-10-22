@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <defs>
+    <linearGradient id="carPlaceholderBg" x1="0" y1="0" x2="800" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F5F2EB" />
+      <stop offset="50%" stop-color="#EDE8DF" />
+      <stop offset="100%" stop-color="#E3DDD2" />
+    </linearGradient>
+    <linearGradient id="carSilhouetteGrad" x1="200" y1="180" x2="600" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#11694E" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#0D1713" stop-opacity="0.08" />
+    </linearGradient>
+    <radialGradient id="stageSpotlight" cx="50%" cy="55%" r="50%">
+      <stop offset="0%" stop-color="#11694E" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#11694E" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#carPlaceholderBg)" />
+  <rect width="800" height="500" fill="url(#stageSpotlight)" />
+
+  <!-- Architectural Telemetry Grid Lines -->
+  <line x1="0" y1="340" x2="800" y2="340" stroke="#11694E" stroke-opacity="0.16" stroke-width="1.5" />
+  <line x1="0" y1="160" x2="800" y2="160" stroke="#0D1713" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="6 6" />
+  <line x1="160" y1="0" x2="160" y2="500" stroke="#0D1713" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="6 6" />
+  <line x1="640" y1="0" x2="640" y2="500" stroke="#0D1713" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="6 6" />
+
+  <!-- Ground Shadow -->
+  <ellipse cx="400" cy="340" rx="235" ry="14" fill="#0D1713" fill-opacity="0.12" />
+
+  <!-- Executive Fastback Vehicle Profile -->
+  <path
+    d="M185 305C185 283 198 268 222 262L284 248L344 202C358 192 375 186 394 186H478C502 186 524 195 540 211L578 248L614 258C632 263 644 278 644 297V312C644 320 637 326 629 326H588C588 299 566 278 540 278C514 278 492 299 492 326H332C332 299 310 278 284 278C258 278 236 299 236 326H202C192 326 185 317 185 305Z"
+    fill="url(#carSilhouetteGrad)"
+    stroke="#11694E"
+    stroke-width="2.5"
+    stroke-linejoin="round"
+  />
+
+  <!-- Cabin Glass Line -->
+  <path
+    d="M304 247L352 208C363 200 377 196 392 196H472C492 196 510 203 524 217L556 247H304Z"
+    fill="#FBFAF7"
+    fill-opacity="0.65"
+    stroke="#11694E"
+    stroke-opacity="0.5"
+    stroke-width="1.75"
+    stroke-linejoin="round"
+  />
+  <line x1="428" y1="196" x2="420" y2="247" stroke="#11694E" stroke-opacity="0.45" stroke-width="1.75" />
+
+  <!-- Headlight & Taillight Accents -->
+  <path d="M192 282L216 276" stroke="#11694E" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M620 274L638 278" stroke="#10B981" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Front Wheel -->
+  <circle cx="284" cy="326" r="34" fill="#0D1713" />
+  <circle cx="284" cy="326" r="21" fill="#EDE8DF" stroke="#11694E" stroke-width="2" />
+  <circle cx="284" cy="326" r="6" fill="#11694E" />
+
+  <!-- Rear Wheel -->
+  <circle cx="540" cy="326" r="34" fill="#0D1713" />
+  <circle cx="540" cy="326" r="21" fill="#EDE8DF" stroke="#11694E" stroke-width="2" />
+  <circle cx="540" cy="326" r="6" fill="#11694E" />
+
+  <!-- Telemetry Badge -->
+  <rect x="312" y="392" width="176" height="32" rx="8" fill="#0D1713" />
+  <circle cx="332" cy="408" r="4" fill="#34D399" />
+  <text x="346" y="412" fill="#FBFAF7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" font-weight="600" letter-spacing="0.14em">IZZAC VERIFIED</text>
+</svg>

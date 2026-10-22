@@ -119,11 +119,13 @@ const HomePage = () => {
               <div className="relative overflow-hidden rounded-xl">
                 <Image
                   src="/images/hero-bg.webp"
-                  alt="Drivers on the road"
-                  width={1200}
-                  height={900}
+                  alt="Executive SUV and luxury sedan parked at a contemporary Lagos residence"
+                  width={1600}
+                  height={1000}
+                  sizes="(max-width: 1024px) 100vw, 42vw"
                   className="w-full h-72 sm:h-80 md:h-[22rem] object-cover transition-transform duration-500 ease-out-expo hover:scale-[1.02]"
                   priority
+                  fetchPriority="high"
                 />
                 <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-lg border border-white/15 bg-[#0d1713]/85 px-3.5 py-2.5 text-xs text-stone-100 backdrop-blur-md">
                   <span className="font-mono uppercase tracking-[0.14em] text-emerald-300">

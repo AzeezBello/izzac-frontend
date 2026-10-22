@@ -26,13 +26,14 @@ const Header = () => {
             href="/"
             className="group flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <div className="relative h-8 w-8 overflow-hidden rounded-lg border border-border/80 shadow-surface">
+            <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg shadow-surface">
               <Image
-                src="/images/feature1.webp"
-                alt="Izzac"
+                src="/logo-mark.svg"
+                alt="Izzac logo"
                 width={32}
                 height={32}
-                className="h-full w-full object-cover"
+                priority
+                className="h-full w-full object-contain"
               />
             </div>
             <span className="text-lg font-bold tracking-[-0.03em] text-foreground">

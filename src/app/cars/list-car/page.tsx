@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
 import { hostFeatureCards, hostJourney } from "../../../lib/productContent";
 import { Badge } from "../../../components/ui/badge";
@@ -24,22 +25,49 @@ const ListCarPage = () => {
   return (
     <div className="bg-background">
       <section className="max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-14 md:pt-16 md:pb-20">
-        <div className="max-w-3xl space-y-5">
-          <Badge variant="emerald">List a car</Badge>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-[-0.035em] leading-[1.08]">
-            Launch your listing with the same tools hosts use across the full app.
-          </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-[60ch] leading-relaxed">
-            This page now acts as the public entry to hosting: it explains listing creation, garage management,
-            and host-side bookings before sending you into the protected add-car flow.
-          </p>
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Button asChild size="lg">
-              <Link href={primaryHref}>{primaryLabel}</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/host">Explore host features</Link>
-            </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="lg:col-span-7 space-y-5">
+            <Badge variant="emerald">List a car</Badge>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-[-0.035em] leading-[1.08]">
+              Launch your listing with the same tools hosts use across the full app.
+            </h1>
+            <p className="text-muted-foreground text-base md:text-lg max-w-[60ch] leading-relaxed">
+              This page acts as the public entry to hosting: it explains listing creation, garage management,
+              and host-side bookings before sending you into the protected add-car flow.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Button asChild size="lg">
+                <Link href={primaryHref}>{primaryLabel}</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/host">Explore host features</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5">
+            <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-2.5 shadow-elevated">
+              <div className="relative overflow-hidden rounded-xl">
+                <Image
+                  src="/images/feature3.webp"
+                  alt="Host handing over vehicle key fob to an executive rider"
+                  width={1600}
+                  height={1000}
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  priority
+                  fetchPriority="high"
+                  className="w-full h-72 md:h-80 object-cover transition-transform duration-500 ease-out-expo hover:scale-[1.02]"
+                />
+                <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-lg border border-white/15 bg-[#0d1713]/85 px-3.5 py-2.5 text-xs text-stone-100 backdrop-blur-md">
+                  <span className="font-mono uppercase tracking-[0.14em] text-emerald-300">
+                    Direct host handover
+                  </span>
+                  <span className="font-mono tabular-nums text-stone-200">
+                    Instant Publishing
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

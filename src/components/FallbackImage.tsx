@@ -12,7 +12,7 @@ type FallbackImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt
 const FallbackImage = ({
   alt,
   src,
-  fallbackSrc = '/window.svg',
+  fallbackSrc = '/images/car-placeholder.svg',
   onError,
   ...props
 }: FallbackImageProps) => {

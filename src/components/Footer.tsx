@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 import { HiOutlineGlobe } from "react-icons/hi";
 import { Separator } from "./ui/separator";
@@ -41,6 +42,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-10">
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-2.5">
+              <Image
+                src="/logo-mark.svg"
+                alt="Izzac logo"
+                width={32}
+                height={32}
+                loading="lazy"
+                className="h-8 w-8 shrink-0 rounded-lg shadow-surface"
+              />
               <span className="text-xl font-bold tracking-[-0.03em] text-foreground">
                 Izzac
               </span>

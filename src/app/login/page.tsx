@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loader from "../../components/Loader";
 import { useAuth } from "../../context/AuthContext";
@@ -49,8 +50,15 @@ const LoginContent = () => {
     <div className="max-w-md mx-auto px-4 md:px-6 py-14 md:py-20 animate-enter-subtle">
       <Card className="shadow-elevated">
         <CardHeader className="space-y-2 pb-5">
-          <div>
+          <div className="flex items-center justify-between">
             <Badge variant="emerald">Session Access</Badge>
+            <Image
+              src="/logo-mark.svg"
+              alt="Izzac logo"
+              width={28}
+              height={28}
+              className="h-7 w-7 rounded-md shadow-surface"
+            />
           </div>
           <CardTitle className="text-3xl font-bold tracking-[-0.03em]">
             Welcome back

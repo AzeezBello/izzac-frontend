@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" fill="none">
+  <defs>
+    <linearGradient id="lockupPineBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#142921" />
+      <stop offset="55%" stop-color="#0D1713" />
+      <stop offset="100%" stop-color="#070D0B" />
+    </linearGradient>
+    <linearGradient id="lockupRim" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6EE7B7" stop-opacity="0.5" />
+      <stop offset="50%" stop-color="#11694E" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#0D1713" stop-opacity="0.12" />
+    </linearGradient>
+    <linearGradient id="lockupEmeraldTrack" x1="20" y1="48" x2="46" y2="25" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="55%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#6EE7B7" />
+    </linearGradient>
+    <linearGradient id="lockupAlabasterTrack" x1="16" y1="16" x2="42" y2="39" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBFAF7" />
+      <stop offset="100%" stop-color="#E6E2D8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Brand Mark -->
+  <rect width="64" height="64" rx="15" fill="url(#lockupPineBg)" />
+  <rect x="1" y="1" width="62" height="62" rx="14" stroke="url(#lockupRim)" stroke-width="1.5" />
+  <path
+    d="M 17.5 18 H 39.5 L 20.5 37"
+    stroke="url(#lockupAlabasterTrack)"
+    stroke-width="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M 46.5 46 H 24.5 L 43.5 27"
+    stroke="url(#lockupEmeraldTrack)"
+    stroke-width="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="17.5" cy="18" r="1.8" fill="#0D1713" />
+  <circle cx="46.5" cy="46" r="1.8" fill="#0D1713" />
+
+  <!-- Wordmark -->
+  <text x="80" y="38" fill="#111C18" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="30" font-weight="800" letter-spacing="-0.03em">Izzac</text>
+  <text x="81" y="53" fill="#11694E" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="9.5" font-weight="600" letter-spacing="0.18em">P2P MOBILITY</text>
+</svg>
