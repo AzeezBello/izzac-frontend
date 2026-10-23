@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import api from "../lib/api";
 import { useAuth } from "../context/AuthContext";
@@ -22,57 +21,84 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "./ui/card";
+import { Select } from "./ui/select";
+import { Card } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
-import { Separator } from "./ui/separator";
-import { Tooltip } from "./ui/tooltip";
+import { Eyebrow } from "./layout/Eyebrow";
+import { OptionCard } from "./layout/OptionCard";
+import { ArrowLink } from "./layout/ArrowLink";
+import { cn } from "@/lib/utils";
 
 type BookCarFormProps = {
   carId: number;
   pricePerDay: number;
   defaultChauffeur?: boolean;
   hubAirport?: string;
+  /** ISO date (YYYY-MM-DD) prefilled from the quick search. */
+  defaultStartDate?: string;
 };
 
-const BookCarForm = ({
-  carId,
-  pricePerDay,
-  defaultChauffeur = true,
-  hubAirport,
-}: BookCarFormProps) => {
-  const { isAuthenticated, qualification, markChauffeurTrialCompleted } =
-    useAuth();
+const Step = ({
+  index,
+  title,
+  aside,
+  children,
+}: {
+  index: string;
+  title: string;
+  aside?: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <div className="space-y-3 border-t border-border/70 pt-5 first:border-t-0 first:pt-0">
+    <div className="flex items-center justify-between gap-3">
+      <Eyebrow index={index} tone="default">
+        {title}
+      </Eyebrow>
+      {aside}
+    </div>
+    {children}
+  </div>
+);
+
+const ReceiptRow = ({
+  label,
+  amount,
+  tone = "default",
+}: {
+  label: React.ReactNode;
+  amount: React.ReactNode;
+  tone?: "default" | "primary";
+}) => (
+  <div className="flex items-baseline justify-between gap-4 py-2 text-xs">
+    <span className={cn(tone === "primary" ? "font-medium text-primary" : "text-muted-foreground")}>{label}</span>
+    <span className={cn("font-mono tabular-nums", tone === "primary" ? "font-semibold text-primary" : "text-foreground")}>
+      {amount}
+    </span>
+  </div>
+);
+
+const BookCarForm = ({ carId, pricePerDay, defaultChauffeur = true, hubAirport, defaultStartDate }: BookCarFormProps) => {
+  const { isAuthenticated, qualification, markChauffeurTrialCompleted } = useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
 
-  const [startDate, setStartDate] = useState("");
+  const [startDate, setStartDate] = useState(defaultStartDate ?? "");
   const [endDate, setEndDate] = useState("");
-  // New users default to Chauffeur-Driven mode for their mandatory trial period
+  // New users default to chauffeur mode for their mandatory trial period
   const [serviceType, setServiceType] = useState<ServiceTypeCode>(
-    qualification.self_drive_eligible && !defaultChauffeur
-      ? "self_drive"
-      : "chauffeur"
+    qualification.self_drive_eligible && !defaultChauffeur ? "self_drive" : "chauffeur"
   );
   const [pickupMode, setPickupMode] = useState<PickupModeCode>("hub_station");
-  const [protectionPlan, setProtectionPlan] =
-    useState<ProtectionPlanCode>("medium");
-  const [insurancePlan, setInsurancePlan] = useState<InsurancePlanCode>(
-    "comprehensive_shield"
-  );
+  const [protectionPlan, setProtectionPlan] = useState<ProtectionPlanCode>("medium");
+  const [insurancePlan, setInsurancePlan] = useState<InsurancePlanCode>("comprehensive_shield");
   const [selectedAddons, setSelectedAddons] = useState<AddonCode[]>([]);
   const [flightOrNotes, setFlightOrNotes] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Keep new users in Chauffeur-Driven mode until Self-Drive qualification is unlocked
+  // Keep new users in chauffeur mode until self-drive qualification is unlocked
   useEffect(() => {
     if (!qualification.self_drive_eligible && serviceType === "self_drive") {
       setServiceType("chauffeur");
@@ -80,19 +106,14 @@ const BookCarForm = ({
   }, [qualification.self_drive_eligible, serviceType]);
 
   const toggleAddon = (code: AddonCode) => {
-    setSelectedAddons((prev) =>
-      prev.includes(code)
-        ? prev.filter((item) => item !== code)
-        : [...prev, code]
-    );
+    setSelectedAddons((prev) => (prev.includes(code) ? prev.filter((item) => item !== code) : [...prev, code]));
   };
 
   const dayCount = useMemo(() => {
     if (!startDate || !endDate) return null;
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const days =
-      Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const days = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return days > 0 ? days : null;
   }, [startDate, endDate]);
 
@@ -100,50 +121,31 @@ const BookCarForm = ({
     const days = dayCount || 1;
     const baseTotal = Number(pricePerDay) * days;
     const discountRate = days >= 30 ? 0.22 : days >= 7 ? 0.1 : 0;
-    const discountedBase =
-      Math.round(baseTotal * (1 - discountRate) * 100) / 100;
-    const discountSavings =
-      Math.round((baseTotal - discountedBase) * 100) / 100;
+    const discountedBase = Math.round(baseTotal * (1 - discountRate) * 100) / 100;
+    const discountSavings = Math.round((baseTotal - discountedBase) * 100) / 100;
 
-    const serviceObj =
-      SERVICE_TYPE_OPTIONS.find((s) => s.code === serviceType) ||
-      SERVICE_TYPE_OPTIONS[0];
+    const serviceObj = SERVICE_TYPE_OPTIONS.find((s) => s.code === serviceType) || SERVICE_TYPE_OPTIONS[0];
     const serviceFee = serviceObj.dailyRateNgn * days;
 
-    const pickupObj =
-      PICKUP_MODE_OPTIONS.find((p) => p.code === pickupMode) ||
-      PICKUP_MODE_OPTIONS[0];
+    const pickupObj = PICKUP_MODE_OPTIONS.find((p) => p.code === pickupMode) || PICKUP_MODE_OPTIONS[0];
     const pickupFee = pickupObj.flatFeeNgn;
 
-    const protectionObj =
-      PROTECTION_PLAN_OPTIONS.find((p) => p.code === protectionPlan) ||
-      PROTECTION_PLAN_OPTIONS[0];
+    const protectionObj = PROTECTION_PLAN_OPTIONS.find((p) => p.code === protectionPlan) || PROTECTION_PLAN_OPTIONS[0];
     const protectionFee = protectionObj.dailyRateNgn * days;
 
-    const insuranceObj =
-      INSURANCE_PLAN_OPTIONS.find((i) => i.code === insurancePlan) ||
-      INSURANCE_PLAN_OPTIONS[0];
+    const insuranceObj = INSURANCE_PLAN_OPTIONS.find((i) => i.code === insurancePlan) || INSURANCE_PLAN_OPTIONS[0];
     const insuranceFee = insuranceObj.dailyRateNgn * days;
 
     let addonFee = 0;
     for (const code of selectedAddons) {
       const addon = BOOKING_ADDON_OPTIONS.find((a) => a.code === code);
       if (addon) {
-        addonFee +=
-          addon.billing === "daily" ? addon.amountNgn * days : addon.amountNgn;
+        addonFee += addon.billing === "daily" ? addon.amountNgn * days : addon.amountNgn;
       }
     }
 
     const total =
-      Math.round(
-        (discountedBase +
-          serviceFee +
-          pickupFee +
-          protectionFee +
-          insuranceFee +
-          addonFee) *
-          100
-      ) / 100;
+      Math.round((discountedBase + serviceFee + pickupFee + protectionFee + insuranceFee + addonFee) * 100) / 100;
 
     return {
       days,
@@ -159,15 +161,7 @@ const BookCarForm = ({
       addonFee,
       total,
     };
-  }, [
-    dayCount,
-    pricePerDay,
-    serviceType,
-    pickupMode,
-    protectionPlan,
-    insurancePlan,
-    selectedAddons,
-  ]);
+  }, [dayCount, pricePerDay, serviceType, pickupMode, protectionPlan, insurancePlan, selectedAddons]);
 
   const handleSelectServiceType = (code: ServiceTypeCode) => {
     if (code === "self_drive" && !qualification.self_drive_eligible) {
@@ -196,10 +190,7 @@ const BookCarForm = ({
     }
 
     const days =
-      Math.floor(
-        (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-          (1000 * 60 * 60 * 24)
-      ) + 1;
+      Math.floor((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
     if (days <= 0) {
       setError("End date must be after start date.");
       return;
@@ -222,21 +213,13 @@ const BookCarForm = ({
         flight_or_notes: flightOrNotes.trim(),
       });
 
-      if (
-        serviceType === "chauffeur" ||
-        serviceType === "airport_transfer" ||
-        serviceType === "corporate_flex"
-      ) {
+      if (serviceType === "chauffeur" || serviceType === "airport_transfer" || serviceType === "corporate_flex") {
         markChauffeurTrialCompleted();
       }
 
-      const cert =
-        data.insurance_certificate_ref ||
-        `NIID-NG-${new Date().getFullYear()}-${carId}`;
+      const cert = data.insurance_certificate_ref || `NIID-NG-${new Date().getFullYear()}-${carId}`;
       setMessage(
-        `Booking confirmed! Total ${formatPrice(
-          data.total_price
-        )} · Insurance Policy ${cert} (${
+        `Booking confirmed! Total ${formatPrice(data.total_price)} · Insurance Policy ${cert} (${
           serviceType === "chauffeur"
             ? "Chauffeur Trial Completed — You can now take the Driving Test Evaluation!"
             : serviceType.replace("_", " ")
@@ -249,452 +232,265 @@ const BookCarForm = ({
     }
   };
 
+  const selfDriveLocked = !qualification.self_drive_eligible;
+
   return (
-    <Card className="border-border/90 shadow-elevated">
-      <CardHeader className="pb-4 border-b border-border/70">
-        <div className="flex items-baseline justify-between gap-2">
-          <div>
-            <Badge variant="emerald" className="mb-1.5">
-              Instant Mobility & Insurance Configurator
-            </Badge>
-            <CardTitle className="text-lg">Reserve this vehicle</CardTitle>
-          </div>
-          <div className="text-right">
-            <p className="font-mono text-lg font-bold text-primary tabular-nums">
-              {formatPrice(pricePerDay)}{" "}
-              <span className="font-sans text-xs font-normal text-muted-foreground">
-                /day
-              </span>
-            </p>
-            <p className="font-mono text-[10px] text-muted-foreground tabular-nums">
-              -10% Weekly · -22% Monthly
-            </p>
-          </div>
+    <Card className="shadow-elevated">
+      <div className="flex items-end justify-between gap-4 border-b border-border/70 p-6 pb-5">
+        <div className="space-y-1">
+          <Eyebrow tone="muted">Reserve</Eyebrow>
+          <p className="font-mono text-2xl font-semibold tabular-nums tracking-tight text-foreground">
+            {formatPrice(pricePerDay)}
+            <span className="ml-1.5 font-sans text-sm font-normal text-muted-foreground">per day</span>
+          </p>
         </div>
-        <CardDescription>
-          Configure trip dates, chauffeur trial or evaluated self-drive mode, NAICOM/NIID motor insurance, and road protection.
-        </CardDescription>
-      </CardHeader>
+        <p className="font-mono text-2xs text-muted-foreground tabular-nums">−10% wk · −22% mo</p>
+      </div>
 
-      <CardContent className="pt-5">
-        <form onSubmit={handleBooking} className="space-y-5">
-          {/* Step 1: Trip Dates */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                01 · Rental Dates
+      <form onSubmit={handleBooking} className="space-y-5 p-6">
+        <Step
+          index="01"
+          title="Dates"
+          aside={
+            dayCount && dayCount >= 7 ? (
+              <Badge variant="emerald">{dayCount >= 30 ? "SuperFlex −22%" : "Weekly −10%"}</Badge>
+            ) : dayCount ? (
+              <span className="font-mono text-2xs text-muted-foreground tabular-nums">
+                {dayCount} {dayCount === 1 ? "day" : "days"}
               </span>
-              {dayCount && dayCount >= 7 && (
-                <Badge variant="emerald">
-                  {dayCount >= 30
-                    ? "22% Monthly SuperFlex Applied"
-                    : "10% Weekly Saver Applied"}
-                </Badge>
-              )}
+            ) : null
+          }
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="start">Start</Label>
+              <Input
+                id="start"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="font-mono text-xs tabular-nums"
+                required
+              />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label htmlFor="start" className="text-xs">
-                  Start date
-                </Label>
-                <Input
-                  id="start"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="font-mono text-xs tabular-nums"
-                  required
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="end" className="text-xs">
-                  End date
-                </Label>
-                <Input
-                  id="end"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="font-mono text-xs tabular-nums"
-                  required
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="end">End</Label>
+              <Input
+                id="end"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="font-mono text-xs tabular-nums"
+                required
+              />
             </div>
           </div>
+        </Step>
 
-          {/* Step 2: Drive & Service Mode (Enforces Chauffeur Trial before Self-Drive Evaluation) */}
-          <fieldset className="space-y-2.5">
-            <div className="flex items-center justify-between gap-2">
-              <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                02 · Drive Mode (Chauffeur Trial vs. Evaluated Self-Drive)
-              </legend>
-              <Badge
-                variant={
-                  qualification.self_drive_eligible ? "emerald" : "secondary"
-                }
-              >
-                {qualification.self_drive_eligible
-                  ? "Self-Drive Certified ✓"
-                  : "Chauffeur Trial Active"}
-              </Badge>
-            </div>
-
-            {!qualification.self_drive_eligible && (
-              <div className="rounded-xl border border-emerald-900/25 bg-[#0d1713] p-3.5 text-xs text-stone-200 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
-                    New User Self-Drive Policy
-                  </span>
-                  <span className="font-mono text-[10px] text-stone-400 tabular-nums">
-                    {qualification.chauffeur_trial_completed
-                      ? "Step 1/2 Done · Take Driving Test"
-                      : "Step 0/2 · Trial Required"}
-                  </span>
-                </div>
-                <p className="text-[11px] text-stone-300 leading-relaxed">
-                  New accounts must complete a{" "}
-                  <strong className="text-stone-100">
-                    Chauffeur-Driven trial period
-                  </strong>{" "}
-                  first, then pass the{" "}
-                  <strong className="text-stone-100">
-                    5-question FRSC/NIN Driving Test Evaluation
-                  </strong>{" "}
-                  to unlock Self-Drive.
-                </p>
-                <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                  <Link
-                    href="/dashboard/rider#evaluation"
-                    className="rounded-md bg-primary px-2.5 py-1 font-mono text-[11px] font-semibold text-primary-foreground hover:bg-emerald-700 transition-colors"
-                  >
-                    {qualification.chauffeur_trial_completed
-                      ? "Take Driving Test Evaluation →"
-                      : "Open Trial & Driving Test Center →"}
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {SERVICE_TYPE_OPTIONS.map((option) => {
-                const isSelfDriveLocked =
-                  option.code === "self_drive" &&
-                  !qualification.self_drive_eligible;
-                const isSelected = serviceType === option.code;
-                return (
-                  <label
-                    key={option.code}
-                    className={`selectable-option-card ${
-                      isSelected ? "is-active" : ""
-                    } ${
-                      isSelfDriveLocked ? "opacity-75" : ""
-                    } rounded-xl p-2.5 cursor-pointer flex items-start gap-2.5`}
-                  >
-                    <input
-                      type="radio"
-                      name="service_type"
-                      value={option.code}
-                      checked={isSelected}
-                      onChange={() => handleSelectServiceType(option.code)}
-                      className="option-control mt-0.5 h-3.5 w-3.5 shrink-0"
-                    />
-                    <div className="text-xs leading-snug flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <p className="font-semibold text-foreground">
-                          {option.shortLabel}
-                        </p>
-                        {option.code === "self_drive" && (
-                          <span className="font-mono text-[10px] font-semibold text-primary">
-                            {qualification.self_drive_eligible
-                              ? "Unlocked ✓"
-                              : "Requires Trial + Test"}
-                          </span>
-                        )}
-                      </div>
-                      <p className="font-mono text-[11px] text-primary tabular-nums">
-                        {option.dailyRateNgn === 0
-                          ? "Included after evaluation"
-                          : `+${formatPrice(option.dailyRateNgn)}/day`}
-                      </p>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          {/* Step 3: Pickup / Airport / Delivery Mode */}
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="pickup-mode"
-              className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-            >
-              03 · Handover & Airport Logistics{" "}
-              {hubAirport ? `(${hubAirport.split(" · ")[0]})` : ""}
-            </Label>
-            <select
-              id="pickup-mode"
-              value={pickupMode}
-              onChange={(e) => setPickupMode(e.target.value as PickupModeCode)}
-              className="w-full h-10 rounded-lg border border-input bg-card px-3 text-xs font-medium text-foreground shadow-surface focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {PICKUP_MODE_OPTIONS.map((mode) => (
-                <option key={mode.code} value={mode.code}>
-                  {mode.name} —{" "}
-                  {mode.flatFeeNgn === 0
-                    ? "Free Hub Pickup"
-                    : `+${formatPrice(mode.flatFeeNgn)}`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Step 4: Mandatory NAICOM / NIID Motor Insurance */}
-          <fieldset className="space-y-2">
-            <div className="flex items-center justify-between">
-              <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                04 · Motor Insurance Policy (NAICOM / NIID Verified)
-              </legend>
-              <Tooltip content="Every booking issues a verifiable NIID motor insurance certificate">
-                <span className="font-mono text-[10px] font-semibold text-primary cursor-help">
-                  NIID Certificate Included ⓘ
-                </span>
-              </Tooltip>
-            </div>
-            <div className="space-y-2">
-              {INSURANCE_PLAN_OPTIONS.map((ins) => {
-                const isSelected = insurancePlan === ins.code;
-                return (
-                  <label
-                    key={ins.code}
-                    className={`selectable-option-card ${
-                      isSelected ? "is-active" : ""
-                    } rounded-xl p-3 cursor-pointer flex items-start gap-2.5`}
-                  >
-                    <input
-                      type="radio"
-                      name="insurance_plan"
-                      value={ins.code}
-                      checked={isSelected}
-                      onChange={() => setInsurancePlan(ins.code)}
-                      className="option-control mt-0.5 h-3.5 w-3.5 shrink-0"
-                    />
-                    <div className="flex-1 text-xs">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-semibold text-foreground">
-                          {ins.name}
-                        </span>
-                        <span className="font-mono font-bold text-primary tabular-nums shrink-0">
-                          {ins.dailyRateNgn === 0
-                            ? "Included"
-                            : `+${formatPrice(ins.dailyRateNgn)}/day`}
-                        </span>
-                      </div>
-                      <p className="font-mono text-[10px] text-muted-foreground mt-0.5 tabular-nums">
-                        {ins.underwriter} · Up to{" "}
-                        {formatPrice(ins.coverageLimitNgn)} cover
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
-                        {ins.summary}
-                      </p>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          {/* Step 5: Road & Tyre Protection Package */}
-          <fieldset className="space-y-2">
-            <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              05 · Road, Pothole & Standby Relief Shield
-            </legend>
-            <div className="space-y-2">
-              {PROTECTION_PLAN_OPTIONS.map((plan) => {
-                const isSelected = protectionPlan === plan.code;
-                return (
-                  <label
-                    key={plan.code}
-                    className={`selectable-option-card ${
-                      isSelected ? "is-active" : ""
-                    } rounded-xl p-3 cursor-pointer flex items-start gap-2.5`}
-                  >
-                    <input
-                      type="radio"
-                      name="protection_plan"
-                      value={plan.code}
-                      checked={isSelected}
-                      onChange={() => setProtectionPlan(plan.code)}
-                      className="option-control mt-0.5 h-3.5 w-3.5 shrink-0"
-                    />
-                    <div className="flex-1 text-xs">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-semibold text-foreground">
-                          {plan.name}
-                        </span>
-                        <span className="font-mono font-bold text-primary tabular-nums">
-                          {plan.dailyRateNgn === 0
-                            ? "Included"
-                            : `+${formatPrice(plan.dailyRateNgn)}/day`}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
-                        {plan.summary}
-                      </p>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          {/* Step 6: Executive Add-Ons */}
-          <fieldset className="space-y-2">
-            <legend className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              06 · Executive & Local Extras (Optional)
-            </legend>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {BOOKING_ADDON_OPTIONS.map((addon) => {
-                const checked = selectedAddons.includes(addon.code);
-                return (
-                  <label
-                    key={addon.code}
-                    className={`selectable-option-card ${
-                      checked ? "is-active" : ""
-                    } rounded-xl p-2.5 cursor-pointer flex items-start gap-2`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleAddon(addon.code)}
-                      className="option-control mt-0.5 h-3.5 w-3.5 rounded shrink-0"
-                    />
-                    <div className="text-xs leading-tight">
-                      <p className="font-semibold text-foreground">
-                        {addon.name.split(" (")[0]}
-                      </p>
-                      <p className="font-mono text-[10px] text-primary mt-0.5 tabular-nums">
-                        +{formatPrice(addon.amountNgn)}{" "}
-                        {addon.billing === "daily" ? "/day" : "flat"}
-                      </p>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          {/* Step 7: Flight Number / Corporate LPO Notes */}
-          <div className="space-y-1">
-            <Label htmlFor="flight-notes" className="text-xs">
-              Flight number, delivery hotel, or corporate LPO ref (optional)
-            </Label>
-            <Input
-              id="flight-notes"
-              type="text"
-              value={flightOrNotes}
-              onChange={(e) => setFlightOrNotes(e.target.value)}
-              placeholder="e.g. BA 075 arrival 18:40 / Eko Hotel VI"
-              className="text-xs"
-            />
-          </div>
-
-          {/* Itemized Fare Breakdown */}
-          <div className="rounded-xl bg-secondary/75 px-4 py-3.5 space-y-2 animate-enter-subtle">
-            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-              <span>
-                Vehicle ({formatPrice(pricePerDay)} × {fareBreakdown.days}{" "}
-                {fareBreakdown.days === 1 ? "day" : "days"})
-              </span>
-              <span>{formatPrice(fareBreakdown.baseTotal)}</span>
-            </div>
-
-            {fareBreakdown.discountSavings > 0 && (
-              <div className="flex items-center justify-between text-xs text-primary font-mono font-semibold tabular-nums">
+        <Step
+          index="02"
+          title="Drive mode"
+          aside={
+            <Badge variant={selfDriveLocked ? "amber" : "emerald"}>
+              {selfDriveLocked ? "Chauffeur trial" : "Self-drive certified"}
+            </Badge>
+          }
+        >
+          {selfDriveLocked && (
+            <Alert variant="info">
+              <AlertDescription className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <span>
-                  Duration discount (-
-                  {Math.round(fareBreakdown.discountRate * 100)}%)
+                  New accounts start chauffeur-driven. Complete one trial trip, then pass the driving test to unlock self-drive.
+                  <span className="ml-1.5 font-mono text-2xs text-muted-foreground tabular-nums">
+                    {qualification.chauffeur_trial_completed ? "Step 1 of 2 done" : "Step 0 of 2"}
+                  </span>
                 </span>
-                <span>-{formatPrice(fareBreakdown.discountSavings)}</span>
-              </div>
-            )}
+                <ArrowLink href="/dashboard/rider#evaluation" size="sm">
+                  {qualification.chauffeur_trial_completed ? "Take the driving test" : "Open trial & test centre"}
+                </ArrowLink>
+              </AlertDescription>
+            </Alert>
+          )}
+          <fieldset className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <legend className="sr-only">Drive mode</legend>
+            {SERVICE_TYPE_OPTIONS.map((option) => {
+              const locked = option.code === "self_drive" && selfDriveLocked;
+              return (
+                <OptionCard
+                  key={option.code}
+                  kind="radio"
+                  size="sm"
+                  name="service_type"
+                  value={option.code}
+                  checked={serviceType === option.code}
+                  disabled={locked}
+                  onChange={() => handleSelectServiceType(option.code)}
+                  title={option.shortLabel}
+                  meta={
+                    locked
+                      ? "Locked"
+                      : option.dailyRateNgn === 0
+                      ? "Included"
+                      : `+${formatPrice(option.dailyRateNgn)}/day`
+                  }
+                />
+              );
+            })}
+          </fieldset>
+        </Step>
 
+        <Step index="03" title={`Handover${hubAirport ? ` · ${hubAirport.split(" · ")[0]}` : ""}`}>
+          <Label htmlFor="pickup-mode" className="sr-only">
+            Handover and airport logistics
+          </Label>
+          <Select id="pickup-mode" value={pickupMode} onChange={(e) => setPickupMode(e.target.value as PickupModeCode)}>
+            {PICKUP_MODE_OPTIONS.map((mode) => (
+              <option key={mode.code} value={mode.code}>
+                {mode.name} — {mode.flatFeeNgn === 0 ? "Free hub pickup" : `+${formatPrice(mode.flatFeeNgn)}`}
+              </option>
+            ))}
+          </Select>
+        </Step>
+
+        <Step
+          index="04"
+          title="Motor insurance"
+          aside={<span className="font-mono text-2xs text-muted-foreground">NIID certificate issued</span>}
+        >
+          <fieldset className="space-y-2">
+            <legend className="sr-only">Motor insurance policy</legend>
+            {INSURANCE_PLAN_OPTIONS.map((ins) => (
+              <OptionCard
+                key={ins.code}
+                kind="radio"
+                name="insurance_plan"
+                value={ins.code}
+                checked={insurancePlan === ins.code}
+                onChange={() => setInsurancePlan(ins.code)}
+                title={ins.name}
+                meta={ins.dailyRateNgn === 0 ? "Included" : `+${formatPrice(ins.dailyRateNgn)}/day`}
+                description={
+                  <>
+                    <span className="font-mono tabular-nums">
+                      {ins.underwriter} · up to {formatPrice(ins.coverageLimitNgn)}
+                    </span>
+                    <span className="block">{ins.summary}</span>
+                  </>
+                }
+              />
+            ))}
+          </fieldset>
+        </Step>
+
+        <Step index="05" title="Road shield">
+          <fieldset className="space-y-2">
+            <legend className="sr-only">Road, pothole and standby protection</legend>
+            {PROTECTION_PLAN_OPTIONS.map((plan) => (
+              <OptionCard
+                key={plan.code}
+                kind="radio"
+                name="protection_plan"
+                value={plan.code}
+                checked={protectionPlan === plan.code}
+                onChange={() => setProtectionPlan(plan.code)}
+                title={plan.name}
+                meta={plan.dailyRateNgn === 0 ? "Included" : `+${formatPrice(plan.dailyRateNgn)}/day`}
+                description={plan.summary}
+              />
+            ))}
+          </fieldset>
+        </Step>
+
+        <Step index="06" title="Extras" aside={<span className="font-mono text-2xs text-muted-foreground">Optional</span>}>
+          <fieldset className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <legend className="sr-only">Executive and local extras</legend>
+            {BOOKING_ADDON_OPTIONS.map((addon) => (
+              <OptionCard
+                key={addon.code}
+                kind="checkbox"
+                size="sm"
+                checked={selectedAddons.includes(addon.code)}
+                onChange={() => toggleAddon(addon.code)}
+                title={addon.name.split(" (")[0]}
+                meta={`+${formatPrice(addon.amountNgn)} ${addon.billing === "daily" ? "/day" : "flat"}`}
+              />
+            ))}
+          </fieldset>
+        </Step>
+
+        <Step index="07" title="Notes" aside={<span className="font-mono text-2xs text-muted-foreground">Optional</span>}>
+          <Label htmlFor="flight-notes" className="sr-only">
+            Flight number, delivery hotel, or corporate LPO reference
+          </Label>
+          <Input
+            id="flight-notes"
+            type="text"
+            value={flightOrNotes}
+            onChange={(e) => setFlightOrNotes(e.target.value)}
+            placeholder="Flight number, hotel, or LPO ref — e.g. BA 075 arr. 18:40"
+          />
+        </Step>
+
+        {/* Receipt */}
+        <div className="animate-enter-subtle rounded-md border border-border/80 bg-surface px-4 py-2">
+          <div className="divide-y divide-border/60">
+            <ReceiptRow
+              label={`Vehicle · ${formatPrice(pricePerDay)} × ${fareBreakdown.days} ${fareBreakdown.days === 1 ? "day" : "days"}`}
+              amount={formatPrice(fareBreakdown.baseTotal)}
+            />
+            {fareBreakdown.discountSavings > 0 && (
+              <ReceiptRow
+                tone="primary"
+                label={`Duration discount −${Math.round(fareBreakdown.discountRate * 100)}%`}
+                amount={`−${formatPrice(fareBreakdown.discountSavings)}`}
+              />
+            )}
             {fareBreakdown.serviceFee > 0 && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-                <span>Drive / service mode ({fareBreakdown.days}d)</span>
-                <span>+{formatPrice(fareBreakdown.serviceFee)}</span>
-              </div>
+              <ReceiptRow label={`Drive mode · ${fareBreakdown.days}d`} amount={`+${formatPrice(fareBreakdown.serviceFee)}`} />
             )}
-
             {fareBreakdown.pickupFee > 0 && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-                <span>Airport / delivery logistics</span>
-                <span>+{formatPrice(fareBreakdown.pickupFee)}</span>
-              </div>
+              <ReceiptRow label="Handover logistics" amount={`+${formatPrice(fareBreakdown.pickupFee)}`} />
             )}
-
-            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-              <span>
-                Motor insurance ({fareBreakdown.insuranceObj.badge})
-              </span>
-              <span>
-                {fareBreakdown.insuranceFee === 0
-                  ? "Included"
-                  : `+${formatPrice(fareBreakdown.insuranceFee)}`}
-              </span>
-            </div>
-
+            <ReceiptRow
+              label={`Motor insurance · ${fareBreakdown.insuranceObj.badge}`}
+              amount={fareBreakdown.insuranceFee === 0 ? "Included" : `+${formatPrice(fareBreakdown.insuranceFee)}`}
+            />
             {fareBreakdown.protectionFee > 0 && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-                <span>Road & tyre shield ({fareBreakdown.days}d)</span>
-                <span>+{formatPrice(fareBreakdown.protectionFee)}</span>
-              </div>
+              <ReceiptRow label={`Road shield · ${fareBreakdown.days}d`} amount={`+${formatPrice(fareBreakdown.protectionFee)}`} />
             )}
-
             {fareBreakdown.addonFee > 0 && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground font-mono tabular-nums">
-                <span>Selected mobility extras ({selectedAddons.length})</span>
-                <span>+{formatPrice(fareBreakdown.addonFee)}</span>
-              </div>
+              <ReceiptRow label={`Extras · ${selectedAddons.length}`} amount={`+${formatPrice(fareBreakdown.addonFee)}`} />
             )}
-
-            <Separator />
-            <div className="flex items-center justify-between text-sm font-semibold text-foreground tabular-nums">
-              <span>
-                {dayCount ? "Estimated trip total" : "Estimated 1-day total"}
+            <div className="flex items-baseline justify-between gap-4 py-3">
+              <span className="text-sm font-medium text-foreground">
+                {dayCount ? "Estimated total" : "Estimated 1-day total"}
               </span>
-              <span className="font-mono text-base font-bold text-primary">
+              <span className="font-mono text-lg font-semibold tabular-nums text-foreground">
                 {formatPrice(fareBreakdown.total)}
               </span>
             </div>
           </div>
+        </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-          {message && (
-            <Alert variant="emerald">
-              <AlertDescription className="font-semibold text-primary">
-                {message}
-              </AlertDescription>
-            </Alert>
-          )}
+        {message && (
+          <Alert variant="emerald">
+            <AlertDescription className="font-medium">{message}</AlertDescription>
+          </Alert>
+        )}
 
-          <Button
-            type="submit"
-            disabled={submitting}
-            size="lg"
-            className="w-full"
-          >
-            {submitting
-              ? "Confirming reservation & NIID insurance..."
-              : `Book now · ${formatPrice(fareBreakdown.total)}`}
-          </Button>
-        </form>
-      </CardContent>
+        <Button type="submit" disabled={submitting} size="lg" className="w-full">
+          {submitting ? "Confirming reservation…" : `Book now · ${formatPrice(fareBreakdown.total)}`}
+        </Button>
+        {!isAuthenticated && (
+          <p className="text-center font-mono text-2xs text-muted-foreground">You&apos;ll be asked to sign in before confirming.</p>
+        )}
+      </form>
     </Card>
   );
 };

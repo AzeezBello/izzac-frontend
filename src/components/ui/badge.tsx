@@ -6,39 +6,45 @@ export type BadgeVariant =
   | "secondary"
   | "outline"
   | "emerald"
+  | "amber"
   | "destructive"
-  | "dark";
+  | "dark"
+  | "signal";
 
 const badgeVariants: Record<BadgeVariant, string> = {
-  default:
-    "border-transparent bg-primary text-primary-foreground",
-  secondary:
-    "border-border/70 bg-secondary text-secondary-foreground",
-  outline:
-    "border-border bg-card/80 text-foreground",
-  emerald:
-    "border-emerald-800/15 bg-emerald-950/[0.06] text-emerald-900",
-  destructive:
-    "border-red-500/20 bg-red-500/10 text-red-800",
-  dark:
-    "border-white/15 bg-white/10 text-stone-100",
+  default: "border-transparent bg-primary text-primary-foreground",
+  secondary: "border-transparent bg-secondary text-foreground/80",
+  outline: "border-border bg-surface-elevated/90 text-foreground",
+  emerald: "border-primary/15 bg-primary-soft text-primary",
+  amber: "border-amber-600/20 bg-amber-50 text-amber-800",
+  destructive: "border-red-500/20 bg-red-50 text-red-800",
+  dark: "border-white/12 bg-white/[0.08] text-ink-foreground",
+  signal: "border-signal/30 bg-signal/15 text-signal",
 };
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
+  dot?: boolean;
 }
 
-function Badge({ className, variant = "default", ...props }: BadgeProps) {
+function Badge({ className, variant = "secondary", dot, children, ...props }: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-0.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] whitespace-nowrap",
-        "transition-colors duration-150 ease-out-quart",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-[3px] font-mono text-2xs font-semibold uppercase tracking-[0.1em] whitespace-nowrap leading-none",
         badgeVariants[variant],
         className
       )}
       {...props}
-    />
+    >
+      {dot && (
+        <span
+          aria-hidden="true"
+          className="h-1.5 w-1.5 rounded-full bg-current opacity-80"
+        />
+      )}
+      {children}
+    </span>
   );
 }
 

@@ -1,356 +1,219 @@
 "use client";
 
 import Link from "next/link";
-import Breadcrumbs from "../../../components/Breadcrumbs";
-import DashboardNav from "../../../components/DashboardNav";
+import DashboardShell from "../../../components/DashboardShell";
 import DrivingEvaluationPanel from "../../../components/DrivingEvaluationPanel";
 import EmptyStateGuide from "../../../components/EmptyStateGuide";
+import Loader from "../../../components/Loader";
 import { useAuth } from "../../../context/AuthContext";
-import {
-  CURRENCIES,
-  CurrencyCode,
-  useCurrency,
-} from "../../../context/CurrencyContext";
+import { CURRENCIES, CurrencyCode, useCurrency } from "../../../context/CurrencyContext";
 import { useOnboarding } from "../../../context/OnboardingContext";
 import { useRequireAuth } from "../../../hooks/useAuth";
-import Loader from "../../../components/Loader";
-import {
-  INSURANCE_PLAN_OPTIONS,
-  IZZAC_PRIVILEGE_TIERS,
-} from "../../../lib/productContent";
+import { INSURANCE_PLAN_OPTIONS, IZZAC_PRIVILEGE_TIERS } from "../../../lib/productContent";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
+import { Eyebrow } from "../../../components/layout/Eyebrow";
+import { InkPanel } from "../../../components/layout/InkPanel";
+import { Stat } from "../../../components/layout/Stat";
+import { cn } from "@/lib/utils";
+
+const ProfileRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+  <div className="flex items-center justify-between gap-4 py-2.5 font-mono text-xs">
+    <span className="text-muted-foreground">{label}</span>
+    <span className="text-right font-medium text-foreground tabular-nums">{value}</span>
+  </div>
+);
 
 const UserProfileDashboard = () => {
-  const { isAuthenticated, isLoading } = useRequireAuth(
-    "/login?next=/user/dashboard"
-  );
+  const { isAuthenticated, isLoading } = useRequireAuth("/login?next=/user/dashboard");
   const { user, qualification } = useAuth();
   const { currency, setCurrency, formatPrice } = useCurrency();
   const { openOnboarding, startProductTour } = useOnboarding();
 
   return (
-    <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 md:py-12 space-y-8 animate-enter-subtle">
-      <Breadcrumbs
-        items={[
-          { label: "My Garage & Dashboards", href: "/dashboard" },
-          { label: "Account, KYC & Clearance Certificates" },
-        ]}
-      />
-
-      <DashboardNav />
-
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-border/80">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="emerald">Account, KYC & Clearance Dossier</Badge>
-            <Badge variant="secondary">
-              Chauffeur Trial · Driving Test · Motor Insurance · Privilege Tier
-            </Badge>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-            Account profile, self-drive certificate & insurance dossier
-          </h1>
-          <p className="text-muted-foreground text-sm md:text-base max-w-[74ch]">
-            Inspect your identity credentials, Chauffeur-Driven Trial completion record, Driving Test Evaluation score, Self-Drive Clearance Certificate, and active motor insurance coverage.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
+    <DashboardShell
+      breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Profile" }]}
+      eyebrow="Account"
+      title="Profile & certificates"
+      description="Identity credentials, chauffeur trial record, driving test score, self-drive clearance and the insurance tiers available at checkout."
+      actions={
+        <>
           <Button type="button" variant="outline" onClick={openOnboarding}>
-            Onboarding Guide
+            Onboarding guide
           </Button>
-          <Button type="button" variant="secondary" onClick={startProductTour}>
-            Guided Product Tour
+          <Button type="button" variant="ghost" onClick={startProductTour}>
+            Product tour
           </Button>
-          <Button asChild>
-            <Link href="/dashboard/bookings">Open Bookings Ledger</Link>
-          </Button>
-        </div>
-      </div>
-
+        </>
+      }
+    >
       {isLoading ? (
-        <Loader />
+        <Loader label="Loading profile" />
       ) : !isAuthenticated ? (
         <EmptyStateGuide
-          eyebrow="Authentication Required"
-          title="Sign in to view your Account, KYC & Self-Drive Clearance Dossier"
-          description="Your unified profile stores your Chauffeur-Driven Trial status, Driving Test Evaluation certificate, motor insurance policies, and Privilege rewards."
-          primaryAction={{
-            label: "Sign in to Account Dossier",
-            href: "/login?next=/user/dashboard",
-          }}
-          secondaryAction={{
-            label: "Create Account",
-            href: "/signup",
-          }}
+          eyebrow="Sign in required"
+          title="Sign in to view your profile"
+          description="Your profile stores your trial status, driving test certificate, insurance options and loyalty tier."
+          primaryAction={{ label: "Sign in", href: "/login?next=/user/dashboard" }}
+          secondaryAction={{ label: "Create account", href: "/signup" }}
           tips={[
-            {
-              title: "Digital Self-Drive Clearance Certificate",
-              description:
-                "Once you complete your Chauffeur Trial and score ≥80% on the Driving Test Evaluation, your certificate is stored here permanently.",
-            },
-            {
-              title: "Verified Motor Insurance",
-              description:
-                "Compare Statutory Third-Party, Comprehensive Motor Insurance, and All-Risk Zero-Excess coverage tiers.",
-            },
-            {
-              title: "Multi-Currency & Loyalty Controls",
-              description:
-                "Switch your active display currency and track your Izzac Privilege tier progression.",
-            },
+            { title: "Clearance certificate", description: "Issued once you complete the chauffeur trial and score 80%+ on the driving test." },
+            { title: "Insurance tiers", description: "Compare third-party, comprehensive and all-risk zero-excess cover." },
+            { title: "Currency & loyalty", description: "Switch display currency and track your Privilege tier." },
           ]}
         />
       ) : (
         <>
-          {/* 12-Column Identity, Clearance Certificate & Currency Dossier */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            <Card className="lg:col-span-4 p-6 flex flex-col justify-between space-y-5">
-              <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
+            <Card className="flex flex-col justify-between p-6 lg:col-span-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
-                  <Badge variant="emerald">Verified Member Profile</Badge>
-                  <span className="font-mono text-xs text-muted-foreground tabular-nums">
-                    ID #{user?.id || "101"}
-                  </span>
+                  <Badge variant="emerald" dot>
+                    Verified member
+                  </Badge>
+                  <span className="font-mono text-2xs text-muted-foreground tabular-nums">ID #{user?.id || "—"}</span>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground tracking-[-0.02em]">
-                    {user?.username || "Executive Member"}
-                  </h2>
-                  <p className="font-mono text-xs text-muted-foreground mt-1">
-                    {user?.email || "member@izzac.com"}
-                  </p>
+                  <h2 className="text-2xl font-semibold tracking-[-0.025em] text-foreground">{user?.username || "Member"}</h2>
+                  <p className="mt-1 font-mono text-xs text-muted-foreground">{user?.email || "—"}</p>
                 </div>
-
-                <div className="space-y-2 pt-3 border-t border-border/70 font-mono text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Account Role:</span>
-                    <span className="font-semibold text-foreground">
-                      Unified Rider + Host
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      Driver’s License:
-                    </span>
-                    <span className="font-semibold text-foreground">
-                      {qualification.frsc_license_number || "Not yet verified"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">National ID:</span>
-                    <span className="font-semibold text-foreground">
-                      {qualification.nin_number
-                        ? `•••••••${qualification.nin_number.slice(-4)}`
-                        : "Not yet verified"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      Driving Experience:
-                    </span>
-                    <span className="font-semibold text-foreground tabular-nums">
-                      {qualification.years_experience} Years
-                    </span>
-                  </div>
+                <div className="divide-y divide-border/70 border-t border-border/70">
+                  <ProfileRow label="Role" value="Rider + host" />
+                  <ProfileRow label="Driver's licence" value={qualification.frsc_license_number || "Not verified"} />
+                  <ProfileRow
+                    label="National ID"
+                    value={qualification.nin_number ? `•••••••${qualification.nin_number.slice(-4)}` : "Not verified"}
+                  />
+                  <ProfileRow label="Experience" value={`${qualification.years_experience} yrs`} />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-border/70 space-y-2.5">
-                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-                  Preferred Display Currency
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="mt-6 space-y-2.5 border-t border-border/70 pt-5">
+                <p className="type-eyebrow text-muted-foreground">Display currency</p>
+                <div className="grid grid-cols-4 gap-1 rounded-md border border-border bg-surface p-1" role="group" aria-label="Display currency">
                   {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
                     <button
                       key={code}
                       type="button"
                       onClick={() => setCurrency(code)}
-                      className={`rounded-lg border px-2.5 py-1.5 font-mono text-xs font-semibold transition-colors ${
-                        currency === code
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-secondary/40 text-foreground hover:bg-secondary"
-                      }`}
+                      aria-pressed={currency === code}
+                      className={cn(
+                        "rounded-sm py-1.5 font-mono text-xs font-medium transition-colors duration-150",
+                        currency === code ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:text-foreground"
+                      )}
                     >
-                      {CURRENCIES[code].label}
+                      {code}
                     </button>
                   ))}
                 </div>
               </div>
             </Card>
 
-            {/* Digital Self-Drive Clearance Certificate Card */}
-            <div className="lg:col-span-8 rounded-2xl bg-[#0d1713] text-stone-100 p-6 md:p-8 border border-emerald-950 shadow-elevated flex flex-col justify-between space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2">
-                  <Badge variant="dark">
-                    Digital Self-Drive Clearance Certificate
-                  </Badge>
-                  <Badge
-                    variant={
-                      qualification.self_drive_eligible ? "emerald" : "secondary"
-                    }
-                  >
-                    {qualification.self_drive_eligible
-                      ? "ACTIVE & VERIFIED ✓"
-                      : "CHAUFFEUR TRIAL MODE"}
+            <InkPanel className="lg:col-span-8">
+              <div className="flex h-full flex-col justify-between gap-8">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <Eyebrow tone="signal">Self-drive clearance certificate</Eyebrow>
+                    <p className="font-mono text-2xl font-semibold tracking-tight tabular-nums text-ink-foreground md:text-3xl">
+                      {qualification.clearance_certificate || "PENDING-EVALUATION"}
+                    </p>
+                  </div>
+                  <Badge variant={qualification.self_drive_eligible ? "signal" : "dark"} dot>
+                    {qualification.self_drive_eligible ? "Active & verified" : "Chauffeur trial mode"}
                   </Badge>
                 </div>
-                <span className="font-mono text-xs text-emerald-300 tabular-nums">
-                  {qualification.clearance_certificate || "PENDING-EVALUATION"}
-                </span>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-stone-400">
-                    Stage 01 · Chauffeur Trial
-                  </p>
-                  <p className="text-lg font-bold text-stone-50">
-                    {qualification.chauffeur_trial_completed
-                      ? "Completed ✓"
-                      : "Pending Trial Trip"}
-                  </p>
-                  <p className="text-xs text-stone-300">
-                    Mandatory trial period before Self-Drive evaluation.
-                  </p>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-stone-400">
-                    Stage 02 · Driving Test Score
-                  </p>
-                  <p className="font-mono text-lg font-bold text-emerald-300 tabular-nums">
-                    {qualification.driving_test_score}% (Pass ≥ 80%)
-                  </p>
-                  <p className="text-xs text-stone-300">
-                    5-question Highway Code & Flood-Corridor assessment.
-                  </p>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-stone-400">
-                    Stage 03 · Motor Insurance
-                  </p>
-                  <p className="text-lg font-bold text-stone-50">
-                    NIID Active ✓
-                  </p>
-                  <p className="text-xs text-stone-300">
-                    Third-Party, Comprehensive, or Zero-Excess All-Risk.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10">
-                <p className="text-xs text-stone-300">
-                  {qualification.self_drive_eligible
-                    ? "Your account is cleared to book any vehicle in Evaluated Self-Drive or Chauffeur-Driven mode."
-                    : "Complete Stage 01 & Stage 02 below to issue your Digital Self-Drive Clearance Certificate."}
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button asChild size="sm">
-                    <a href="#evaluation">
-                      {qualification.self_drive_eligible
-                        ? "Review Evaluation"
-                        : "Complete Evaluation Now"}
-                    </a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
+                <div className="grid grid-cols-1 gap-6 border-y border-white/10 py-6 sm:grid-cols-3 sm:divide-x sm:divide-white/10 sm:[&>*:not(:first-child)]:pl-6">
+                  <Stat
+                    inverted
                     size="sm"
-                    className="border-white/20 bg-white/5 text-stone-100 hover:bg-white/10"
-                  >
-                    <Link href="/cars">Browse Fleet →</Link>
-                  </Button>
+                    label="01 · Chauffeur trial"
+                    value={qualification.chauffeur_trial_completed ? "Complete" : "Pending"}
+                    tone={qualification.chauffeur_trial_completed ? "signal" : "default"}
+                    detail="Mandatory before evaluation"
+                  />
+                  <Stat
+                    inverted
+                    size="sm"
+                    label="02 · Driving test"
+                    value={`${qualification.driving_test_score}%`}
+                    tone={qualification.driving_test_status === "passed" ? "signal" : "default"}
+                    detail="Pass mark 80%"
+                  />
+                  <Stat inverted size="sm" label="03 · Motor insurance" value="NIID" tone="signal" detail="Verified on every trip" />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <p className="max-w-[48ch] text-xs leading-relaxed text-ink-muted">
+                    {qualification.self_drive_eligible
+                      ? "Cleared to book any vehicle in self-drive or chauffeur-driven mode."
+                      : "Complete stages one and two below to issue your certificate."}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button asChild size="sm">
+                      <a href="#evaluation">{qualification.self_drive_eligible ? "Review evaluation" : "Complete evaluation"}</a>
+                    </Button>
+                    <Button asChild variant="inverse" size="sm">
+                      <Link href="/cars">Browse fleet</Link>
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </InkPanel>
           </div>
 
-          {/* Motor Insurance Policy Comparison & Izzac Privilege Tiers */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-7 rounded-2xl border border-border/90 bg-card p-6 space-y-5 shadow-surface">
-              <div className="space-y-1">
-                <Badge variant="emerald">Motor Insurance Schedule</Badge>
-                <h2 className="text-xl font-bold text-foreground">
-                  Verified Motor Insurance Policies Available at Checkout
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  Every booking automatically issues a digital insurance certificate reference (`NIID-NG-2026-...`).
-                </p>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+            <section className="space-y-5 lg:col-span-7">
+              <div className="space-y-2">
+                <Eyebrow>Motor insurance</Eyebrow>
+                <h2 className="text-h2 text-foreground">Policies available at checkout</h2>
+                <p className="text-sm text-muted-foreground">Every booking issues a digital certificate reference.</p>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 divide-y divide-border/70 border-y border-border/70 md:grid-cols-3 md:divide-x md:divide-y-0">
                 {INSURANCE_PLAN_OPTIONS.map((plan) => (
-                  <div
-                    key={plan.code}
-                    className="rounded-xl border border-border/80 bg-secondary/25 p-4 flex flex-col justify-between space-y-3"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-1">
-                        <Badge variant="secondary">{plan.badge}</Badge>
-                        <span className="font-mono text-xs font-bold text-primary tabular-nums">
-                          {plan.dailyRateNgn === 0
-                            ? "Included"
-                            : `+${formatPrice(plan.dailyRateNgn)}/d`}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-bold text-foreground">
-                        {plan.name}
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {plan.summary}
-                      </p>
-                    </div>
-                    <div className="pt-2 border-t border-border/60 font-mono text-[10px] text-muted-foreground space-y-0.5">
-                      <p>Limit: {formatPrice(plan.coverageLimitNgn)}</p>
-                      <p>{plan.underwriter}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="lg:col-span-5 rounded-2xl border border-border/90 bg-card p-6 space-y-5 shadow-surface">
-              <div className="space-y-1">
-                <Badge variant="secondary">Izzac Privilege Program</Badge>
-                <h2 className="text-xl font-bold text-foreground">
-                  Executive Loyalty Tiers & Perks
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  Automatic discounts and priority upgrades as you complete Chauffeur and Self-Drive bookings.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {IZZAC_PRIVILEGE_TIERS.map((tier) => (
-                  <div
-                    key={tier.tier}
-                    className="rounded-xl border border-border/80 bg-secondary/25 p-3.5 space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-foreground">
-                        {tier.tier}
+                  <div key={plan.code} className="space-y-2 py-5 md:px-5 md:first:pl-0 md:last:pr-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge variant={plan.code === "comprehensive_shield" ? "emerald" : "secondary"}>{plan.badge}</Badge>
+                      <span className="font-mono text-xs font-semibold text-primary tabular-nums">
+                        {plan.dailyRateNgn === 0 ? "Included" : `+${formatPrice(plan.dailyRateNgn)}/d`}
                       </span>
-                      <Badge variant="emerald">{tier.discount}</Badge>
                     </div>
-                    <p className="font-mono text-[11px] text-muted-foreground">
-                      {tier.threshold}
+                    <h3 className="text-sm font-medium text-foreground">{plan.name}</h3>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{plan.summary}</p>
+                    <p className="font-mono text-2xs text-muted-foreground tabular-nums">
+                      {plan.underwriter} · up to {formatPrice(plan.coverageLimitNgn)}
                     </p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
+
+            <section className="space-y-5 lg:col-span-5">
+              <div className="space-y-2">
+                <Eyebrow>Izzac Privilege</Eyebrow>
+                <h2 className="text-h2 text-foreground">Loyalty tiers</h2>
+                <p className="text-sm text-muted-foreground">Discounts and priority upgrades as you complete bookings.</p>
+              </div>
+              <div className="divide-y divide-border/70 border-y border-border/70">
+                {IZZAC_PRIVILEGE_TIERS.map((tier, idx) => (
+                  <div key={tier.tier} className="grid grid-cols-[2rem_1fr_auto] items-baseline gap-3 py-4">
+                    <span className="font-mono text-xs text-primary tabular-nums">0{idx + 1}</span>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{tier.tier}</p>
+                      <p className="font-mono text-2xs text-muted-foreground">{tier.threshold}</p>
+                    </div>
+                    <Badge variant="emerald">{tier.discount}</Badge>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
 
-          {/* Interactive Driving Test & Chauffeur Trial Evaluation Panel */}
           <DrivingEvaluationPanel />
         </>
       )}
-    </div>
+    </DashboardShell>
   );
 };
 

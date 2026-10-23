@@ -61,7 +61,7 @@ const organizationJsonLd = {
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -70,12 +70,12 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
         <AuthProvider>
           <CurrencyProvider>
             <OnboardingProvider>
               <Header />
-              <main className="flex-grow">{children}</main>
+              <main id="main" className="flex-1">{children}</main>
               <Footer />
             </OnboardingProvider>
           </CurrencyProvider>

@@ -12,9 +12,7 @@ const TabsContext = React.createContext<TabsContextValue | undefined>(undefined)
 
 function useTabsContext() {
   const ctx = React.useContext(TabsContext);
-  if (!ctx) {
-    throw new Error("Tabs components must be used within <Tabs />");
-  }
+  if (!ctx) throw new Error("Tabs components must be used within <Tabs />");
   return ctx;
 }
 
@@ -31,9 +29,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 
     const handleChange = React.useCallback(
       (next: string) => {
-        if (value === undefined) {
-          setInternalValue(next);
-        }
+        if (value === undefined) setInternalValue(next);
         onValueChange?.(next);
       },
       [value, onValueChange]
@@ -50,30 +46,40 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 );
 Tabs.displayName = "Tabs";
 
-const TabsList = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="tablist"
-    className={cn(
-      "inline-flex h-10 items-center justify-center rounded-xl border border-border/80 bg-secondary/80 p-1 text-muted-foreground shadow-[inset_0_1px_2px_rgba(15,23,19,0.04)]",
-      className
-    )}
-    {...props}
-  />
-));
+export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** `segmented` = pill switcher, `underline` = editorial rule tabs */
+  variant?: "segmented" | "underline";
+}
+
+const TabsListContext = React.createContext<"segmented" | "underline">("segmented");
+
+const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
+  ({ className, variant = "segmented", ...props }, ref) => (
+    <TabsListContext.Provider value={variant}>
+      <div
+        ref={ref}
+        role="tablist"
+        className={cn(
+          variant === "segmented"
+            ? "inline-flex h-10 items-center rounded-md border border-border/80 bg-secondary/70 p-1 text-muted-foreground"
+            : "flex items-center gap-6 border-b border-border/80",
+          className
+        )}
+        {...props}
+      />
+    </TabsListContext.Provider>
+  )
+);
 TabsList.displayName = "TabsList";
 
-export interface TabsTriggerProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   value: string;
 }
 
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ className, value, onClick, ...props }, ref) => {
     const { value: activeValue, onValueChange } = useTabsContext();
+    const variant = React.useContext(TabsListContext);
     const isActive = activeValue === value;
 
     return (
@@ -88,13 +94,21 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
           onClick?.(e);
         }}
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3.5 py-1.5 text-xs font-semibold tracking-[-0.01em] select-none",
-          "transition-[transform,background-color,color,box-shadow] duration-150 ease-out-quart",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-          "active:scale-[0.98]",
-          isActive
-            ? "bg-card text-foreground shadow-surface border border-border/60"
-            : "text-muted-foreground hover:text-foreground",
+          "whitespace-nowrap select-none text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "transition-[background-color,color,box-shadow,border-color] duration-150 ease-out-quart",
+          variant === "segmented"
+            ? cn(
+                "inline-flex h-8 items-center justify-center rounded-sm px-3.5 active:scale-[0.98]",
+                isActive
+                  ? "bg-surface-elevated text-foreground shadow-surface"
+                  : "text-muted-foreground hover:text-foreground"
+              )
+            : cn(
+                "-mb-px border-b-2 pb-3 pt-1",
+                isActive
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              ),
           className
         )}
         {...props}
@@ -112,13 +126,12 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, value, children, ...props }, ref) => {
     const { value: activeValue } = useTabsContext();
     if (activeValue !== value) return null;
-
     return (
       <div
         ref={ref}
         role="tabpanel"
         data-state="active"
-        className={cn("mt-4 animate-enter-subtle focus-visible:outline-none", className)}
+        className={cn("mt-5 animate-enter-subtle focus-visible:outline-none", className)}
         {...props}
       >
         {children}

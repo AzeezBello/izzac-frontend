@@ -11,15 +11,9 @@ type TooltipProps = {
 };
 
 /**
- * Accessible tooltip with a directional pointer arrow that points directly at its trigger button.
- * Supports pointer hover, keyboard focus, and Escape dismissal (WCAG 1.4.13).
+ * Accessible hover/focus tooltip with Escape dismissal (WCAG 1.4.13).
  */
-export const Tooltip = ({
-  content,
-  children,
-  position = "bottom",
-  className,
-}: TooltipProps) => {
+export const Tooltip = ({ content, children, position = "bottom", className }: TooltipProps) => {
   const [open, setOpen] = useState(false);
   const tooltipId = useId();
 
@@ -31,9 +25,7 @@ export const Tooltip = ({
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
       onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          setOpen(false);
-        }
+        if (e.key === "Escape") setOpen(false);
       }}
     >
       {children}
@@ -42,7 +34,8 @@ export const Tooltip = ({
         role="tooltip"
         aria-hidden={!open}
         className={cn(
-          "pointer-events-none absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-lg border border-emerald-900/40 bg-[#0d1713] px-2.5 py-1.5 font-mono text-[11px] font-medium text-stone-100 shadow-elevated transition-[opacity,transform] duration-150 ease-out-quart",
+          "pointer-events-none absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-sm bg-ink px-2.5 py-1.5 font-mono text-2xs font-medium text-ink-foreground shadow-elevated",
+          "transition-[opacity,transform] duration-150 ease-out-quart",
           position === "bottom" ? "top-full mt-2" : "bottom-full mb-2",
           open
             ? "opacity-100 translate-y-0"
@@ -51,14 +44,11 @@ export const Tooltip = ({
             : "opacity-0 translate-y-1"
         )}
       >
-        {/* Pointer Arrow pointing directly to the button */}
         <span
           aria-hidden="true"
           className={cn(
-            "absolute left-1/2 -translate-x-1/2 h-2 w-2 rotate-45 bg-[#0d1713] border-emerald-900/40",
-            position === "bottom"
-              ? "-top-1 border-l border-t"
-              : "-bottom-1 border-r border-b"
+            "absolute left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-ink",
+            position === "bottom" ? "-top-1" : "-bottom-1"
           )}
         />
         {content}

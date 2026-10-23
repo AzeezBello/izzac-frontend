@@ -198,25 +198,41 @@ Structured design specification combining **Google Design.Md (`google-labs-code/
 
 ## 7. Components
 
-### 1. Interactive Button (`ui/button.tsx`)
-- **Press State**: `:active:scale-[0.98]`
-- **Transition**: `transition-[transform,background-color,border-color,color,box-shadow] duration-150 ease-out-quart` (Never `transition-all`).
-- **Tactile feedback**: Subtle cursor attractor or micro spark (`@react-bits/ClickSpark-TS-TW`) on primary conversion triggers.
+All primitives live in `src/components/ui/*` (controls) and `src/components/layout/*` (composition). Pages compose these; they never re-declare container widths, eyebrow styles, or dark panel backgrounds inline.
 
-### 2. Vehicle Cards (`ui/card.tsx`)
-- **Hover Physics**: `hover:-translate-y-1 hover:shadow-elevated transition-[transform,box-shadow,border-color] duration-200 ease-out-quart`
-- **Image Reveal**: Sub-element image scale `scale-[1.03] duration-500 ease-out-expo` with clean overflow clipping.
-- **Telemetry Row**: Price in `tabular-nums font-mono text-base font-semibold`, daily breakdown badge, and instant trip status.
+### Layout vocabulary (`components/layout`)
+| Primitive | Purpose |
+| --- | --- |
+| `Container` | Canvas widths: `wide` (1600px, default), `default` (1280), `narrow` (960), `prose` (720). |
+| `Section` | Vertical rhythm (`sm` / `default` / `lg`), tone band (`surface` / `ink`), hairline rules. |
+| `Eyebrow` | Mono uppercase label with optional index (`01 — Label`). Replaces badge spam above headings. |
+| `SectionHeading` | Eyebrow + title (`display` / `h1` / `h2`) + lede + right-aligned action. |
+| `PageHeader` | Operate-mode header: breadcrumbs, eyebrow, H1, lede, actions. |
+| `Stat` / `StatStrip` | Telemetry figures in a hairline-divided grid. Never KPI cards. |
+| `Ledger` / `LedgerRow` | Hairline-separated rows with mono index, title, description, right aside. |
+| `ArrowLink` | Inline link with sliding `→`. |
+| `Chip` / `ChipGroup` | Filter pills with `aria-pressed`, optional count. |
+| `InkPanel` | The single dark pine emphasis surface per page. One per view, maximum. |
+| `OptionCard` | Radio / checkbox rendered as a selectable surface. |
 
-### 3. Disclosures & Accordions (`ui/accordion.tsx`)
-- **Fluid Grid Transition**: Animated using CSS Grid `grid-rows-[0fr]` to `grid-rows-[1fr]` with `opacity` transition (`200ms cubic-bezier(0.22, 1, 0.36, 1)`).
-- **100% Interruptible**: Zero content clipping or jerky JavaScript height calculations.
+### Shell & domain components
+- `Header` — sticky, 64px, three primary links (Fleet, Services, Host) + Dashboard when authenticated; currency popover; Headless UI mobile sheet.
+- `Footer` — oversized wordmark, three link columns, meta rule with hub codes and currency segmented control.
+- `DashboardShell` — sidebar (identity, three-step qualification status, section nav) + main column with page header; collapses to a pill switcher on mobile.
+- `VehicleCard` — image 4:3, name, mono hub line, price right, hairline spec footer. Layouts: `default`, `wide`, `compact`.
+- `FleetFilters` — shared hub / mode / class chip rails.
+- `EmptyStateGuide` — dashed surface with eyebrow, H2, actions, optional three-tip ledger.
+- `Reveal` — GSAP `useGSAP` scroll reveal (transform + opacity only, reduced-motion safe).
 
-### 4. Dynamic Fare Breakdown (`BookCarForm.tsx`)
-- **Entrance**: `translateY(6px) scale(0.985)` → `translateY(0) scale(1)` (`220ms ease-out-quart`).
-- **Digits**: Always `tabular-nums` to prevent horizontal container wiggle when dates or insurance options shift.
-
----
+### Controls (`components/ui`)
+1. **Button** — variants `default` (emerald), `ink`, `secondary`, `outline`, `ghost`, `destructive`, `link`, `inverse` (on dark). Heights 36 / 44 / 48px, `rounded-md`, `active:scale-[0.98]`, explicit transition properties.
+2. **Badge** — pill, mono 11px uppercase. Variants `secondary` (default), `emerald`, `amber`, `destructive`, `outline`, `dark`, `signal`. Use for state only.
+3. **Card** — `rounded-lg`, hairline border, `shadow-card`. `interactive` adds the hover lift; `tone="surface"` for pebble fill. Never nest bordered cards.
+4. **Input / Select / Textarea / Label** — 44px, `rounded-md`, focus ring `primary/15`. `Label` accepts a mono `hint`.
+5. **Tabs** — `segmented` pill switcher or `underline` editorial tabs.
+6. **Accordion** — CSS-grid height animation, optional mono `index` per trigger.
+7. **Alert** — `default`, `emerald`, `destructive`, `info`, `warning`; leading status dot.
+8. **Tooltip**, **Skeleton**, **Separator**.
 
 ## 8. Do's and Don'ts (Hallmark 57-Gate Anti-Patterns)
 

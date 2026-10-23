@@ -9,15 +9,13 @@ import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-} from "../../components/ui/card";
-import { Badge } from "../../components/ui/badge";
+import { Card } from "../../components/ui/card";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+import { Container } from "../../components/layout/Container";
+import { Eyebrow } from "../../components/layout/Eyebrow";
+import { InkPanel } from "../../components/layout/InkPanel";
+import { Ledger, LedgerRow } from "../../components/layout/Ledger";
+import { ArrowLink } from "../../components/layout/ArrowLink";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -43,7 +41,6 @@ const LoginPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await login(username, password);
-
     if (result.success) {
       router.push(nextPath || "/dashboard");
     } else {
@@ -52,159 +49,115 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-10 md:py-16 space-y-6 animate-enter-subtle">
+    <Container className="space-y-8 py-10 md:py-16 animate-enter-subtle">
       <Breadcrumbs items={[{ label: "Log in" }]} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-        <div className="lg:col-span-5">
-          <Card className="shadow-elevated h-full flex flex-col justify-between">
-            <div>
-              <CardHeader className="space-y-2 pb-5">
-                <div className="flex items-center justify-between">
-                  <Badge variant="emerald">Session Access</Badge>
-                  <Image
-                    src="/logo-mark.svg"
-                    alt="Izzac Mobility crest logo"
-                    width={28}
-                    height={28}
-                    className="h-7 w-7 rounded-md shadow-surface"
-                  />
-                </div>
-                <h1 className="text-3xl font-bold tracking-[-0.03em] text-card-foreground leading-tight">
-                  Welcome back
-                </h1>
-                <CardDescription>
-                  Sign in to access your Unified Overview, Rider & Driving Test Center, Host Garage, and Motor Insurance Ledger.
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      name="username"
-                      type="text"
-                      autoComplete="username"
-                      placeholder="e.g. tunde_executive"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Signing in..." : "Sign in to workspace"}
-                  </Button>
-                </form>
-              </CardContent>
+      <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12 lg:gap-12">
+        <Card className="flex flex-col justify-between shadow-elevated lg:col-span-5">
+          <div className="space-y-6 p-7 md:p-8">
+            <div className="flex items-center justify-between">
+              <Eyebrow tone="muted">Sign in</Eyebrow>
+              <Image src="/logo-mark.svg" alt="Izzac Mobility" width={28} height={28} className="h-7 w-7 rounded-sm" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-h1 text-foreground">Welcome back</h1>
+              <p className="text-[15px] leading-relaxed text-muted-foreground">
+                Your rider trips, host garage, bookings and insurance certificates in one account.
+              </p>
             </div>
 
-            <CardFooter className="border-t border-border/70 pt-4 text-xs text-muted-foreground justify-between">
-              <span>New to Izzac?</span>
-              <Link
-                href="/signup"
-                className="font-semibold text-primary hover:underline"
-              >
-                Create an account →
-              </Link>
-            </CardFooter>
-          </Card>
-        </div>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  placeholder="e.g. tunde_executive"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
 
-        {/* Right 7-Column Executive Workspace Preview */}
-        <div className="lg:col-span-7 rounded-2xl bg-[#0d1713] text-stone-100 p-7 md:p-10 border border-emerald-950 shadow-elevated flex flex-col justify-between space-y-6">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in…" : "Sign in"}
+              </Button>
+            </form>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-border/70 px-7 py-4 text-xs text-muted-foreground md:px-8">
+            <span>New to Izzac?</span>
+            <Link href="/signup" className="font-medium text-primary hover:underline">
+              Create an account →
+            </Link>
+          </div>
+        </Card>
+
+        <InkPanel className="flex flex-col justify-between lg:col-span-7">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="dark">Unified Rider & Host Account</Badge>
-              <Badge variant="emerald">6 Specialized Dashboards</Badge>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-[-0.03em] text-stone-50">
-              One account for Chauffeur Trials, Self-Drive Evaluation, Motor Insurance & Fleet Hosting
+            <Eyebrow tone="signal">One account, two roles</Eyebrow>
+            <h2 className="text-h1 text-ink-foreground">
+              Pick up where you left off, from chauffeur trial to self-drive clearance.
             </h2>
-            <p className="text-sm text-stone-300 leading-relaxed max-w-2xl">
-              Sign in to pick up where you left off across all six Izzac workspaces—from completing your mandatory Chauffeur-Driven Trial and 5-question Driving Test Evaluation to managing your hosted fleet and active motor insurance certificates.
+            <p className="max-w-[56ch] text-[15px] leading-relaxed text-ink-muted">
+              Every new rider starts chauffeur-driven, passes a short driving test to unlock self-drive, and carries a verified
+              motor insurance certificate on every trip. Hosts manage their fleet from the same login.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-1.5">
-              <p className="font-mono text-xs font-semibold text-emerald-300">
-                01 · Chauffeur Trial
-              </p>
-              <p className="text-sm font-bold text-stone-50">
-                Mandatory First Stage
-              </p>
-              <p className="text-xs text-stone-300 leading-relaxed">
-                New riders start with a Chauffeur-Driven Trial before unlocking Self-Drive evaluation.
-              </p>
-            </div>
+          <Ledger inverted className="my-8">
+            <LedgerRow
+              inverted
+              index="01"
+              title="Chauffeur trial"
+              description="Your first trip is driven by a vetted executive chauffeur while we verify your profile."
+            />
+            <LedgerRow
+              inverted
+              index="02"
+              title="Driving test"
+              description="Verify your licence and ID, then score 80% or more on a five-question highway and flood-corridor test."
+            />
+            <LedgerRow
+              inverted
+              index="03"
+              title="Motor insurance"
+              description="Choose statutory third-party, comprehensive, or zero-excess all-risk cover at checkout."
+            />
+          </Ledger>
 
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-1.5">
-              <p className="font-mono text-xs font-semibold text-emerald-300">
-                02 · Driving Test Exam
-              </p>
-              <p className="text-sm font-bold text-stone-50">
-                80%+ Pass & License Check
-              </p>
-              <p className="text-xs text-stone-300 leading-relaxed">
-                Complete the 5-question Highway Code & Flood-Corridor test to unlock Self-Drive.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-1.5">
-              <p className="font-mono text-xs font-semibold text-emerald-300">
-                03 · Motor Insurance
-              </p>
-              <p className="text-sm font-bold text-stone-50">
-                3 Verified Policy Tiers
-              </p>
-              <p className="text-xs text-stone-300 leading-relaxed">
-                Statutory Third-Party, Comprehensive, or All-Risk Zero-Excess cover on every trip.
-              </p>
-            </div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <ArrowLink href="/cars" tone="signal">
+              Browse the fleet
+            </ArrowLink>
+            <ArrowLink href="/services" tone="inverse">
+              Services and insurance
+            </ArrowLink>
           </div>
-
-          <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-300">
-            <span>Want to inspect the fleet or take the Driving Test preview first?</span>
-            <div className="flex items-center gap-3">
-              <Link href="/cars" className="font-mono font-semibold text-emerald-300 hover:underline">
-                Browse 32+ Cars →
-              </Link>
-              <Link href="/services" className="font-mono font-semibold text-stone-200 hover:underline">
-                Services & Insurance →
-              </Link>
-            </div>
-          </div>
-        </div>
+        </InkPanel>
       </div>
-    </div>
+    </Container>
   );
 };
 

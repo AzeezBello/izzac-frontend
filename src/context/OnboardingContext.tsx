@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import Link from "next/link";
 import { CURRENCIES, CurrencyCode, useCurrency } from "./CurrencyContext";
-import { Badge } from "../components/ui/badge";
+import { Eyebrow } from "../components/layout/Eyebrow";
 import { Button } from "../components/ui/button";
 
 type OnboardingContextValue = {
@@ -242,40 +242,30 @@ export const OnboardingProvider = ({
         tourStep,
       }}
     >
-      {/* First-visit non-blocking welcome bar so SSR page source & initial layout remain clean */}
+      {/* First-visit, non-blocking welcome bar */}
       {showFirstVisitBanner && !isOpen && !isTourActive && (
         <div
           role="region"
           aria-label="First-time visitor onboarding guide"
-          className="border-b border-emerald-900/30 bg-[#0d1713] text-stone-100 px-4 py-2.5 text-xs"
+          className="border-b border-border/70 bg-surface"
         >
-          <div className="max-w-[1760px] mx-auto flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <Badge variant="dark">New to Izzac?</Badge>
-              <span className="text-stone-200">
-                Take the 4-step Executive Mobility Onboarding or launch the interactive Product Tour.
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={openOnboarding}
-                className="rounded-md bg-primary px-3 py-1 font-mono text-[11px] font-semibold text-primary-foreground hover:bg-emerald-700 transition-colors"
-              >
-                Start Onboarding (4 Steps)
-              </button>
-              <button
-                type="button"
-                onClick={startProductTour}
-                className="rounded-md border border-white/20 bg-white/5 px-3 py-1 font-mono text-[11px] font-semibold text-stone-100 hover:bg-white/10 transition-colors"
-              >
-                Guided Product Tour
-              </button>
+          <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-10 xl:px-12">
+            <p className="flex items-center gap-3 text-xs text-foreground/85">
+              <span className="type-eyebrow text-primary">New here?</span>
+              <span>Take the four-step introduction or a 60-second product tour.</span>
+            </p>
+            <div className="flex items-center gap-1.5">
+              <Button type="button" size="sm" onClick={openOnboarding}>
+                Start introduction
+              </Button>
+              <Button type="button" size="sm" variant="outline" onClick={startProductTour}>
+                Product tour
+              </Button>
               <button
                 type="button"
                 onClick={markOnboardingSeen}
                 aria-label="Dismiss welcome guide"
-                className="px-2 py-1 font-mono text-[11px] text-stone-400 hover:text-stone-200"
+                className="px-2 py-1 font-mono text-2xs text-muted-foreground transition-colors duration-150 hover:text-foreground"
               >
                 Dismiss
               </button>
@@ -286,74 +276,65 @@ export const OnboardingProvider = ({
 
       {children}
 
-      {/* Step-by-Step Onboarding Modal Dialog (Modern Web Guidance: light-dismiss-a-dialog) */}
+      {/* Step-by-step onboarding dialog (light-dismiss) */}
       <dialog
         ref={dialogRef}
         {...({ closedby: "any" } as React.DialogHTMLAttributes<HTMLDialogElement>)}
         aria-labelledby="onboarding-dialog-title"
-        className="w-full max-w-xl rounded-2xl border border-border bg-card p-0 text-foreground shadow-elevated backdrop:bg-black/60 backdrop:backdrop-blur-xs"
+        className="w-full max-w-xl rounded-xl border border-border bg-surface-elevated p-0 text-foreground shadow-modal backdrop:bg-ink/60 backdrop:backdrop-blur-sm open:animate-enter-subtle"
       >
-        <div className="p-6 md:p-8 space-y-6">
-          <div className="flex items-center justify-between border-b border-border/80 pb-4">
-            <Badge variant="emerald">{currentSlide.badge}</Badge>
+        <div className="space-y-6 p-6 md:p-8">
+          <div className="flex items-center justify-between border-b border-border/70 pb-4">
+            <Eyebrow index={currentSlide.step}>{currentSlide.badge}</Eyebrow>
             <button
               type="button"
               onClick={closeOnboarding}
-              className="rounded-lg border border-border/80 px-2.5 py-1 font-mono text-xs text-muted-foreground hover:text-foreground"
+              className="rounded-sm border border-border px-2.5 py-1 font-mono text-2xs text-muted-foreground transition-colors duration-150 hover:text-foreground"
             >
               Esc · Close
             </button>
           </div>
 
           <div className="space-y-3">
-            <h2
-              id="onboarding-dialog-title"
-              className="text-2xl font-bold text-foreground tracking-[-0.03em]"
-            >
+            <h2 id="onboarding-dialog-title" className="text-h2 text-foreground">
               {currentSlide.title}
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {currentSlide.summary}
-            </p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{currentSlide.summary}</p>
           </div>
 
           {onboardingStep === 1 && (
-            <div className="rounded-xl border border-border/80 bg-secondary/50 p-4 space-y-2.5">
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
-                Select your active currency:
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="space-y-2.5">
+              <p className="type-eyebrow text-muted-foreground">Display currency</p>
+              <div className="grid grid-cols-2 gap-1 rounded-md border border-border bg-surface p-1 sm:grid-cols-4" role="group" aria-label="Display currency">
                 {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
                   <button
                     key={code}
                     type="button"
                     onClick={() => setCurrency(code)}
-                    className={`rounded-lg border px-3 py-2 font-mono text-xs font-semibold transition-colors ${
+                    aria-pressed={currency === code}
+                    className={`rounded-sm py-2 font-mono text-xs font-medium transition-colors duration-150 ${
                       currency === code
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-card text-foreground hover:bg-secondary"
+                        ? "bg-ink text-ink-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {CURRENCIES[code].flag} {CURRENCIES[code].label}
+                    {CURRENCIES[code].flag} {code}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          <ul className="space-y-2.5 border-t border-border/70 pt-4 text-sm text-foreground/90">
+          <ol className="divide-y divide-border/70 border-y border-border/70">
             {currentSlide.bullets.map((bullet, idx) => (
-              <li key={bullet} className="flex items-start gap-2.5">
-                <span className="font-mono text-xs font-bold text-primary pt-0.5 tabular-nums">
-                  0{idx + 1}
-                </span>
+              <li key={bullet} className="grid grid-cols-[2rem_1fr] gap-2 py-3 text-sm text-foreground/90">
+                <span className="font-mono text-xs text-primary tabular-nums">0{idx + 1}</span>
                 <span>{bullet}</span>
               </li>
             ))}
-          </ul>
+          </ol>
 
-          {/* Step Progress Dots & Navigation Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/80 pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
             <div className="flex items-center gap-1.5" aria-label="Onboarding progress">
               {ONBOARDING_STEPS.map((s, idx) => (
                 <button
@@ -361,7 +342,8 @@ export const OnboardingProvider = ({
                   type="button"
                   onClick={() => setOnboardingStep(idx)}
                   aria-label={`Go to step ${idx + 1}`}
-                  className={`h-2 rounded-full transition-all ${
+                  aria-current={idx === onboardingStep ? "step" : undefined}
+                  className={`h-1.5 rounded-full transition-[width,background-color] duration-200 ease-out-quart ${
                     idx === onboardingStep
                       ? "w-7 bg-primary"
                       : "w-2 bg-border hover:bg-muted-foreground"
@@ -378,7 +360,7 @@ export const OnboardingProvider = ({
                   size="sm"
                   onClick={() => setOnboardingStep((s) => Math.max(0, s - 1))}
                 >
-                  ← Previous
+                  Previous
                 </Button>
               )}
 
@@ -392,7 +374,7 @@ export const OnboardingProvider = ({
                     )
                   }
                 >
-                  Next step →
+                  Next step
                 </Button>
               ) : (
                 <>
@@ -402,10 +384,10 @@ export const OnboardingProvider = ({
                     size="sm"
                     onClick={startProductTour}
                   >
-                    Launch Product Tour
+                    Launch product tour
                   </Button>
                   <Button type="button" size="sm" onClick={closeOnboarding}>
-                    Start Exploring
+                    Start exploring
                   </Button>
                 </>
               )}
@@ -414,70 +396,65 @@ export const OnboardingProvider = ({
         </div>
       </dialog>
 
-      {/* Guided Product Tour Floating Dock */}
+      {/* Guided product tour dock */}
       {isTourActive && (
         <aside
-          aria-label="Guided Product Tour"
-          className="fixed bottom-4 inset-x-4 z-50 mx-auto max-w-2xl rounded-2xl border border-emerald-500/40 bg-[#0d1713] p-5 text-stone-100 shadow-elevated animate-enter-subtle"
+          aria-label="Guided product tour"
+          className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl rounded-lg border border-border bg-surface-elevated p-5 text-foreground shadow-floating animate-enter-subtle"
         >
           <div className="flex items-center justify-between gap-2 pb-2">
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-300 tabular-nums">
-              {currentTourStop.eyebrow}
-            </span>
+            <Eyebrow>{currentTourStop.eyebrow}</Eyebrow>
             <button
               type="button"
               onClick={stopProductTour}
-              className="font-mono text-xs text-stone-400 hover:text-stone-100"
+              className="font-mono text-2xs text-muted-foreground transition-colors duration-150 hover:text-foreground"
             >
-              End Tour ✕
+              End tour ✕
             </button>
           </div>
 
-          <h3 className="text-lg font-bold text-stone-50 tracking-[-0.02em]">
+          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
             {currentTourStop.title}
           </h3>
-          <p className="text-xs sm:text-sm text-stone-300 mt-1 leading-relaxed">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {currentTourStop.description}
           </p>
 
-          <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border/70 pt-3">
             <Link
               href={currentTourStop.actionHref}
               onClick={stopProductTour}
-              className="font-mono text-xs font-semibold text-emerald-300 hover:underline"
+              className="text-sm font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
             >
               {currentTourStop.actionLabel} →
             </Link>
 
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 disabled={tourStep === 0}
                 onClick={() => setTourStep((s) => Math.max(0, s - 1))}
-                className="rounded-lg border border-white/15 px-3 py-1.5 font-mono text-xs text-stone-200 disabled:opacity-40 hover:bg-white/10"
               >
-                ← Prev
-              </button>
+                Prev
+              </Button>
               {tourStep < PRODUCT_TOUR_STOPS.length - 1 ? (
-                <button
+                <Button
                   type="button"
+                  size="sm"
                   onClick={() =>
                     setTourStep((s) =>
                       Math.min(PRODUCT_TOUR_STOPS.length - 1, s + 1)
                     )
                   }
-                  className="rounded-lg bg-primary px-3.5 py-1.5 font-mono text-xs font-semibold text-primary-foreground hover:bg-emerald-700"
                 >
-                  Next ({tourStep + 1}/{PRODUCT_TOUR_STOPS.length}) →
-                </button>
+                  Next ({tourStep + 1}/{PRODUCT_TOUR_STOPS.length})
+                </Button>
               ) : (
-                <button
-                  type="button"
-                  onClick={stopProductTour}
-                  className="rounded-lg bg-primary px-3.5 py-1.5 font-mono text-xs font-semibold text-primary-foreground hover:bg-emerald-700"
-                >
-                  Finish Tour ✓
-                </button>
+                <Button type="button" size="sm" onClick={stopProductTour}>
+                  Finish tour
+                </Button>
               )}
             </div>
           </div>

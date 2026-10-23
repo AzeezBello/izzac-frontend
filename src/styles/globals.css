@@ -2,46 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------
+   Izzac Editorial Mobility Design System · Tokens
+   Source of truth: DESIGN.md (DTCG front matter)
+   ------------------------------------------------------------------ */
 @layer base {
   :root {
-    /* Warm mineral / stone canvas & deep pine-tinted ink (Impeccable + Taste-Skill: no pure #000 or harsh #fff) */
-    --background: 45 23% 98%;
-    --foreground: 155 24% 9%;
+    /* Canvas & ink */
+    --background: 45 23% 98%;          /* Warm Mineral Alabaster */
+    --foreground: 155 24% 9%;          /* Deep Pine Ink */
+    --surface: 45 20% 96%;             /* Soft Pebble */
+    --surface-elevated: 0 0% 100%;     /* Crisp card */
 
-    --card: 45 30% 99.2%;
+    /* Dark pine panel system */
+    --ink: 155 24% 9%;
+    --ink-foreground: 45 20% 96%;
+    --ink-muted: 150 8% 62%;
+    --ink-border: 155 14% 18%;
+
+    --card: 0 0% 100%;
     --card-foreground: 155 24% 9%;
-
-    --popover: 45 30% 99.2%;
+    --popover: 0 0% 100%;
     --popover-foreground: 155 24% 9%;
 
-    /* Single high-conviction botanical emerald accent (<80% saturation lock) */
+    /* Botanical emerald accent */
     --primary: 161 72% 24%;
-    --primary-foreground: 45 33% 98%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 161 75% 20%;
+    --primary-active: 161 78% 17%;
+    --primary-soft: 161 55% 92%;
     --brand-color: hsl(161 72% 24%);
+    --signal: 158 64% 52%;             /* Emerald highlight for dark panels */
 
-    --secondary: 45 16% 93.5%;
-    --secondary-foreground: 155 22% 14%;
+    --secondary: 40 10% 92%;
+    --secondary-foreground: 155 24% 9%;
+    --secondary-hover: 40 12% 88%;
 
-    --muted: 45 15% 94%;
-    --muted-foreground: 155 10% 38%;
+    --muted: 40 10% 92%;
+    --muted-foreground: 155 12% 40%;
 
-    --accent: 156 32% 92%;
-    --accent-foreground: 161 72% 20%;
+    --accent: 161 55% 92%;
+    --accent-foreground: 161 72% 24%;
 
-    --destructive: 4 74% 46%;
-    --destructive-foreground: 45 33% 98%;
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --warning: 36 90% 42%;
+    --warning-foreground: 0 0% 100%;
 
-    --border: 45 14% 88.5%;
-    --input: 45 14% 86%;
+    --border: 40 10% 88%;
+    --input: 40 10% 84%;
     --ring: 161 72% 24%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
-    /* Emil Kowalski motion curve tokens */
     --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* Modern Web Guidance: intrinsic size animation opt-in & brand form controls */
+    --header-height: 4rem;
+
     interpolate-size: allow-keywords;
     color-scheme: light;
     accent-color: var(--brand-color);
@@ -55,118 +73,169 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground font-sans selection:bg-emerald-900 selection:text-stone-50;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
     accent-color: var(--brand-color);
   }
 
-  /* Modern Web Guidance (improve-text-layout-and-legibility): balanced headings & pretty body copy */
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
   h1, h2, h3, h4 {
     text-wrap: balance;
-    letter-spacing: -0.025em;
   }
 
-  p, li, blockquote {
+  p, li, blockquote, dd {
     text-wrap: pretty;
   }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.55;
+    cursor: pointer;
+  }
 }
 
-/* Modern Web Guidance (child-state-based-styling): style option cards based on child :checked state */
-.selectable-option-card {
-  --option-bg: hsl(var(--card));
-  --option-border: hsl(var(--border));
-  --option-ring: transparent;
-  background-color: var(--option-bg);
-  border: 1px solid var(--option-border);
-  box-shadow: 0 0 0 1px var(--option-ring);
-  transition: background-color 150ms var(--ease-out-quart),
-    border-color 150ms var(--ease-out-quart),
-    box-shadow 150ms var(--ease-out-quart);
-}
+/* ------------------------------------------------------------------
+   Typography & layout vocabulary
+   ------------------------------------------------------------------ */
+@layer components {
+  .type-eyebrow {
+    @apply font-mono text-2xs font-semibold uppercase tracking-[0.14em];
+  }
+  .type-telemetry {
+    @apply font-mono text-sm font-medium tabular-nums tracking-tight;
+  }
+  .type-lede {
+    @apply text-base md:text-lg leading-relaxed text-muted-foreground;
+  }
+  .type-body {
+    @apply text-[15px] leading-relaxed text-foreground/90;
+  }
 
-.selectable-option-card:has(.option-control:checked) {
-  --option-bg: hsl(156 32% 95%);
-  --option-border: hsl(var(--primary));
-  --option-ring: hsl(var(--primary) / 0.25);
-}
+  /* Hairline ledger: stacked rows separated by subtle rules */
+  .ledger {
+    @apply divide-y divide-border/70 border-y border-border/70;
+  }
 
-.selectable-option-card:has(.option-control:focus-visible) {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
+  /* Ink panel: the single dark emphasis surface per page */
+  .ink-panel {
+    @apply relative overflow-hidden rounded-xl bg-ink text-ink-foreground;
+    background-image:
+      radial-gradient(60% 50% at 100% 0%, hsl(161 60% 22% / 0.45), transparent 70%),
+      radial-gradient(40% 40% at 0% 100%, hsl(161 60% 16% / 0.35), transparent 70%);
+  }
+  .ink-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, hsl(0 0% 100% / 0.07) 1px, transparent 0);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.15));
+  }
 
-@supports not selector(:has(*)) {
-  .selectable-option-card.is-active {
-    --option-bg: hsl(156 32% 95%);
+  /* Selectable option card (radio / checkbox wrappers) */
+  .option-card {
+    --option-bg: hsl(var(--surface-elevated));
+    --option-border: hsl(var(--border));
+    --option-ring: transparent;
+    background-color: var(--option-bg);
+    border: 1px solid var(--option-border);
+    box-shadow: 0 0 0 1px var(--option-ring);
+    transition:
+      background-color 150ms var(--ease-out-quart),
+      border-color 150ms var(--ease-out-quart),
+      box-shadow 150ms var(--ease-out-quart),
+      transform 150ms var(--ease-out-quart);
+  }
+  .option-card:hover {
+    --option-border: hsl(var(--input));
+  }
+  .option-card:active {
+    transform: scale(0.99);
+  }
+  .option-card:has(.option-control:checked),
+  .option-card.is-active {
+    --option-bg: hsl(var(--primary-soft) / 0.55);
     --option-border: hsl(var(--primary));
-    --option-ring: hsl(var(--primary) / 0.25);
+    --option-ring: hsl(var(--primary) / 0.22);
+  }
+  .option-card:has(.option-control:focus-visible) {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  .option-card:has(.option-control:disabled) {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* Backwards-compatible aliases */
+  .selectable-option-card {
+    @apply option-card;
   }
 }
 
-/* Modern Web Guidance (brand-consistent-forms): progressive enhancement fallback when accent-color is unsupported */
-@supports not (accent-color: var(--brand-color)) {
-  form input[type="checkbox"].option-control,
-  form input[type="radio"].option-control {
-    accent-color: #11694b;
-  }
-}
-
-/* Modern Web Guidance (validate-input-after-interaction): defer error state until blur/submit */
+/* ------------------------------------------------------------------
+   Form validation: defer errors until the user has interacted
+   ------------------------------------------------------------------ */
 .validated-field-error {
   display: none;
   color: hsl(var(--destructive));
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
-
 input.validated-input:user-invalid,
 input.validated-input.user-invalid-fallback {
   border-color: hsl(var(--destructive));
-  background-color: hsl(4 74% 96%);
+  background-color: hsl(0 72% 97%);
 }
-
 input.validated-input:user-invalid + .validated-field-error,
 input.validated-input.user-invalid-fallback + .validated-field-error {
   display: block;
 }
-
 input.validated-input:user-valid,
 input.validated-input.user-valid-fallback {
   border-color: hsl(var(--primary));
 }
 
-/* Modern Web Guidance (responsive-table): semantic sticky table that stacks on narrow containers */
+/* ------------------------------------------------------------------
+   Responsive comparison table (services benchmark)
+   ------------------------------------------------------------------ */
 .comparison-table-wrapper {
   overflow: auto;
   max-inline-size: 100%;
   container-type: inline-size;
 }
-
 .comparison-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  --label-2: "Izzac Mobility OS";
-  --label-3: "Europcar Global Standard";
-  --label-4: "Rider & Fleet Impact";
+  --label-2: "Izzac";
+  --label-3: "Global standard";
+  --label-4: "Why it matters";
 }
-
 .comparison-table thead {
   position: sticky;
   inset-block-start: 0;
   z-index: 2;
 }
-
 .comparison-table tbody th {
   position: sticky;
   inset-inline-start: 0;
   z-index: 1;
-  background-color: hsl(var(--card));
+  background-color: hsl(var(--surface-elevated));
 }
-
 @container (width < 640px) {
   .comparison-table,
   .comparison-table thead,
@@ -176,25 +245,21 @@ input.validated-input.user-valid-fallback {
   .comparison-table td {
     display: block;
   }
-
   .comparison-table thead {
     display: none;
   }
-
   .comparison-table tbody tr {
     margin-block-end: 1rem;
     border: 1px solid hsl(var(--border));
-    border-radius: 0.75rem;
+    border-radius: 1rem;
     overflow: hidden;
   }
-
   .comparison-table tbody th {
     position: sticky;
     inset-block-start: 0;
     z-index: 2;
-    background-color: hsl(var(--secondary));
+    background-color: hsl(var(--surface));
   }
-
   .comparison-table td::before {
     display: block;
     font-family: var(--font-geist-mono), monospace;
@@ -205,44 +270,43 @@ input.validated-input.user-valid-fallback {
     color: hsl(var(--primary));
     margin-block-end: 0.25rem;
   }
-
-  .comparison-table td:nth-child(2)::before {
-    content: var(--label-2) ": ";
-  }
-
-  .comparison-table td:nth-child(3)::before {
-    content: var(--label-3) ": ";
-  }
-
-  .comparison-table td:nth-child(4)::before {
-    content: var(--label-4) ": ";
-  }
+  .comparison-table td:nth-child(2)::before { content: var(--label-2) ": "; }
+  .comparison-table td:nth-child(3)::before { content: var(--label-3) ": "; }
+  .comparison-table td:nth-child(4)::before { content: var(--label-4) ": "; }
 }
 
+/* ------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------ */
 @layer utilities {
-  .max-w-6xl,
-  .max-w-5xl {
-    max-width: 1760px !important;
-    width: 100%;
-  }
-
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
-
-  /* Emil Kowalski: subtle staggered reveal for sibling elements without scale(0) */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .press {
+    @apply active:scale-[0.98] transition-transform duration-150 ease-out-quart;
+  }
   .stagger-item {
-    animation: enter-subtle 240ms var(--ease-out-quart) both;
+    animation: fade-up 480ms var(--ease-out-expo) both;
   }
   .stagger-item:nth-child(1) { animation-delay: 0ms; }
-  .stagger-item:nth-child(2) { animation-delay: 40ms; }
-  .stagger-item:nth-child(3) { animation-delay: 80ms; }
-  .stagger-item:nth-child(4) { animation-delay: 120ms; }
-  .stagger-item:nth-child(5) { animation-delay: 160ms; }
-  .stagger-item:nth-child(6) { animation-delay: 200ms; }
+  .stagger-item:nth-child(2) { animation-delay: 50ms; }
+  .stagger-item:nth-child(3) { animation-delay: 100ms; }
+  .stagger-item:nth-child(4) { animation-delay: 150ms; }
+  .stagger-item:nth-child(5) { animation-delay: 200ms; }
+  .stagger-item:nth-child(6) { animation-delay: 250ms; }
+  .stagger-item:nth-child(7) { animation-delay: 300ms; }
+  .stagger-item:nth-child(8) { animation-delay: 350ms; }
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  }
 }
 
-/* Emil Kowalski & Modern Web Guidance: strict reduced-motion compliance */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

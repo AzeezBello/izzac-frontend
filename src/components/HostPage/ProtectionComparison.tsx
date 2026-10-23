@@ -1,79 +1,62 @@
 import Link from "next/link";
 import { hostWorkflow } from "../../lib/productContent";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { Section } from "../layout/Section";
+import { SectionHeading } from "../layout/SectionHeading";
+import { InkPanel } from "../layout/InkPanel";
+import { Eyebrow } from "../layout/Eyebrow";
 
 const ProtectionComparison = () => {
   return (
-    <section className="border-y border-border/80 bg-secondary/35 py-16 md:py-24">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-12">
-          <div className="space-y-3">
-            <Badge variant="emerald">Host workflow</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-              How hosting works across the actual app
-            </h2>
-            <p className="text-muted-foreground max-w-[60ch] leading-relaxed">
-              These are the live capabilities hosts can use today, from protected listing creation to host-side bookings visibility.
-            </p>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/dashboard/bookings">Open bookings workspace →</Link>
-          </Button>
-        </div>
+    <Section tone="surface" rule="both">
+      <div className="space-y-12">
+        <SectionHeading
+          eyebrow="How hosting works"
+          title="Three stages, all live in the app today"
+          lede="From protected listing creation to host-side booking visibility, every stage runs on the same account you ride with."
+          action={
+            <Button asChild variant="outline">
+              <Link href="/dashboard/bookings">Open bookings</Link>
+            </Button>
+          }
+        />
 
-        {/* Impeccable: Architectural hairline ledger without card-in-card nesting */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 rounded-2xl border border-border/90 bg-card shadow-surface divide-y lg:divide-y-0 lg:divide-x divide-border/80 overflow-hidden">
+        <ol className="grid grid-cols-1 divide-y divide-border/70 border-y border-border/70 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
           {hostWorkflow.map((stage, stageIndex) => (
-            <div key={stage.title} className="p-6 md:p-8 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-primary tabular-nums">
-                    Stage 0{stageIndex + 1}
-                  </span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground tracking-[-0.02em]">
-                  {stage.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-2.5 leading-relaxed">
-                  {stage.description}
-                </p>
+            <li key={stage.title} className="flex flex-col justify-between gap-6 py-8 lg:px-8 lg:first:pl-0 lg:last:pr-0">
+              <div className="space-y-3">
+                <Eyebrow index={`0${stageIndex + 1}`}>Stage</Eyebrow>
+                <h3 className="text-h2 text-foreground">{stage.title}</h3>
+                <p className="text-[15px] leading-relaxed text-muted-foreground">{stage.description}</p>
               </div>
-
-              <ul className="mt-6 pt-5 border-t border-border/70 divide-y divide-border/60 text-sm text-foreground/90">
+              <ul className="divide-y divide-border/60 border-t border-border/70 text-sm text-foreground/90">
                 {stage.items.map((item, itemIdx) => (
-                  <li
-                    key={item}
-                    className="py-2.5 first:pt-0 last:pb-0 flex items-start gap-2.5"
-                  >
-                    <span className="font-mono text-[11px] text-primary font-semibold pt-0.5 tabular-nums">
-                      0{itemIdx + 1}
-                    </span>
+                  <li key={item} className="grid grid-cols-[2rem_1fr] gap-2 py-2.5">
+                    <span className="font-mono text-2xs text-primary tabular-nums pt-0.5">0{itemIdx + 1}</span>
                     <span className="leading-snug">{item}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
 
-        <div className="rounded-2xl bg-[#0d1713] text-stone-100 p-7 md:p-10 mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 border border-emerald-950 shadow-elevated">
-          <div className="space-y-2 max-w-2xl">
-            <Badge variant="dark">Unified Account Architecture</Badge>
-            <h3 className="text-2xl font-bold tracking-[-0.025em] pt-1">
-              Use one account across the full platform
-            </h3>
-            <p className="text-stone-300 text-sm md:text-base leading-relaxed">
-              Hosts can still browse and book cars as riders, while the same account powers garage management and host-side bookings.
-            </p>
+        <InkPanel>
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl space-y-3">
+              <Eyebrow tone="signal">One account, two roles</Eyebrow>
+              <h3 className="text-h1 text-ink-foreground">Host your fleet. Ride someone else&apos;s.</h3>
+              <p className="text-[15px] leading-relaxed text-ink-muted">
+                The same login powers garage management, host-side bookings and your own chauffeur or self-drive trips.
+              </p>
+            </div>
+            <Button asChild size="lg" className="shrink-0">
+              <Link href="/signup?role=host">Create a host account</Link>
+            </Button>
           </div>
-          <Button asChild size="lg" className="shrink-0">
-            <Link href="/signup?role=host">Create a host account</Link>
-          </Button>
-        </div>
+        </InkPanel>
       </div>
-    </section>
+    </Section>
   );
 };
 

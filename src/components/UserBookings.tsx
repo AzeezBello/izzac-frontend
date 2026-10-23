@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import api from "../lib/api";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Alert, AlertDescription } from "./ui/alert";
+import { Eyebrow } from "./layout/Eyebrow";
+import { Ledger } from "./layout/Ledger";
 
 type Booking = {
   id: number;
@@ -30,40 +31,38 @@ const UserBookings = () => {
   }, []);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">Your Bookings</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {bookings.length > 0 ? (
-          <ul className="divide-y divide-border/80">
-            {bookings.map((booking) => (
-              <li
-                key={booking.id}
-                className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-              >
-                <div>
-                  <p className="font-semibold text-foreground">
-                    Car: {booking.car.make} {booking.car.model}
-                  </p>
-                  <p className="font-mono text-xs text-muted-foreground tabular-nums">
-                    Start Date: {booking.start_date} · End Date: {booking.end_date}
-                  </p>
-                </div>
-                <Badge variant="emerald">Active</Badge>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-muted-foreground">No bookings found.</p>
-        )}
-      </CardContent>
-    </Card>
+    <section className="space-y-4">
+      <div className="space-y-1.5">
+        <Eyebrow>Your trips</Eyebrow>
+        <h2 className="text-h2 text-foreground">Bookings</h2>
+      </div>
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      {bookings.length > 0 ? (
+        <Ledger>
+          {bookings.map((booking) => (
+            <div key={booking.id} className="flex flex-col gap-2 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {booking.car.make} {booking.car.model}
+                </p>
+                <p className="font-mono text-xs text-muted-foreground tabular-nums">
+                  {booking.start_date} → {booking.end_date}
+                </p>
+              </div>
+              <Badge variant="emerald" dot>
+                Active
+              </Badge>
+            </div>
+          ))}
+        </Ledger>
+      ) : (
+        <p className="text-sm text-muted-foreground">No bookings found.</p>
+      )}
+    </section>
   );
 };
 

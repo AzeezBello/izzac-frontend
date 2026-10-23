@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import DrivingEvaluationPanel from "../../components/DrivingEvaluationPanel";
+import { Reveal } from "../../components/motion/Reveal";
 import { useCurrency } from "../../context/CurrencyContext";
 import { SITE_NAME, SITE_URL } from "../../lib/seo";
 import {
@@ -18,50 +19,43 @@ import {
 } from "../../lib/productContent";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
-import { Card } from "../../components/ui/card";
-import { Tooltip } from "../../components/ui/tooltip";
+import {
+  ArrowLink,
+  Chip,
+  Container,
+  Eyebrow,
+  InkPanel,
+  Ledger,
+  LedgerRow,
+  OptionCard,
+  Section,
+  SectionHeading,
+  Stat,
+  StatStrip,
+} from "../../components/layout";
+import { cn, pad } from "@/lib/utils";
 
 const FLEET_BENCHMARK_TIERS = [
-  {
-    id: "commuter",
-    label: "City Commuter (Corolla / Civic)",
-    dailyRateNgn: 78000,
-    href: "/cars?category=City+Commuter",
-  },
-  {
-    id: "sedan",
-    label: "Executive Sedan (C300 / ES 350)",
-    dailyRateNgn: 165000,
-    href: "/cars?category=Executive+Sedan",
-  },
-  {
-    id: "pickup",
-    label: "Field 4x4 & Shuttle (Hilux / Ranger)",
-    dailyRateNgn: 135000,
-    href: "/cars?category=Pickup+%26+Shuttle",
-  },
-  {
-    id: "suv",
-    label: "Luxury & Escort SUV (Prado / GLE 450 / LC300)",
-    dailyRateNgn: 260000,
-    href: "/cars?category=Luxury+SUV",
-  },
+  { id: "commuter", label: "City commuter", example: "Corolla · Civic", dailyRateNgn: 78000, href: "/cars?category=City+Commuter" },
+  { id: "sedan", label: "Executive sedan", example: "C300 · ES 350", dailyRateNgn: 165000, href: "/cars?category=Executive+Sedan" },
+  { id: "pickup", label: "Field 4x4 & shuttle", example: "Hilux · Ranger", dailyRateNgn: 135000, href: "/cars?category=Pickup+%26+Shuttle" },
+  { id: "suv", label: "Luxury & escort SUV", example: "Prado · GLE 450 · LC300", dailyRateNgn: 260000, href: "/cars?category=Luxury+SUV" },
 ];
 
 const DURATION_PRESETS = [
-  { days: 3, label: "3 Days · Short-Term", discountPct: 0 },
-  { days: 7, label: "7 Days · Weekly Saver (-10%)", discountPct: 10 },
-  { days: 30, label: "30 Days · Monthly SuperFlex (-22%)", discountPct: 22 },
-  { days: 90, label: "90 Days · Quarterly Corporate (-22%)", discountPct: 22 },
+  { days: 3, label: "Short term", discountPct: 0 },
+  { days: 7, label: "Weekly saver", discountPct: 10 },
+  { days: 30, label: "Monthly SuperFlex", discountPct: 22 },
+  { days: 90, label: "Quarterly", discountPct: 22 },
 ];
 
-const bentoSpans = [
-  "lg:col-span-7",
-  "lg:col-span-5",
-  "lg:col-span-5",
-  "lg:col-span-7",
-  "lg:col-span-7",
-  "lg:col-span-5",
+const PAGE_NAV = [
+  { href: "#pillars", label: "Services" },
+  { href: "#calculator", label: "Calculator" },
+  { href: "#insurance", label: "Insurance" },
+  { href: "#protection", label: "Protection" },
+  { href: "#benchmark", label: "Compare" },
+  { href: "#hubs", label: "Hubs" },
 ];
 
 const ServicesPage = () => {
@@ -73,35 +67,20 @@ const ServicesPage = () => {
   const [fleetCount, setFleetCount] = useState(1);
 
   const activeTier = useMemo(
-    () =>
-      FLEET_BENCHMARK_TIERS.find((t) => t.id === selectedTierId) ||
-      FLEET_BENCHMARK_TIERS[1],
+    () => FLEET_BENCHMARK_TIERS.find((t) => t.id === selectedTierId) || FLEET_BENCHMARK_TIERS[1],
     [selectedTierId]
   );
 
   const estimate = useMemo(() => {
     const rawVehicleTotal = activeTier.dailyRateNgn * selectedDays * fleetCount;
-    const discountRate =
-      selectedDays >= 30 ? 0.22 : selectedDays >= 7 ? 0.1 : 0;
+    const discountRate = selectedDays >= 30 ? 0.22 : selectedDays >= 7 ? 0.1 : 0;
     const discountSavings = Math.round(rawVehicleTotal * discountRate);
     const discountedVehicleTotal = rawVehicleTotal - discountSavings;
     const chauffeurTotal = withChauffeur ? 25000 * selectedDays * fleetCount : 0;
     const shieldTotal = withRoadShield ? 12000 * selectedDays * fleetCount : 0;
     const grandTotal = discountedVehicleTotal + chauffeurTotal + shieldTotal;
-    const effectiveDailyPerCar = Math.round(
-      grandTotal / (selectedDays * fleetCount)
-    );
-
-    return {
-      rawVehicleTotal,
-      discountRate,
-      discountSavings,
-      discountedVehicleTotal,
-      chauffeurTotal,
-      shieldTotal,
-      grandTotal,
-      effectiveDailyPerCar,
-    };
+    const effectiveDailyPerCar = Math.round(grandTotal / (selectedDays * fleetCount));
+    return { rawVehicleTotal, discountRate, discountSavings, discountedVehicleTotal, chauffeurTotal, shieldTotal, grandTotal, effectiveDailyPerCar };
   }, [activeTier, selectedDays, withChauffeur, withRoadShield, fleetCount]);
 
   const servicesJsonLd = {
@@ -109,489 +88,490 @@ const ServicesPage = () => {
     "@type": "Service",
     serviceType:
       "Corporate Chauffeur, Self-Drive Car Rental, Motor Insurance, Airport VIP Meet & Greet & SuperFlex Subscriptions",
-    provider: {
-      "@type": "AutoRental",
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
+    provider: { "@type": "AutoRental", name: SITE_NAME, url: SITE_URL },
     areaServed: ["Lagos", "Abuja", "Port Harcourt", "Accra", "Nairobi"],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Izzac Mobility Service Pillars",
       itemListElement: SERVICE_PILLARS.map((pillar) => ({
         "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: pillar.title,
-          description: pillar.description,
-        },
+        itemOffered: { "@type": "Service", name: pillar.title, description: pillar.description },
       })),
     },
   };
 
   return (
     <div className="bg-background">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
-      />
-      {/* Asymmetric 12-Col Editorial Hero */}
-      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-10 pb-16 md:pt-14 md:pb-24 space-y-6">
-        <Breadcrumbs items={[{ label: "Services & B2B" }]} />
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          <div className="lg:col-span-7 space-y-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="emerald">Executive & Corporate Mobility Suite</Badge>
-              <Badge variant="secondary">Europcar Competitive Upgrade</Badge>
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-foreground tracking-[-0.035em] leading-[1.06]">
-              Global rental discipline, engineered for real roads & executive realities.
-            </h1>
-            <p className="text-muted-foreground text-base md:text-lg max-w-[66ch] leading-relaxed">
-              We benchmarked global leaders like Europcar and redesigned every product and service around how mobility actually works in Lagos, Abuja, Port Harcourt, Accra, and Nairobi: mandatory Chauffeur-Driven trials, Self-Drive qualification exams, NIID Motor Insurance, MOPOL security protocol, prepaid full-tank fuel, and 22%-off Monthly SuperFlex subscriptions.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Tooltip content="Filter 32+ vehicles by city hub and mobility service">
-                <Button asChild size="lg">
-                  <Link href="/cars">Browse 32+ live vehicles</Link>
-                </Button>
-              </Tooltip>
-              <Tooltip content="Calculate 10% Weekly & 22% Monthly SuperFlex fleet savings">
-                <Button asChild variant="secondary" size="lg">
-                  <a href="#calculator">Corporate & monthly calculator</a>
-                </Button>
-              </Tooltip>
-              <Tooltip content="See how Izzac outperforms Europcar on 8 executive mobility dimensions">
-                <Button asChild variant="outline" size="lg">
-                  <a href="#benchmark">Izzac vs. Europcar</a>
-                </Button>
-              </Tooltip>
-            </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }} />
 
-            <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-border/80">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                  Drive Modes
-                </p>
-                <p className="font-mono text-sm font-semibold text-foreground mt-0.5 tabular-nums">
-                  Chauffeur + Self
-                </p>
-              </div>
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                  Airport Desks
-                </p>
-                <p className="font-mono text-sm font-semibold text-foreground mt-0.5 tabular-nums">
-                  LOS · ABV · PHC
-                </p>
-              </div>
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                  SuperFlex Save
-                </p>
-                <p className="font-mono text-sm font-semibold text-primary mt-0.5 tabular-nums">
-                  Up to 22% Off
-                </p>
-              </div>
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                  Relief SLA
-                </p>
-                <p className="font-mono text-sm font-semibold text-foreground mt-0.5 tabular-nums">
-                  2-Hr Standby Car
-                </p>
-              </div>
+      {/* ------------------------------------------------------------ Hero */}
+      <Section spacing="sm" className="pt-8 md:pt-12">
+        <Breadcrumbs items={[{ label: "Services" }]} />
+        <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="space-y-7 lg:col-span-7">
+            <Eyebrow index="01">Services & corporate</Eyebrow>
+            <h1 className="text-display max-w-[16ch] text-foreground">Global rental discipline, built for real roads.</h1>
+            <p className="type-lede max-w-[54ch]">
+              We kept what works in international car hire and rebuilt the rest for Lagos, Abuja and Port Harcourt:
+              chauffeur trials, a self-drive test, NIID motor insurance, security escort, prepaid fuel and a monthly
+              SuperFlex rate 22% under daily.
+            </p>
+            <div className="flex flex-wrap gap-2.5">
+              <Button asChild size="lg">
+                <Link href="/cars">Browse the fleet</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <a href="#calculator">Corporate calculator</a>
+              </Button>
             </div>
           </div>
-
           <div className="lg:col-span-5">
-            <div className="relative rounded-2xl border border-border/90 bg-card p-2.5 shadow-elevated">
-              <div className="relative overflow-hidden rounded-xl">
-                <Image
-                  src="/images/feature1.webp"
-                  alt="Izzac executive SUV and sedan fleet staged for corporate and airport protocol service"
-                  width={1600}
-                  height={1000}
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                  priority
-                  fetchPriority="high"
-                  className="w-full h-72 sm:h-80 md:h-[22rem] object-cover"
-                />
-                <div className="absolute inset-x-3 bottom-3 rounded-lg border border-white/15 bg-[#0d1713]/90 p-3.5 text-xs text-stone-100 backdrop-blur-md space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono uppercase tracking-[0.14em] text-emerald-300">
-                      Executive Fleet Standard
-                    </span>
-                    <span className="font-mono tabular-nums text-stone-200">
-                      6 Mobility Pillars
-                    </span>
-                  </div>
-                  <p className="text-stone-300 text-[11px] leading-snug">
-                    Chauffeur Trial · Certified Self-Drive · Airport VIP · SuperFlex B2B · Hilux 4x4 · P2P Fleet Hosting
-                  </p>
-                </div>
+            <div className="relative overflow-hidden rounded-xl bg-secondary">
+              <Image
+                src="/images/feature1.webp"
+                alt="Izzac executive SUV and sedan fleet staged for corporate and airport protocol service"
+                width={1600}
+                height={1000}
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                priority
+                fetchPriority="high"
+                className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
+              />
+              <div className="absolute inset-x-4 bottom-4 flex items-center justify-between rounded-md border border-white/10 bg-ink/85 px-4 py-3 font-mono text-2xs text-ink-foreground backdrop-blur-md">
+                <span className="text-signal">Six services</span>
+                <span className="tabular-nums text-ink-muted">LOS · ABV · PHC</span>
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* 6 Core Mobility Products & Services (Asymmetric 12-Col Bento Grid) */}
-      <section className="border-y border-border/80 bg-secondary/35 py-16 md:py-24">
-        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-10">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div className="space-y-2">
-              <Badge variant="emerald">Products & Services Portfolio</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-                Six mobility products tailored for executive & commercial fleets
-              </h2>
-              <p className="text-muted-foreground max-w-[62ch] text-sm md:text-base">
-                Every service pillar integrates directly into the live vehicle catalogue and checkout configurator—no offline quote forms required.
-              </p>
-            </div>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/cars">Open live vehicle catalogue →</Link>
-            </Button>
-          </div>
+        <StatStrip columns={4} className="mt-14">
+          <Stat label="Drive modes" value="2" detail="Chauffeur-driven or verified self-drive" />
+          <Stat label="Airport desks" value="3" detail="LOS · ABV · PHC curbside handover" />
+          <Stat label="SuperFlex" value="−22%" tone="primary" detail="Monthly · −10% weekly" />
+          <Stat label="Relief SLA" value="2 h" detail="Standby replacement in core hubs" />
+        </StatStrip>
+      </Section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {SERVICE_PILLARS.map((pillar, index) => (
-              <Card
-                key={pillar.code}
-                className={`${bentoSpans[index % bentoSpans.length]} p-6 md:p-8 flex flex-col justify-between hover:border-stone-300 hover:shadow-elevated stagger-item`}
+      {/* -------------------------------------------------- Sticky anchors */}
+      <div className="sticky top-[var(--header-height)] z-30 border-y border-border/70 bg-background/85 backdrop-blur-md">
+        <Container>
+          <nav aria-label="On this page" className="-mx-4 flex gap-6 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
+            {PAGE_NAV.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="shrink-0 border-b-2 border-transparent py-3.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted-foreground transition-colors duration-150 hover:border-foreground hover:text-foreground"
               >
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <Badge variant="secondary">{pillar.eyebrow}</Badge>
-                    <span className="font-mono text-xs font-semibold text-primary tabular-nums">
-                      {pillar.priceTag}
-                    </span>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </Container>
+      </div>
+
+      {/* --------------------------------------------------------- Pillars */}
+      <Section id="pillars" className="scroll-mt-28">
+        <SectionHeading
+          eyebrow="Services"
+          index="02"
+          title="Six services. Each one a toggle at checkout."
+          lede="Priced per day, applied on the vehicle page. Nothing is quoted offline."
+          action={<ArrowLink href="/cars">Open the catalogue</ArrowLink>}
+        />
+        <div className="mt-12 ledger">
+          {SERVICE_PILLARS.map((pillar, index) => {
+            const flip = index % 2 === 1;
+            return (
+              <Reveal key={pillar.code} className="grid grid-cols-1 gap-8 py-10 md:py-14 lg:grid-cols-12 lg:gap-12" selector=":scope > *" stagger={0.1}>
+                <div className={cn("lg:col-span-5", flip && "lg:order-2 lg:col-start-8")}>
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-mono text-xs tabular-nums text-primary">{pad(index + 1)}</span>
+                    <div className="space-y-2">
+                      <h3 className="text-h2 text-foreground">{pillar.title}</h3>
+                      <p className="font-mono text-2xs uppercase tracking-[0.1em] text-muted-foreground">{pillar.subtitle}</p>
+                    </div>
                   </div>
-
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-[-0.025em]">
-                      {pillar.title}
-                    </h3>
-                    <p className="font-mono text-xs text-muted-foreground mt-1">
-                      {pillar.subtitle}
-                    </p>
+                  <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground lg:pl-8">{pillar.description}</p>
+                  <div className="mt-6 flex items-center gap-5 lg:pl-8">
+                    <span className="font-mono text-sm font-semibold tabular-nums text-foreground">{pillar.priceTag}</span>
+                    <ArrowLink href={pillar.href}>{pillar.cta}</ArrowLink>
                   </div>
-
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {pillar.description}
-                  </p>
-
-                  <ul className="space-y-2 pt-2 border-t border-border/70 text-sm text-foreground/90">
+                </div>
+                <div className={cn("lg:col-span-6", flip ? "lg:order-1 lg:col-start-1" : "lg:col-start-7")}>
+                  <ul className="divide-y divide-border/70 border-t border-border/70">
                     {pillar.highlights.map((item, idx) => (
-                      <li key={item} className="flex items-start gap-2.5">
-                        <span className="font-mono text-xs font-semibold text-primary pt-0.5 tabular-nums">
-                          0{idx + 1}
-                        </span>
+                      <li key={item} className="grid grid-cols-[2rem_1fr] gap-3 py-3.5 text-sm text-foreground/90">
+                        <span className="font-mono text-2xs tabular-nums text-muted-foreground pt-0.5">{pad(idx + 1)}</span>
                         <span className="leading-snug">{item}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-border/70 space-y-3">
-                  <p className="text-xs text-muted-foreground bg-secondary/60 rounded-lg px-3 py-2 leading-relaxed">
-                    <span className="font-mono font-semibold uppercase tracking-[0.1em] text-primary">
-                      vs. Europcar:{" "}
-                    </span>
+                  <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                    <span className="font-mono uppercase tracking-[0.1em] text-primary">vs. global standard · </span>
                     {pillar.europcarUpgradeNote}
                   </p>
-                  <div>
-                    <Link
-                      href={pillar.href}
-                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-emerald-900 transition-colors duration-150"
-                    >
-                      <span>{pillar.cta}</span>
-                      <span
-                        aria-hidden="true"
-                        className="transition-transform duration-150 ease-out-quart group-hover:translate-x-0.5"
-                      >
-                        →
-                      </span>
-                    </Link>
-                  </div>
                 </div>
-              </Card>
-            ))}
-          </div>
+              </Reveal>
+            );
+          })}
         </div>
-      </section>
+      </Section>
 
-      {/* Interactive Corporate & SuperFlex Subscription Calculator */}
-      <section
-        id="calculator"
-        className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-16 md:py-24 scroll-mt-20"
-      >
-        <div className="rounded-2xl bg-[#0d1713] text-stone-100 p-6 sm:p-8 md:p-11 border border-emerald-950 shadow-elevated">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="space-y-2">
-                <Badge variant="dark">Interactive Rate Configurator</Badge>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-[-0.03em] text-stone-50">
-                  Corporate Fleet & Monthly SuperFlex Estimator
-                </h2>
-                <p className="text-stone-300 text-sm md:text-base leading-relaxed">
-                  Compare short-term daily rentals against Izzac’s automatic Weekly (-10%) and Monthly SuperFlex (-22%) subscription discounts—complete with corporate chauffeur and Road Shield options.
+      {/* ------------------------------------------------------ Calculator */}
+      <Section id="calculator" rule="top" className="scroll-mt-28">
+        <InkPanel padding="lg">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="space-y-8 lg:col-span-7">
+              <div className="space-y-4">
+                <Eyebrow index="03" tone="signal">
+                  Corporate & monthly estimator
+                </Eyebrow>
+                <h2 className="text-display text-ink-foreground">Price a fleet in seconds.</h2>
+                <p className="max-w-[48ch] text-[15px] leading-relaxed text-ink-muted">
+                  Weekly bookings take 10% off, monthly take 22%. Add chauffeurs and road shield per vehicle.
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block font-mono text-xs uppercase tracking-[0.14em] text-emerald-300 mb-2">
-                    1. Select Vehicle Class
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {FLEET_BENCHMARK_TIERS.map((tier) => {
-                      const active = tier.id === selectedTierId;
-                      return (
-                        <button
-                          key={tier.id}
-                          type="button"
-                          onClick={() => setSelectedTierId(tier.id)}
-                          className={`text-left rounded-xl border p-3.5 transition-colors duration-150 ${
-                            active
-                              ? "border-emerald-400 bg-emerald-950/80 text-stone-50"
-                              : "border-white/10 bg-white/5 text-stone-300 hover:border-white/25"
-                          }`}
-                        >
-                          <p className="text-sm font-semibold">{tier.label}</p>
-                          <p className="font-mono text-xs text-emerald-300 mt-1 tabular-nums">
-                            {formatPrice(tier.dailyRateNgn)} /day base
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
+              <fieldset className="space-y-3">
+                <legend className="type-eyebrow text-signal">1 · Vehicle class</legend>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {FLEET_BENCHMARK_TIERS.map((tier) => {
+                    const active = tier.id === selectedTierId;
+                    return (
+                      <button
+                        key={tier.id}
+                        type="button"
+                        onClick={() => setSelectedTierId(tier.id)}
+                        aria-pressed={active}
+                        className={cn(
+                          "rounded-md border p-3.5 text-left transition-[background-color,border-color,transform] duration-150 ease-out-quart active:scale-[0.99]",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal",
+                          active ? "border-signal/60 bg-white/[0.08]" : "border-white/10 bg-white/[0.03] hover:border-white/25"
+                        )}
+                      >
+                        <p className="text-sm font-medium text-ink-foreground">{tier.label}</p>
+                        <p className="mt-0.5 font-mono text-2xs text-ink-muted">{tier.example}</p>
+                        <p className="mt-2 font-mono text-xs tabular-nums text-signal">{formatPrice(tier.dailyRateNgn)} /day</p>
+                      </button>
+                    );
+                  })}
                 </div>
+              </fieldset>
 
-                <div>
-                  <label className="block font-mono text-xs uppercase tracking-[0.14em] text-emerald-300 mb-2">
-                    2. Rental Duration & Subscription Tier
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {DURATION_PRESETS.map((preset) => {
-                      const active = selectedDays === preset.days;
-                      return (
-                        <button
-                          key={preset.days}
-                          type="button"
-                          onClick={() => setSelectedDays(preset.days)}
-                          className={`rounded-xl border px-3 py-2.5 text-left transition-colors duration-150 ${
-                            active
-                              ? "border-emerald-400 bg-emerald-950/80 text-stone-50"
-                              : "border-white/10 bg-white/5 text-stone-300 hover:border-white/25"
-                          }`}
-                        >
-                          <p className="font-mono text-sm font-bold tabular-nums">
-                            {preset.days} Days
-                          </p>
-                          <p className="text-[11px] text-emerald-300/90 mt-0.5">
-                            {preset.discountPct > 0
-                              ? `Save ${preset.discountPct}%`
-                              : "Standard rate"}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
+              <fieldset className="space-y-3">
+                <legend className="type-eyebrow text-signal">2 · Duration</legend>
+                <div className="flex flex-wrap gap-2">
+                  {DURATION_PRESETS.map((preset) => {
+                    const active = selectedDays === preset.days;
+                    return (
+                      <Chip
+                        key={preset.days}
+                        active={active}
+                        onClick={() => setSelectedDays(preset.days)}
+                        count={preset.discountPct > 0 ? `−${preset.discountPct}%` : undefined}
+                        className={cn(!active && "border-white/15 bg-white/[0.04] text-ink-foreground hover:border-white/30 hover:text-white")}
+                      >
+                        {preset.days} days · {preset.label}
+                      </Chip>
+                    );
+                  })}
                 </div>
+              </fieldset>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                  <label className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-xs text-stone-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={withChauffeur}
-                      onChange={(e) => setWithChauffeur(e.target.checked)}
-                      className="h-4 w-4 rounded"
-                    />
+              <fieldset className="space-y-3">
+                <legend className="type-eyebrow text-signal">3 · Options</legend>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <OptionCard
+                    kind="checkbox"
+                    checked={withChauffeur}
+                    onChange={(e) => setWithChauffeur(e.target.checked)}
+                    title={<span className="text-ink-foreground">Pro chauffeur</span>}
+                    meta={<span className="text-signal">+{formatPrice(25000)}/d</span>}
+                    containerClassName="[--option-bg:hsl(0_0%_100%/0.04)] [--option-border:hsl(0_0%_100%/0.12)] hover:[--option-border:hsl(0_0%_100%/0.3)]"
+                  />
+                  <OptionCard
+                    kind="checkbox"
+                    checked={withRoadShield}
+                    onChange={(e) => setWithRoadShield(e.target.checked)}
+                    title={<span className="text-ink-foreground">Road & tyre shield</span>}
+                    meta={<span className="text-signal">+{formatPrice(12000)}/d</span>}
+                    containerClassName="[--option-bg:hsl(0_0%_100%/0.04)] [--option-border:hsl(0_0%_100%/0.12)] hover:[--option-border:hsl(0_0%_100%/0.3)]"
+                  />
+                  <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.04] px-3.5 py-3">
                     <div>
-                      <p className="font-semibold text-stone-100">
-                        Pro Chauffeur
-                      </p>
-                      <p className="font-mono text-[11px] text-emerald-300 tabular-nums">
-                        +{formatPrice(25000)}/day
+                      <p className="text-sm font-medium text-ink-foreground">Fleet units</p>
+                      <p className="font-mono text-2xs tabular-nums text-ink-muted">
+                        {fleetCount} {fleetCount === 1 ? "vehicle" : "vehicles"}
                       </p>
                     </div>
-                  </label>
-
-                  <label className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-xs text-stone-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={withRoadShield}
-                      onChange={(e) => setWithRoadShield(e.target.checked)}
-                      className="h-4 w-4 rounded"
-                    />
-                    <div>
-                      <p className="font-semibold text-stone-100">
-                        Road & Tyre Shield
-                      </p>
-                      <p className="font-mono text-[11px] text-emerald-300 tabular-nums">
-                        +{formatPrice(12000)}/day
-                      </p>
-                    </div>
-                  </label>
-
-                  <div className="rounded-xl border border-white/15 bg-white/5 px-3.5 py-2.5 text-xs text-stone-200 flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-stone-100">Fleet Units</p>
-                      <p className="font-mono text-[11px] text-stone-400 tabular-nums">
-                        {fleetCount} {fleetCount === 1 ? "Vehicle" : "Vehicles"}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => setFleetCount((c) => Math.max(1, c - 1))}
-                        className="h-7 w-7 rounded bg-white/10 font-mono text-sm font-bold hover:bg-white/20"
                         aria-label="Decrease fleet count"
+                        className="h-8 w-8 rounded-sm border border-white/15 font-mono text-sm text-ink-foreground transition-colors duration-150 hover:bg-white/10 active:scale-[0.96]"
                       >
-                        -
+                        −
                       </button>
+                      <span className="w-7 text-center font-mono text-sm tabular-nums text-ink-foreground">{fleetCount}</span>
                       <button
                         type="button"
                         onClick={() => setFleetCount((c) => Math.min(20, c + 1))}
-                        className="h-7 w-7 rounded bg-white/10 font-mono text-sm font-bold hover:bg-white/20"
                         aria-label="Increase fleet count"
+                        className="h-8 w-8 rounded-sm border border-white/15 font-mono text-sm text-ink-foreground transition-colors duration-150 hover:bg-white/10 active:scale-[0.96]"
                       >
                         +
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </fieldset>
             </div>
 
-            {/* Live Tabular-Nums Quote Ledger */}
-            <div className="lg:col-span-5 rounded-xl border border-white/15 bg-black/35 p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <span className="font-mono text-xs uppercase tracking-[0.14em] text-emerald-300">
-                  Live Fleet Estimate
-                </span>
-                <span className="font-mono text-xs text-stone-300 tabular-nums">
-                  {selectedDays} Days × {fleetCount}{" "}
-                  {fleetCount === 1 ? "Car" : "Cars"}
-                </span>
-              </div>
-
-              <div className="space-y-2.5 font-mono text-xs tabular-nums">
-                <div className="flex items-center justify-between text-stone-300">
-                  <span>Standard vehicle tariff</span>
-                  <span>{formatPrice(estimate.rawVehicleTotal)}</span>
-                </div>
-
-                {estimate.discountSavings > 0 && (
-                  <div className="flex items-center justify-between text-emerald-300">
-                    <span>
-                      SuperFlex discount (-{Math.round(estimate.discountRate * 100)}%)
-                    </span>
-                    <span>-{formatPrice(estimate.discountSavings)}</span>
-                  </div>
-                )}
-
-                {estimate.chauffeurTotal > 0 && (
-                  <div className="flex items-center justify-between text-stone-300">
-                    <span>Vetted corporate chauffeur(s)</span>
-                    <span>+{formatPrice(estimate.chauffeurTotal)}</span>
-                  </div>
-                )}
-
-                {estimate.shieldTotal > 0 && (
-                  <div className="flex items-center justify-between text-stone-300">
-                    <span>Road, Tyre & Flood Shield</span>
-                    <span>+{formatPrice(estimate.shieldTotal)}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-white/15 pt-4 space-y-1">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-semibold text-stone-200">
-                    Estimated Total
-                  </span>
-                  <span className="font-mono text-2xl font-bold text-emerald-300 tabular-nums">
-                    {formatPrice(estimate.grandTotal)}
+            {/* Live estimate */}
+            <div className="lg:col-span-5">
+              <div className="rounded-lg border border-white/10 bg-ink/60 p-6 md:p-7 lg:sticky lg:top-[calc(var(--header-height)+5rem)]">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <span className="type-eyebrow text-signal">Live estimate</span>
+                  <span className="font-mono text-2xs tabular-nums text-ink-muted">
+                    {selectedDays} d × {fleetCount} {fleetCount === 1 ? "car" : "cars"}
                   </span>
                 </div>
-                <p className="font-mono text-xs text-stone-400 text-right tabular-nums">
-                  Effective {formatPrice(estimate.effectiveDailyPerCar)} /car/day
+
+                <dl className="mt-4 space-y-2.5 font-mono text-xs tabular-nums">
+                  <div className="flex items-center justify-between text-ink-muted">
+                    <dt>Vehicle tariff</dt>
+                    <dd>{formatPrice(estimate.rawVehicleTotal)}</dd>
+                  </div>
+                  {estimate.discountSavings > 0 && (
+                    <div className="flex items-center justify-between text-signal">
+                      <dt>SuperFlex −{Math.round(estimate.discountRate * 100)}%</dt>
+                      <dd>−{formatPrice(estimate.discountSavings)}</dd>
+                    </div>
+                  )}
+                  {estimate.chauffeurTotal > 0 && (
+                    <div className="flex items-center justify-between text-ink-muted">
+                      <dt>Chauffeur{fleetCount > 1 ? "s" : ""}</dt>
+                      <dd>+{formatPrice(estimate.chauffeurTotal)}</dd>
+                    </div>
+                  )}
+                  {estimate.shieldTotal > 0 && (
+                    <div className="flex items-center justify-between text-ink-muted">
+                      <dt>Road, tyre & flood shield</dt>
+                      <dd>+{formatPrice(estimate.shieldTotal)}</dd>
+                    </div>
+                  )}
+                </dl>
+
+                <div className="mt-5 border-t border-white/10 pt-5">
+                  <Stat inverted size="lg" tone="signal" label="Estimated total" value={formatPrice(estimate.grandTotal)} detail={`Effective ${formatPrice(estimate.effectiveDailyPerCar)} per car per day`} />
+                </div>
+
+                <p className="mt-5 text-xs leading-relaxed text-ink-muted">
+                  Includes consolidated VAT invoice, 2-hour replacement guarantee in Lagos, Abuja and Port Harcourt, and scheduled maintenance.
                 </p>
+
+                <Button asChild size="lg" className="mt-6 w-full">
+                  <Link href={activeTier.href}>Browse {activeTier.label.toLowerCase()}s</Link>
+                </Button>
               </div>
-
-              <p className="text-xs text-stone-300/90 leading-relaxed pt-1">
-                Includes consolidated VAT invoice, 2-hour replacement vehicle guarantee in Lagos/Abuja/PH, and scheduled maintenance.
-              </p>
-
-              <Button asChild size="lg" className="w-full">
-                <Link href={activeTier.href}>
-                  Browse matching {activeTier.label.split(" (")[0]}s →
-                </Link>
-              </Button>
             </div>
+          </div>
+        </InkPanel>
+      </Section>
+
+      {/* ------------------------------------------------------ Evaluation */}
+      <Section spacing="sm">
+        <DrivingEvaluationPanel compact />
+      </Section>
+
+      {/* ------------------------------------------------------- Insurance */}
+      <Section id="insurance" rule="top" className="scroll-mt-28">
+        <SectionHeading
+          eyebrow="Motor insurance"
+          index="04"
+          title="A NIID certificate on every reservation."
+          lede="Third-party is included. Upgrade to comprehensive or zero-excess all-risk at checkout."
+        />
+        <Reveal className="mt-12 grid grid-cols-1 divide-y divide-border/70 border-y border-border/70 lg:grid-cols-3 lg:divide-x lg:divide-y-0" stagger={0.08}>
+          {INSURANCE_PLAN_OPTIONS.map((ins, idx) => {
+            const featured = ins.code === "comprehensive_shield";
+            return (
+              <div key={ins.code} className={cn("flex flex-col justify-between gap-8 py-8 lg:px-8 lg:first:pl-0 lg:last:pr-0", featured && "lg:bg-surface lg:px-8")}>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-xs tabular-nums text-primary">{pad(idx + 1)}</span>
+                    {featured ? <Badge variant="emerald">Most chosen</Badge> : <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted-foreground">{ins.badge}</span>}
+                  </div>
+                  <h3 className="text-h3 text-foreground">{ins.name}</h3>
+                  <p className="font-mono text-2xl font-semibold tabular-nums tracking-tight text-foreground">
+                    {ins.dailyRateNgn === 0 ? "Included" : `+${formatPrice(ins.dailyRateNgn)}`}
+                    {ins.dailyRateNgn > 0 && <span className="ml-1 font-sans text-xs font-normal text-muted-foreground">/day</span>}
+                  </p>
+                  <p className="font-mono text-2xs text-muted-foreground tabular-nums">
+                    {ins.underwriter} · cover to {formatPrice(ins.coverageLimitNgn)}
+                  </p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{ins.summary}</p>
+                </div>
+                <ul className="divide-y divide-border/60 border-t border-border/70 text-sm text-foreground/90">
+                  {ins.coverageItems.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 py-2.5">
+                      <span aria-hidden="true" className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-primary" />
+                      <span className="leading-snug">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </Reveal>
+      </Section>
+
+      {/* ------------------------------------------------------ Protection */}
+      <Section id="protection" rule="top" tone="surface" className="scroll-mt-28">
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-7">
+            <SectionHeading
+              eyebrow="Protection tiers"
+              index="05"
+              size="h2"
+              title="Waivers that cover potholes, tyres and flood corridors."
+              lede="Standard global waivers exclude rims, tyres and flood. Ours do not."
+            />
+            <Ledger className="mt-8">
+              {PROTECTION_PLAN_OPTIONS.map((plan, idx) => (
+                <LedgerRow
+                  key={plan.code}
+                  index={pad(idx + 1)}
+                  title={plan.name}
+                  description={
+                    <>
+                      {plan.summary}
+                      <span className="mt-2 block font-mono text-2xs text-muted-foreground">{plan.coverageItems.join(" · ")}</span>
+                    </>
+                  }
+                  aside={
+                    <span className="font-mono text-sm font-semibold tabular-nums text-foreground">
+                      {plan.dailyRateNgn === 0 ? "Included" : `+${formatPrice(plan.dailyRateNgn)}/d`}
+                    </span>
+                  }
+                />
+              ))}
+            </Ledger>
+          </div>
+          <div className="lg:col-span-5">
+            <SectionHeading
+              eyebrow="Extras"
+              size="h2"
+              title="Add what the trip needs."
+              lede="Prepaid fuel, security escort, 5G cabin Wi-Fi, interstate clearance."
+            />
+            <Ledger className="mt-8">
+              {BOOKING_ADDON_OPTIONS.map((addon) => (
+                <LedgerRow
+                  key={addon.code}
+                  density="compact"
+                  title={<span className="text-[15px]">{addon.name.split(" (")[0]}</span>}
+                  description={<span className="text-xs">{addon.description}</span>}
+                  aside={
+                    <span className="font-mono text-xs font-semibold tabular-nums text-foreground">
+                      +{formatPrice(addon.amountNgn)}
+                      <span className="font-normal text-muted-foreground"> {addon.billing === "daily" ? "/d" : "flat"}</span>
+                    </span>
+                  }
+                />
+              ))}
+            </Ledger>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* Mandatory Chauffeur-Driven Trial, Self-Drive Evaluation & NAICOM/NIID Motor Insurance */}
-      <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pb-16 space-y-10">
-        <DrivingEvaluationPanel compact />
+      {/* ------------------------------------------------------- Benchmark */}
+      <Section id="benchmark" rule="top" className="scroll-mt-28">
+        <SectionHeading
+          eyebrow="How we compare"
+          index="06"
+          title="Where Izzac departs from the global rental standard."
+          lede="We kept transparent tiers, duration discounts and airport desks. We changed what breaks on Nigerian roads."
+        />
+        <div
+          tabIndex={0}
+          role="region"
+          aria-labelledby="competitor-benchmark-caption"
+          className="comparison-table-wrapper mt-10 rounded-lg border border-border/80 bg-surface-elevated"
+        >
+          <table className="comparison-table text-left text-sm">
+            <caption id="competitor-benchmark-caption" className="sr-only">
+              Comparison of Izzac executive mobility services versus the global car rental standard
+            </caption>
+            <thead>
+              <tr className="border-b border-border bg-surface font-mono text-2xs uppercase tracking-[0.12em] text-muted-foreground">
+                <th scope="col" className="p-4 font-semibold text-foreground">Capability</th>
+                <th scope="col" className="p-4 font-semibold text-primary">Izzac</th>
+                <th scope="col" className="p-4 font-semibold">Global standard</th>
+                <th scope="col" className="p-4 font-semibold text-foreground">Why it matters</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/70">
+              {EUROPCAR_COMPETITOR_BENCHMARK.map((row) => (
+                <tr key={row.capability} className="align-top">
+                  <th scope="row" className="p-4 font-medium text-foreground">{row.capability}</th>
+                  <td className="bg-primary-soft/30 p-4 font-medium text-foreground">{row.izzacAdvantage}</td>
+                  <td className="p-4 text-muted-foreground">{row.europcarStandard}</td>
+                  <td className="p-4 text-foreground/85">{row.africanMarketImpact}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <Badge variant="emerald">NAICOM & NIID Motor Insurance</Badge>
-            <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
-              Motor insurance policies issued with every reservation
-            </h2>
-            <p className="text-muted-foreground text-sm md:text-base max-w-[66ch]">
-              Every booking automatically generates a verifiable NIID insurance certificate reference, with optional upgrades to Comprehensive Collision + Flood or Executive Zero-Excess All-Risk + SRCC cover.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 rounded-2xl border border-border/90 bg-card shadow-surface divide-y lg:divide-y-0 lg:divide-x divide-border/80 overflow-hidden">
-            {INSURANCE_PLAN_OPTIONS.map((ins) => (
-              <div
-                key={ins.code}
-                className="p-6 md:p-8 flex flex-col justify-between space-y-5"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <Badge
-                      variant={
-                        ins.code === "comprehensive_shield"
-                          ? "emerald"
-                          : "secondary"
-                      }
-                    >
-                      {ins.badge}
-                    </Badge>
-                    <span className="font-mono text-sm font-bold text-primary tabular-nums">
-                      {ins.dailyRateNgn === 0
-                        ? "Included (₦0/d)"
-                        : `+${formatPrice(ins.dailyRateNgn)} /day`}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground tracking-[-0.02em]">
-                    {ins.name}
-                  </h3>
-                  <p className="font-mono text-xs text-muted-foreground tabular-nums">
-                    Underwriter: {ins.underwriter} · Limit:{" "}
-                    {formatPrice(ins.coverageLimitNgn)}
-                  </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {ins.summary}
-                  </p>
+      {/* -------------------------------------------------------------- Hubs */}
+      <Section id="hubs" rule="top" tone="surface" className="scroll-mt-28">
+        <SectionHeading eyebrow="Coverage" index="07" title="City and airport hubs." lede="Curbside handover at each airport desk, plus city hubs in every listed metro." />
+        <Reveal className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border/80 bg-border/70 sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
+          {AFRICAN_REGIONAL_HUBS.map((hub) => (
+            <div key={hub.city} className="flex flex-col justify-between gap-5 bg-surface-elevated p-6">
+              <div className="space-y-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-mono text-lg font-semibold tracking-tight text-primary">{hub.airportCode}</span>
+                  <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted-foreground">{hub.country}</span>
                 </div>
+                <h3 className="text-h3 text-foreground">{hub.city}</h3>
+                <p className="font-mono text-2xs text-muted-foreground">{hub.airportName}</p>
+                <p className="text-xs leading-relaxed text-muted-foreground">{hub.corridors}</p>
+              </div>
+              <p className="border-t border-border/70 pt-3 font-mono text-2xs leading-relaxed text-foreground/75">
+                {hub.servicesAvailable.join(" · ")}
+              </p>
+            </div>
+          ))}
+        </Reveal>
 
-                <ul className="pt-4 border-t border-border/70 space-y-2 text-xs text-foreground/90">
-                  {ins.coverageItems.map((item, idx) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <span className="font-mono font-semibold text-primary tabular-nums">
-                        0{idx + 1}
-                      </span>
-                      <span>{item}</span>
+        <div className="mt-20">
+          <SectionHeading
+            eyebrow="Izzac Privilege"
+            size="h2"
+            title="Loyalty for frequent flyers and fleets."
+            lede="Automatic discounts, lounge access, free cabin Wi-Fi and guaranteed December allocation."
+          />
+          <div className="mt-8 grid grid-cols-1 divide-y divide-border/70 border-y border-border/70 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+            {IZZAC_PRIVILEGE_TIERS.map((tier, idx) => (
+              <div key={tier.tier} className="space-y-4 py-7 lg:px-8 lg:first:pl-0 lg:last:pr-0">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs tabular-nums text-primary">Tier {pad(idx + 1)}</span>
+                  <span className="font-mono text-sm font-semibold tabular-nums text-foreground">{tier.discount}</span>
+                </div>
+                <div>
+                  <h3 className="text-h3 text-foreground">{tier.tier}</h3>
+                  <p className="mt-1 font-mono text-2xs text-muted-foreground">{tier.threshold}</p>
+                </div>
+                <ul className="space-y-2 border-t border-border/70 pt-4 text-sm text-foreground/85">
+                  {tier.perks.map((perk) => (
+                    <li key={perk} className="flex items-start gap-2.5">
+                      <span aria-hidden="true" className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-primary" />
+                      <span className="leading-snug">{perk}</span>
                     </li>
                   ))}
                 </ul>
@@ -599,259 +579,7 @@ const ServicesPage = () => {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Tiered Protection Packages & Executive Mobility Extras */}
-      <section className="border-y border-border/80 bg-secondary/30 py-16 md:py-24">
-        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-14">
-          <div className="space-y-8">
-            <div className="space-y-2">
-              <Badge variant="emerald">Protection & Risk Mitigation</Badge>
-              <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Protection tiers built for real road conditions
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base max-w-[66ch]">
-                Standard global rental waivers often exclude pothole tyre damage, rims, and flood corridors. Izzac’s protection tiers address real urban and highway road risks transparently.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 rounded-2xl border border-border/90 bg-card shadow-surface divide-y lg:divide-y-0 lg:divide-x divide-border/80 overflow-hidden">
-              {PROTECTION_PLAN_OPTIONS.map((plan) => (
-                <div
-                  key={plan.code}
-                  className="p-6 md:p-8 flex flex-col justify-between space-y-6"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge
-                        variant={
-                          plan.code === "medium" ? "emerald" : "secondary"
-                        }
-                      >
-                        {plan.badge}
-                      </Badge>
-                      <span className="font-mono text-sm font-bold text-primary tabular-nums">
-                        {plan.dailyRateNgn === 0
-                          ? "Included"
-                          : `+${formatPrice(plan.dailyRateNgn)} /day`}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground tracking-[-0.02em]">
-                      {plan.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {plan.summary}
-                    </p>
-                  </div>
-
-                  <ul className="pt-4 border-t border-border/70 space-y-2.5 text-sm text-foreground/90">
-                    {plan.coverageItems.map((item, idx) => (
-                      <li key={item} className="flex items-start gap-2.5">
-                        <span className="font-mono text-xs font-semibold text-primary tabular-nums">
-                          0{idx + 1}
-                        </span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Executive Mobility Add-Ons */}
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Badge variant="secondary">Localized Extras & Add-Ons</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Every booking can be equipped with executive extras
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base max-w-[62ch]">
-                Instead of snow chains or ski racks, configure your reservation with prepaid fuel, executive security escort, 5G cabin Wi-Fi, or interstate travel clearance.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {BOOKING_ADDON_OPTIONS.map((addon) => (
-                <Card key={addon.code} className="p-5 flex flex-col justify-between">
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant="emerald">{addon.badge}</Badge>
-                      <span className="font-mono text-xs font-bold text-primary tabular-nums">
-                        +{formatPrice(addon.amountNgn)}{" "}
-                        {addon.billing === "daily" ? "/day" : "flat"}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-semibold text-foreground">
-                      {addon.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {addon.description}
-                    </p>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Modern Web Guidance (responsive-table): Semantic Competitor Benchmark Table */}
-      <section
-        id="benchmark"
-        className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-16 md:py-24 space-y-8 scroll-mt-20"
-      >
-        <div className="space-y-2">
-          <Badge variant="emerald">Competitive Benchmark</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-            How Izzac improves on Europcar for executive & corporate mobility
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-base max-w-[64ch]">
-            We retained the best parts of Europcar’s international structure—transparent protection tiers, multi-duration discounts, and airport hubs—while re-architecting the product for real road infrastructure, chauffeur trials, and security realities.
-          </p>
-        </div>
-
-        <div
-          tabIndex={0}
-          role="region"
-          aria-labelledby="competitor-benchmark-caption"
-          className="comparison-table-wrapper rounded-2xl border border-border/90 bg-card shadow-surface"
-        >
-          <table className="comparison-table text-left text-sm">
-            <caption id="competitor-benchmark-caption" className="sr-only">
-              Comparison of Izzac executive mobility services versus Europcar global rental standard
-            </caption>
-            <thead>
-              <tr className="border-b border-border bg-secondary/80 font-mono text-xs uppercase tracking-[0.12em] text-foreground">
-                <th scope="col" className="p-4 font-semibold">
-                  Capability / Dimension
-                </th>
-                <th scope="col" className="p-4 font-semibold text-primary">
-                  Izzac Mobility OS
-                </th>
-                <th scope="col" className="p-4 font-semibold text-muted-foreground">
-                  Europcar Global Standard
-                </th>
-                <th scope="col" className="p-4 font-semibold">
-                  Operational Impact
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/80">
-              {EUROPCAR_COMPETITOR_BENCHMARK.map((row) => (
-                <tr key={row.capability} className="align-top">
-                  <th
-                    scope="row"
-                    className="p-4 font-semibold text-foreground border-b sm:border-b-0 border-border/60"
-                  >
-                    {row.capability}
-                  </th>
-                  <td className="p-4 text-foreground font-medium bg-emerald-950/[0.03]">
-                    {row.izzacAdvantage}
-                  </td>
-                  <td className="p-4 text-muted-foreground">
-                    {row.europcarStandard}
-                  </td>
-                  <td className="p-4 text-foreground/90">
-                    {row.africanMarketImpact}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* Regional Hubs & Izzac Privilege Loyalty Program */}
-      <section className="border-t border-border/80 bg-secondary/35 py-16 md:py-24">
-        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 space-y-16">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Badge variant="emerald">Regional Coverage & Airport Desks</Badge>
-              <h2 className="text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Active City & Airport Mobility Hubs
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {AFRICAN_REGIONAL_HUBS.map((hub) => (
-                <Card key={hub.city} className="p-6 space-y-3 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-primary">
-                        {hub.airportCode}
-                      </span>
-                      <Badge variant="outline">{hub.country}</Badge>
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground">
-                      {hub.city}
-                    </h3>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      {hub.airportName}
-                    </p>
-                    <p className="text-xs text-muted-foreground leading-relaxed pt-1">
-                      {hub.corridors}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5 pt-3 border-t border-border/70">
-                    {hub.servicesAvailable.map((svc) => (
-                      <span
-                        key={svc}
-                        className="rounded bg-secondary px-2 py-0.5 font-mono text-[10px] font-medium text-foreground/85"
-                      >
-                        {svc}
-                      </span>
-                    ))}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Izzac Privilege Loyalty Tiers */}
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Badge variant="secondary">Izzac Privilege Rewards</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-[-0.03em]">
-                Loyalty perks built for frequent executive & corporate flyers
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base max-w-[62ch]">
-                Inspired by Europcar Privilege and upgraded with domestic airport lounge access, free 5G cabin Wi-Fi, and guaranteed December peak-season fleet allocation.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 rounded-2xl border border-border/90 bg-card shadow-surface divide-y lg:divide-y-0 lg:divide-x divide-border/80 overflow-hidden">
-              {IZZAC_PRIVILEGE_TIERS.map((tier, idx) => (
-                <div key={tier.tier} className="p-6 md:p-8 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                      Tier 0{idx + 1}
-                    </span>
-                    <Badge variant="emerald">{tier.discount}</Badge>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground">
-                      {tier.tier}
-                    </h3>
-                    <p className="font-mono text-xs text-muted-foreground mt-1">
-                      {tier.threshold}
-                    </p>
-                  </div>
-                  <ul className="space-y-2 pt-3 border-t border-border/70 text-sm text-foreground/90">
-                    {tier.perks.map((perk) => (
-                      <li key={perk} className="flex items-start gap-2">
-                        <span className="text-primary font-bold">✓</span>
-                        <span>{perk}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      </Section>
     </div>
   );
 };

@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import api from "../../../lib/api";
-import Breadcrumbs from "../../../components/Breadcrumbs";
-import DashboardNav from "../../../components/DashboardNav";
+import DashboardShell from "../../../components/DashboardShell";
 import DrivingEvaluationPanel from "../../../components/DrivingEvaluationPanel";
-import FallbackImage from "../../../components/FallbackImage";
+import Loader from "../../../components/Loader";
+import VehicleCard from "../../../components/VehicleCard";
 import { useAuth } from "../../../context/AuthContext";
 import { useCurrency } from "../../../context/CurrencyContext";
 import { useRequireAuth } from "../../../hooks/useAuth";
-import Loader from "../../../components/Loader";
-import { DETAILED_CAR_CATALOGUE, resolveCarImage } from "../../../lib/carCatalogue";
+import { DETAILED_CAR_CATALOGUE } from "../../../lib/carCatalogue";
 import { riderJourney } from "../../../lib/productContent";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
-import { Card } from "../../../components/ui/card";
+import { ArrowLink, Eyebrow, Ledger } from "../../../components/layout";
+import { cn } from "@/lib/utils";
 
 type RiderBooking = {
   id: number;
@@ -41,10 +41,16 @@ const INSURANCE_LABELS: Record<string, string> = {
   zero_excess_all_risk: "All-Risk Zero-Excess + SRCC",
 };
 
+type StepState = "done" | "current" | "locked";
+
+const stateBadge: Record<StepState, { variant: "emerald" | "amber" | "secondary"; label: string }> = {
+  done: { variant: "emerald", label: "Done" },
+  current: { variant: "amber", label: "Current" },
+  locked: { variant: "secondary", label: "Locked" },
+};
+
 const RiderDashboard = () => {
-  const { isAuthenticated, isLoading } = useRequireAuth(
-    "/login?next=/dashboard/rider"
-  );
+  const { isAuthenticated, isLoading } = useRequireAuth("/login?next=/dashboard/rider");
   const { qualification } = useAuth();
   const { formatPrice } = useCurrency();
   const [bookings, setBookings] = useState<RiderBooking[]>([]);
@@ -59,296 +65,177 @@ const RiderDashboard = () => {
 
   const recommendedCars = DETAILED_CAR_CATALOGUE.slice(0, 4);
 
+  const trialState: StepState = qualification.chauffeur_trial_completed ? "done" : "current";
+  const testState: StepState =
+    qualification.driving_test_status === "passed" ? "done" : qualification.chauffeur_trial_completed ? "current" : "locked";
+  const selfDriveState: StepState = qualification.self_drive_eligible ? "done" : "locked";
+
+  const steps: { index: string; eyebrow: string; title: string; detail: string; state: StepState }[] = [
+    {
+      index: "01",
+      eyebrow: "Chauffeur trial",
+      title: qualification.chauffeur_trial_completed ? "Trial completed" : "Trial pending",
+      detail: "One chauffeur-driven, airport VIP or corporate trip unlocks the test.",
+      state: trialState,
+    },
+    {
+      index: "02",
+      eyebrow: "Driving test",
+      title:
+        qualification.driving_test_status === "passed"
+          ? `Passed at ${qualification.driving_test_score}%`
+          : "5 questions · 80% to pass",
+      detail: qualification.frsc_license_number
+        ? `License ${qualification.frsc_license_number}`
+        : "License and 11-digit ID verified on submission.",
+      state: testState,
+    },
+    {
+      index: "03",
+      eyebrow: "Self-drive",
+      title: qualification.self_drive_eligible ? "Self-drive unlocked" : "Chauffeur mode",
+      detail: qualification.clearance_certificate || "Certificate issued after steps 01 and 02.",
+      state: selfDriveState,
+    },
+  ];
+
   return (
-    <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 md:py-12 space-y-8 animate-enter-subtle">
-      <Breadcrumbs
-        items={[
-          { label: "My Garage & Dashboards", href: "/dashboard" },
-          { label: "Rider & Driving Test Evaluation" },
-        ]}
-      />
-
-      <DashboardNav />
-
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-border/80">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="emerald">Rider & Self-Drive Qualification Hub</Badge>
-            <Badge variant="secondary">
-              Chauffeur Trial → Driving Test → Self-Drive + Motor Insurance
-            </Badge>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.03em]">
-            Rider mobility & self-drive evaluation workspace
-          </h1>
-          <p className="text-muted-foreground text-sm md:text-base max-w-[74ch]">
-            All new riders start with a Chauffeur-Driven Trial period before taking the License/ID Driving Test Evaluation to unlock Self-Drive. Every trip is backed by a verified motor insurance certificate.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Button asChild variant="secondary">
-            <a href="#evaluation">Take Driving Test Evaluation</a>
-          </Button>
+    <DashboardShell
+      breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Rider & driving test" }]}
+      eyebrow="Rider"
+      title="Rider & driving test"
+      description="New riders start with a chauffeur-driven trial, then pass the driving test at 80% to unlock self-drive. Every trip carries a verified NIID insurance certificate."
+      actions={
+        <>
           <Button asChild variant="outline">
-            <Link href="/dashboard/bookings">Bookings & NIID Certificates</Link>
+            <a href="#evaluation">Take the driving test</a>
           </Button>
           <Button asChild>
-            <Link href="/cars">Browse 32+ Cars</Link>
+            <Link href="/cars">Browse the fleet</Link>
           </Button>
-        </div>
-      </div>
-
+        </>
+      }
+    >
       {isLoading && <Loader />}
 
-      {/* 4-Column Rider Qualification & Insurance KPI Telemetry */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <Card className="p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              Stage 01 · Trial Period
-            </span>
-            <Badge
-              variant={
-                qualification.chauffeur_trial_completed ? "emerald" : "secondary"
-              }
+      {/* 3-step progress rail */}
+      <ol className="grid grid-cols-1 divide-y divide-border/70 border-y border-border/70 md:grid-cols-3 md:divide-x md:divide-y-0">
+        {steps.map((step) => {
+          const badge = stateBadge[step.state];
+          return (
+            <li
+              key={step.index}
+              aria-current={step.state === "current" ? "step" : undefined}
+              className={cn("space-y-2.5 px-0 py-5 md:px-6 md:first:pl-0 md:last:pr-0", step.state === "locked" && "opacity-70")}
             >
-              {qualification.chauffeur_trial_completed
-                ? "Completed ✓"
-                : "Mandatory First Step"}
-            </Badge>
-          </div>
-          <p className="text-xl font-bold text-foreground">
-            {qualification.chauffeur_trial_completed
-              ? "Chauffeur Trial Verified"
-              : "Chauffeur Trial Pending"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Complete 1 Chauffeur-Driven, Airport VIP, or Corporate trip to unlock Stage 02.
-          </p>
-        </Card>
+              <div className="flex items-center justify-between gap-3">
+                <Eyebrow index={step.index} tone={step.state === "done" ? "primary" : "muted"}>
+                  {step.eyebrow}
+                </Eyebrow>
+                <Badge variant={badge.variant}>{badge.label}</Badge>
+              </div>
+              <p className="text-h3 text-foreground">{step.title}</p>
+              <p className="font-mono text-2xs tabular-nums text-muted-foreground">{step.detail}</p>
+            </li>
+          );
+        })}
+      </ol>
 
-        <Card className="p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              Stage 02 · Driving Test
-            </span>
-            <Badge
-              variant={
-                qualification.driving_test_status === "passed"
-                  ? "emerald"
-                  : "secondary"
-              }
-            >
-              {qualification.driving_test_status === "passed"
-                ? `Passed (${qualification.driving_test_score}%)`
-                : "80% Pass Required"}
-            </Badge>
-          </div>
-          <p className="text-xl font-bold text-foreground">
-            {qualification.driving_test_status === "passed"
-              ? "Highway & Flood Exam Passed"
-              : "5-Question Evaluation"}
-          </p>
-          <p className="font-mono text-xs text-muted-foreground">
-            License: {qualification.frsc_license_number || "Not yet submitted"}
-          </p>
-        </Card>
-
-        <Card className="p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              Stage 03 · Self-Drive Gate
-            </span>
-            <Badge
-              variant={qualification.self_drive_eligible ? "emerald" : "outline"}
-            >
-              {qualification.self_drive_eligible
-                ? "Unlocked ✓"
-                : "Locked (Chauffeur Only)"}
-            </Badge>
-          </div>
-          <p className="text-xl font-bold text-foreground">
-            {qualification.self_drive_eligible
-              ? "Self-Drive Active"
-              : "Chauffeur Mode Active"}
-          </p>
-          <p className="font-mono text-xs text-primary">
-            {qualification.clearance_certificate ||
-              "Pass Stage 01 + 02 to issue certificate"}
-          </p>
-        </Card>
-
-        <Card className="p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              Motor Insurance
-            </span>
-            <Badge variant="emerald">NIID Verified</Badge>
-          </div>
-          <p className="text-xl font-bold text-foreground">
-            {bookings.length} Insured{" "}
-            {bookings.length === 1 ? "Trip" : "Trips"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Statutory Third-Party, Comprehensive, or All-Risk Zero-Excess + SRCC.
-          </p>
-        </Card>
-      </div>
-
-      {/* Main Interactive Chauffeur Trial, Driving Test & Motor Insurance Center */}
       <DrivingEvaluationPanel />
 
-      {/* Flattened 4-column rider flow ledger */}
-      <div className="rounded-2xl border border-border/90 bg-card shadow-surface overflow-hidden">
-        <div className="px-6 py-4 border-b border-border/80 bg-secondary/40 flex items-center justify-between">
-          <Badge variant="emerald">
-            Rider Progression: Chauffeur Trial → Driving Test → Self-Drive
-          </Badge>
-          <span className="font-mono text-xs text-muted-foreground tabular-nums">
-            01 — 04
-          </span>
+      {/* Rider journey */}
+      <section className="space-y-5">
+        <div className="flex items-end justify-between gap-4">
+          <div className="space-y-1.5">
+            <Eyebrow>How it works</Eyebrow>
+            <h2 className="text-h2 text-foreground">From chauffeur trial to self-drive</h2>
+          </div>
+          <span className="font-mono text-xs tabular-nums text-muted-foreground">01 — 04</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border/80">
+        <ol className="grid grid-cols-1 divide-y divide-border/70 border-y border-border/70 md:grid-cols-2 md:divide-x xl:grid-cols-4 md:divide-y-0 md:[&>li:nth-child(2n)]:border-r-0 xl:[&>li:nth-child(2n)]:border-r">
           {riderJourney.map((step, index) => (
-            <div key={step.title} className="p-6 space-y-2">
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary tabular-nums">
-                Step 0{index + 1}
-              </p>
-              <h2 className="text-base font-semibold text-foreground tracking-[-0.015em]">
-                {step.title}
-              </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {step.description}
-              </p>
-            </div>
+            <li key={step.title} className="space-y-2 py-5 md:px-6 md:first:pl-0 xl:last:pr-0">
+              <span className="font-mono text-2xs tabular-nums text-primary">0{index + 1}</span>
+              <h3 className="text-base font-medium tracking-[-0.015em] text-foreground">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{step.description}</p>
+            </li>
           ))}
-        </div>
-      </div>
+        </ol>
+      </section>
 
-      {/* Active Rider Bookings & Recommended Vehicles */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <div className="lg:col-span-5 rounded-2xl border border-border/90 bg-card p-6 space-y-4 shadow-surface">
-          <div className="flex items-center justify-between">
-            <div>
-              <Badge variant="emerald">Your Rider Trips</Badge>
-              <h2 className="text-lg font-bold text-foreground mt-1">
-                Active Bookings & NIID Policies ({bookings.length})
+      {/* Bookings + recommended */}
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-12">
+        <section className="space-y-4 lg:col-span-5">
+          <div className="flex items-end justify-between gap-4">
+            <div className="space-y-1.5">
+              <Eyebrow>Your trips</Eyebrow>
+              <h2 className="text-h3 text-foreground">
+                Bookings <span className="font-mono text-sm font-normal tabular-nums text-muted-foreground">({bookings.length})</span>
               </h2>
             </div>
-            <Link
-              href="/dashboard/bookings"
-              className="font-mono text-xs font-semibold text-primary hover:underline"
-            >
-              Full Ledger →
-            </Link>
+            <ArrowLink href="/dashboard/bookings" size="sm">
+              Full list
+            </ArrowLink>
           </div>
 
           {bookings.length === 0 ? (
-            <div className="rounded-xl border border-border/80 bg-secondary/35 p-4 space-y-3">
-              <p className="text-sm font-semibold text-foreground">
-                Start with a Chauffeur-Driven Trial Trip
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Select any vehicle on the right to book your Chauffeur-Driven Trial with verified Motor Insurance included.
+            <div className="space-y-3 rounded-lg border border-dashed border-border bg-surface/60 p-5">
+              <p className="text-sm font-medium text-foreground">Start with a chauffeur-driven trial.</p>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Pick any vehicle on the right. Your first booking is chauffeured and includes verified motor insurance.
               </p>
               <Button asChild size="sm">
-                <Link href="/cars?service=Chauffeur+%26+Protocol">
-                  Browse Chauffeur Trial Fleet →
-                </Link>
+                <Link href="/cars?service=Chauffeur+%26+Protocol">Browse chauffeur fleet</Link>
               </Button>
             </div>
           ) : (
-            <div className="divide-y divide-border/70">
+            <Ledger>
               {bookings.slice(0, 4).map((b) => (
-                <div key={b.id} className="py-3 first:pt-0 last:pb-0 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-foreground">
+                <div key={b.id} className="space-y-1 py-3.5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm font-medium text-foreground">
                       {b.car.make} {b.car.model}
                     </span>
-                    <span className="font-mono text-xs font-bold text-primary tabular-nums">
+                    <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-foreground">
                       {formatPrice(b.total_price)}
                     </span>
                   </div>
-                  <p className="font-mono text-[11px] text-muted-foreground tabular-nums">
-                    {b.start_date} → {b.end_date} ·{" "}
-                    {INSURANCE_LABELS[b.insurance_plan || "comprehensive_shield"]}
+                  <p className="font-mono text-2xs tabular-nums text-muted-foreground">
+                    {b.start_date} → {b.end_date} · {INSURANCE_LABELS[b.insurance_plan || "comprehensive_shield"]}
                   </p>
                   {b.insurance_certificate_ref && (
-                    <p className="font-mono text-[10px] text-primary">
-                      NIID Cert: {b.insurance_certificate_ref}
-                    </p>
+                    <p className="font-mono text-2xs tabular-nums text-primary">NIID {b.insurance_certificate_ref}</p>
                   )}
                 </div>
               ))}
-            </div>
+            </Ledger>
           )}
-        </div>
+        </section>
 
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-foreground">
-                Recommended Chauffeur Trial & Self-Drive Fleet
+        <section className="space-y-4 lg:col-span-7">
+          <div className="flex items-end justify-between gap-4">
+            <div className="space-y-1.5">
+              <Eyebrow>Recommended</Eyebrow>
+              <h2 className="text-h3 text-foreground">
+                {qualification.self_drive_eligible ? "Ready for self-drive" : "Ready for your chauffeur trial"}
               </h2>
-              <p className="text-xs text-muted-foreground">
-                Ready for immediate Chauffeur-Driven Trial or Evaluated Self-Drive across Lagos, Abuja & PH.
-              </p>
             </div>
-            <Link
-              href="/cars"
-              className="font-mono text-xs font-semibold text-primary hover:underline"
-            >
-              All 32+ cars →
-            </Link>
+            <ArrowLink href="/cars" size="sm">
+              All vehicles
+            </ArrowLink>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {recommendedCars.map((car) => (
-              <Link
+              <VehicleCard
                 key={car.id}
-                href={`/cars/${car.id}`}
-                className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Card className="overflow-hidden h-full flex flex-col hover:-translate-y-0.5 hover:shadow-elevated">
-                  <div className="relative aspect-[16/9] bg-secondary">
-                    <FallbackImage
-                      src={resolveCarImage(car)}
-                      alt={`${car.year} ${car.make} ${car.model} in ${car.location}`}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-2.5 left-2.5 flex gap-1.5">
-                      <Badge
-                        variant="emerald"
-                        className="bg-card/90 backdrop-blur-sm"
-                      >
-                        {qualification.self_drive_eligible
-                          ? "Self-Drive Ready"
-                          : "Chauffeur Trial"}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="p-4 flex items-center justify-between gap-2">
-                    <div>
-                      <h3 className="text-sm font-bold text-foreground group-hover:text-primary">
-                        {car.make} {car.model}
-                      </h3>
-                      <p className="font-mono text-[11px] text-muted-foreground">
-                        {car.location}
-                      </p>
-                    </div>
-                    <span className="font-mono text-sm font-bold text-primary tabular-nums">
-                      {formatPrice(car.price_per_day)}/d
-                    </span>
-                  </div>
-                </Card>
-              </Link>
+                car={car}
+                footer={qualification.self_drive_eligible ? "Self-drive ready →" : "Chauffeur trial →"}
+              />
             ))}
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </DashboardShell>
   );
 };
 

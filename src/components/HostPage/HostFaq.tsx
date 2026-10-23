@@ -2,14 +2,11 @@
 
 import Link from "next/link";
 import { hostFaqs } from "../../lib/productContent";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
-import { Badge } from "../ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Button } from "../ui/button";
+import { Section } from "../layout/Section";
+import { Eyebrow } from "../layout/Eyebrow";
+import { Ledger } from "../layout/Ledger";
 
 const quickLinks = [
   {
@@ -20,14 +17,12 @@ const quickLinks = [
   {
     href: "/dashboard/add-car",
     title: "Jump to add car",
-    description:
-      "If you are already signed in, move straight into listing creation.",
+    description: "Already signed in? Move straight into listing creation.",
   },
   {
     href: "/dashboard/bookings",
     title: "Open bookings",
-    description:
-      "Switch into the host view to monitor reservations on your cars.",
+    description: "Switch to the host view to monitor reservations on your cars.",
   },
 ];
 
@@ -38,83 +33,67 @@ const HostFaq = () => {
     mainEntity: hostFaqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faq.answer,
-      },
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
     })),
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24 text-foreground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-        <div className="lg:col-span-5 space-y-5">
-          <Badge variant="emerald">Host FAQ</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-[-0.03em]">
-            Questions hosts usually ask before they publish
-          </h2>
-          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            Everything you need to know about account setup, listing fields, inventory control, and reservation tracking.
-          </p>
+    <Section>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="space-y-8 lg:col-span-5">
+          <div className="space-y-4">
+            <Eyebrow>Host FAQ</Eyebrow>
+            <h2 className="text-h1 text-foreground">Questions hosts ask before they publish</h2>
+            <p className="type-lede text-[15px]">Account setup, listing fields, inventory control and reservation tracking.</p>
+          </div>
 
-          <div className="pt-2 divide-y divide-border/80 rounded-xl border border-border/80 bg-card shadow-surface overflow-hidden">
+          <Ledger>
             {quickLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="group block p-4 transition-colors duration-150 ease-out-quart hover:bg-secondary/60"
+                className="group flex items-center justify-between gap-4 py-4 transition-colors duration-150 hover:text-primary"
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors duration-150">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary">
                     {item.title}
                   </h3>
-                  <span
-                    aria-hidden="true"
-                    className="font-mono text-xs text-muted-foreground transition-transform duration-150 ease-out-quart group-hover:translate-x-0.5 group-hover:text-primary"
-                  >
-                    →
-                  </span>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{item.description}</p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                  {item.description}
-                </p>
+                <span
+                  aria-hidden="true"
+                  className="font-mono text-sm text-muted-foreground transition-transform duration-200 ease-out-quart group-hover:translate-x-0.5 group-hover:text-primary"
+                >
+                  →
+                </span>
               </Link>
             ))}
-          </div>
+          </Ledger>
         </div>
 
-        <div className="lg:col-span-7 space-y-8">
-          <div className="rounded-2xl border border-border/80 bg-card px-6 py-2 shadow-surface">
-            <Accordion type="single" collapsible defaultValue="faq-0">
-              {hostFaqs.map((faq, index) => (
-                <AccordionItem key={faq.question} value={`faq-${index}`}>
-                  <AccordionTrigger>{faq.question}</AccordionTrigger>
-                  <AccordionContent>{faq.answer}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+        <div className="space-y-10 lg:col-span-7">
+          <Accordion type="single" collapsible defaultValue="faq-0">
+            {hostFaqs.map((faq, index) => (
+              <AccordionItem key={faq.question} value={`faq-${index}`}>
+                <AccordionTrigger index={`0${index + 1}`}>{faq.question}</AccordionTrigger>
+                <AccordionContent>{faq.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
 
-          <div className="rounded-2xl border border-border/90 bg-secondary/50 p-6 md:p-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <h3 className="text-xl font-bold tracking-[-0.02em]">
-                Ready to publish your first listing?
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Create your host account, add a car, and manage the full lifecycle from Izzac.
-              </p>
+              <h3 className="text-h3 text-foreground">Ready to publish your first listing?</h3>
+              <p className="text-sm text-muted-foreground">Create a host account, add a car, and manage the full lifecycle.</p>
             </div>
-            <Button asChild variant="editorial" size="lg" className="shrink-0">
+            <Button asChild variant="ink" size="lg" className="shrink-0">
               <Link href="/signup?role=host">Start hosting</Link>
             </Button>
           </div>
         </div>
       </div>
-    </section>
+    </Section>
   );
 };
 

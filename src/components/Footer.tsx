@@ -1,42 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { CURRENCIES, CurrencyCode, useCurrency } from "../context/CurrencyContext";
 import { useOnboarding } from "../context/OnboardingContext";
-import { Separator } from "./ui/separator";
-import { Badge } from "./ui/badge";
-import { Tooltip } from "./ui/tooltip";
+import { Container } from "./layout/Container";
+import { cn } from "@/lib/utils";
 
-const footerSections = [
+const columns = [
   {
-    title: "Mobility Services",
+    title: "Ride",
     links: [
-      { href: "/services", label: "All Products & Services" },
-      { href: "/cars?service=Chauffeur+%26+Protocol", label: "Chauffeur & Protocol" },
-      { href: "/cars?service=Airport+VIP+Transfer", label: "Airport VIP (LOS/ABV/PHC)" },
-      { href: "/services#calculator", label: "Corporate SuperFlex (-22%)" },
-      { href: "/services#benchmark", label: "Izzac vs. Europcar" },
+      { href: "/cars", label: "Browse the fleet" },
+      { href: "/cars?service=Chauffeur+%26+Protocol", label: "Chauffeur & protocol" },
+      { href: "/cars?service=Airport+VIP+Transfer", label: "Airport VIP transfer" },
+      { href: "/services#calculator", label: "Corporate SuperFlex" },
+      { href: "/services#benchmark", label: "How we compare" },
     ],
   },
   {
-    title: "Fleet & Hubs",
+    title: "Hubs",
     links: [
-      { href: "/cars", label: "Browse 32+ Vehicles" },
-      { href: "/cars?hub=Lagos", label: "Lagos (VI, Lekki, Ikeja)" },
-      { href: "/cars?hub=Abuja", label: "Abuja (Maitama, Asokoro)" },
-      { href: "/cars?hub=Port+Harcourt", label: "Port Harcourt Energy Hub" },
-      { href: "/cars?category=Pickup+%26+Shuttle", label: "Hilux 4x4 & Executive Vans" },
+      { href: "/cars?hub=Lagos", label: "Lagos · LOS" },
+      { href: "/cars?hub=Abuja", label: "Abuja · ABV" },
+      { href: "/cars?hub=Port+Harcourt", label: "Port Harcourt · PHC" },
+      { href: "/cars?hub=Kano", label: "Kano · KAN" },
+      { href: "/cars?category=Pickup+%26+Shuttle", label: "4x4 & shuttles" },
     ],
   },
   {
-    title: "Dashboards & Account",
+    title: "Host",
     links: [
-      { href: "/dashboard", label: "Overview Command Center" },
-      { href: "/dashboard/rider", label: "Rider & Driving Test" },
-      { href: "/dashboard/host", label: "Host Fleet Garage" },
-      { href: "/dashboard/bookings", label: "Bookings & Insurance" },
-      { href: "/user/dashboard", label: "Profile & Certificates" },
+      { href: "/host", label: "Become a host" },
+      { href: "/cars/list-car", label: "List a car" },
+      { href: "/dashboard/host", label: "Host garage" },
+      { href: "/dashboard/bookings", label: "Bookings" },
+      { href: "/user/dashboard", label: "Profile & certificates" },
     ],
   },
 ];
@@ -46,101 +44,43 @@ const Footer = () => {
   const { openOnboarding, startProductTour } = useOnboarding();
 
   return (
-    <footer className="border-t border-border/80 bg-secondary/40 text-foreground">
-      <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-12 md:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-10">
-          <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <Image
-                src="/logo-mark.svg"
-                alt="Izzac Mobility crest logo"
-                width={32}
-                height={32}
-                loading="lazy"
-                className="h-8 w-8 shrink-0 rounded-lg shadow-surface"
-              />
-              <span className="text-xl font-bold tracking-[-0.03em] text-foreground">
-                Izzac
-              </span>
-              <Badge variant="emerald">Executive Mobility OS</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Enterprise car rental, vetted corporate chauffeur service, mandatory trial-to-self-drive driver evaluation, verified motor insurance, and P2P fleet sharing built for Lagos, Abuja, Port Harcourt, and regional corridors.
+    <footer className="border-t border-border/70 bg-surface">
+      <Container className="py-14 md:py-20">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-5">
+            <p className="text-[clamp(3rem,8vw,6rem)] font-semibold leading-none tracking-[-0.05em] text-foreground">
+              Izzac<span className="text-primary">.</span>
             </p>
-            <div className="flex flex-wrap items-center gap-2.5 pt-1 font-mono text-xs text-muted-foreground tabular-nums">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-card px-2.5 py-1">
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  className="h-3.5 w-3.5 text-primary"
-                >
-                  <circle cx="10" cy="10" r="7.5" />
-                  <path d="M2.5 10h15M10 2.5c2.2 2.2 2.2 12.8 0 15M10 2.5c-2.2 2.2-2.2 12.8 0 15" />
-                </svg>
-                <span>LOS · ABV · PHC · ACC · NBO Hubs</span>
-              </span>
-              <div className="inline-flex items-center rounded-md border border-border/80 bg-card p-0.5">
-                {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
-                  <button
-                    key={code}
-                    type="button"
-                    onClick={() => setCurrency(code)}
-                    className={`rounded px-2 py-0.5 text-[11px] font-semibold transition-colors duration-150 ${
-                      currency === code
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {CURRENCIES[code].label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <Tooltip
-                position="top"
-                content="Re-open the 4-step executive mobility intro"
+            <p className="max-w-[40ch] text-[15px] leading-relaxed text-muted-foreground">
+              Executive chauffeur service, evaluated self-drive, airport protocol and corporate fleets across Nigeria&apos;s
+              major hubs. One account for riders and hosts.
+            </p>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={openOnboarding}
+                className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 font-mono text-xs text-foreground transition-colors duration-150 hover:border-input"
               >
-                <button
-                  type="button"
-                  onClick={openOnboarding}
-                  className="rounded-lg border border-border/80 bg-card px-3 py-1.5 font-mono text-xs font-medium text-foreground hover:bg-secondary transition-colors"
-                >
-                  Onboarding Guide
-                </button>
-              </Tooltip>
-              <Tooltip
-                position="top"
-                content="Walk through the 5 core features step by step"
+                Onboarding guide
+              </button>
+              <button
+                type="button"
+                onClick={startProductTour}
+                className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 font-mono text-xs text-foreground transition-colors duration-150 hover:border-input"
               >
-                <button
-                  type="button"
-                  onClick={startProductTour}
-                  className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 font-mono text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
-                >
-                  Start Product Tour
-                </button>
-              </Tooltip>
+                Product tour
+              </button>
             </div>
           </div>
 
-          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
-            {footerSections.map((section) => (
-              <div key={section.title} className="space-y-3">
-                <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-foreground">
-                  {section.title}
-                </h2>
-                <ul className="space-y-2.5 text-sm">
-                  {section.links.map((link) => (
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-7 lg:pl-8">
+            {columns.map((column) => (
+              <div key={column.title} className="space-y-4">
+                <h2 className="type-eyebrow text-muted-foreground">{column.title}</h2>
+                <ul className="space-y-2.5">
+                  {column.links.map((link) => (
                     <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="text-muted-foreground transition-colors duration-150 ease-out-quart hover:text-primary"
-                      >
+                      <Link href={link.href} className="text-sm text-foreground/80 transition-colors duration-150 hover:text-primary">
                         {link.label}
                       </Link>
                     </li>
@@ -151,57 +91,32 @@ const Footer = () => {
           </div>
         </div>
 
-        <Separator />
-
-        <div className="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs text-muted-foreground">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="font-mono tabular-nums">© 2026 Izzac Mobility.</span>
+        <div className="mt-14 flex flex-col gap-5 border-t border-border/70 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-2xs uppercase tracking-[0.1em] text-muted-foreground">
+            <span className="tabular-nums">© 2026 Izzac Mobility</span>
             <span aria-hidden="true">·</span>
-            <Link href="/" className="hover:text-foreground transition-colors duration-150">
-              Home
-            </Link>
+            <span>LOS · ABV · PHC · KAN · IBA · ENU</span>
             <span aria-hidden="true">·</span>
-            <Link href="/services" className="hover:text-foreground transition-colors duration-150">
-              Services & B2B
-            </Link>
-            <span aria-hidden="true">·</span>
-            <Link href="/cars" className="hover:text-foreground transition-colors duration-150">
-              Browse fleet
-            </Link>
-            <span aria-hidden="true">·</span>
-            <Link href="/host" className="hover:text-foreground transition-colors duration-150">
-              Host
-            </Link>
-            <span aria-hidden="true">·</span>
-            <Link href="/dashboard/rider" className="hover:text-foreground transition-colors duration-150">
-              Rider Hub
-            </Link>
+            <span>NIID-verified cover on every trip</span>
           </div>
-
-          <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
-            <Link
-              href="/cars?hub=Lagos"
-              className="hover:text-foreground transition-colors duration-150"
-            >
-              LOS Lagos
-            </Link>
-            <span aria-hidden="true">·</span>
-            <Link
-              href="/cars?hub=Abuja"
-              className="hover:text-foreground transition-colors duration-150"
-            >
-              ABV Abuja
-            </Link>
-            <span aria-hidden="true">·</span>
-            <Link
-              href="/cars?hub=Port+Harcourt"
-              className="hover:text-foreground transition-colors duration-150"
-            >
-              PHC Port Harcourt
-            </Link>
+          <div className="inline-flex items-center rounded-md border border-border bg-surface-elevated p-0.5" role="group" aria-label="Display currency">
+            {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => setCurrency(code)}
+                aria-pressed={currency === code}
+                className={cn(
+                  "rounded-sm px-2.5 py-1 font-mono text-2xs font-semibold transition-colors duration-150",
+                  currency === code ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {code}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 };
