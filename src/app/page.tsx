@@ -32,6 +32,10 @@ import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Tooltip } from "../components/ui/tooltip";
 import { Alert, AlertDescription } from "../components/ui/alert";
+import { SplitText } from "../components/reactbits/SplitText";
+import { ClickSpark } from "../components/reactbits/ClickSpark";
+import { GlassRefraction } from "../components/canvasui/GlassRefraction";
+import { ScrollWorldStage } from "../components/scrollworld/ScrollWorldStage";
 
 const HomePage = () => {
   const { formatPrice } = useCurrency();
@@ -94,17 +98,21 @@ const HomePage = () => {
                 Chauffeur Trial · Self-Drive Exam · Motor Insurance · SuperFlex
               </Badge>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.3rem] font-bold text-foreground tracking-[-0.035em] leading-[1.06]">
-              Book executive rides, airport protocol, or corporate fleets from one Izzac account.
-            </h1>
+            <SplitText
+              text="Book executive rides, airport protocol, or corporate fleets from one Izzac account."
+              className="text-4xl sm:text-5xl lg:text-[3.3rem] font-bold text-foreground tracking-[-0.035em] leading-[1.06]"
+              tag="h1"
+            />
             <p className="text-muted-foreground text-base md:text-lg max-w-[66ch] leading-relaxed">
               Engineered to outperform traditional car rentals: new riders start with a Chauffeur-Driven Trial before passing our Driving Test Evaluation to unlock Self-Drive, with NAICOM/NIID Motor Insurance and up to 22% off monthly SuperFlex subscriptions included.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Tooltip content="Inspect all 32+ executive sedans, SUVs, EVs & Hilux 4x4 pickups">
-                <Button asChild size="lg">
-                  <Link href="/cars">Browse fleet</Link>
-                </Button>
+                <ClickSpark>
+                  <Button asChild size="lg">
+                    <Link href="/cars">Browse fleet</Link>
+                  </Button>
+                </ClickSpark>
               </Tooltip>
               <Tooltip content="Compare our 6 mobility services, motor insurance & SuperFlex rates vs. Europcar">
                 <Button asChild variant="secondary" size="lg">
@@ -160,7 +168,7 @@ const HomePage = () => {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative rounded-2xl border border-border/90 bg-card p-2.5 shadow-elevated">
+            <GlassRefraction className="p-2.5 shadow-elevated">
               <div className="relative overflow-hidden rounded-xl">
                 <Image
                   src="/images/hero-bg.webp"
@@ -186,7 +194,7 @@ const HomePage = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </GlassRefraction>
           </div>
         </div>
       </section>
@@ -545,6 +553,9 @@ const HomePage = () => {
       <section className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pb-16">
         <DrivingEvaluationPanel compact />
       </section>
+
+      {/* Scroll World Architecture: 4 Stages of Verified Mobility */}
+      <ScrollWorldStage />
 
       {/* Impeccable + Taste-Skill: Architectural Dual-Ledger (Zero card-in-card nesting) */}
       <section className="border-y border-border/80 bg-secondary/35 py-16 md:py-24">
