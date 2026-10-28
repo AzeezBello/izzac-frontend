@@ -19,12 +19,12 @@ const HostFeatures = () => {
         <Breadcrumbs items={[{ label: "Host" }]} />
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="space-y-7 lg:col-span-7">
-            <Eyebrow>Host on Izzac</Eyebrow>
+            <Eyebrow>Host on Izzac Mobility</Eyebrow>
             <h1 className="text-display text-foreground">
               Your car, booked by vetted riders. Paid like a fleet.
             </h1>
             <p className="type-lede max-w-[54ch]">
-              Publish a sedan, SUV or 4x4 once. Izzac handles guest vetting, chauffeur trials, insurance and SuperFlex
+              Publish a sedan, SUV or 4x4 once. Izzac Mobility handles guest vetting, chauffeur trials, insurance and SuperFlex
               corporate pricing, and you manage everything from one account.
             </p>
             <div className="flex flex-wrap items-center gap-3">

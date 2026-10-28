@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
 import { CURRENCIES, CurrencyCode, useCurrency } from "../context/CurrencyContext";
+import { useCookieConsent } from "../context/CookieConsentContext";
 import { useOnboarding } from "../context/OnboardingContext";
 import { Container } from "./layout/Container";
 import { cn } from "@/lib/utils";
@@ -40,7 +42,9 @@ const columns = [
 ];
 
 const Footer = () => {
+  const { isAuthenticated } = useAuth();
   const { currency, setCurrency } = useCurrency();
+  const { openCookieSettings } = useCookieConsent();
   const { openOnboarding, startProductTour } = useOnboarding();
 
   return (
@@ -48,28 +52,45 @@ const Footer = () => {
       <Container className="py-14 md:py-20">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="space-y-6 lg:col-span-5">
-            <p className="text-[clamp(3rem,8vw,6rem)] font-semibold leading-none tracking-[-0.05em] text-foreground">
-              Izzac<span className="text-primary">.</span>
+            <p className="text-[clamp(2.25rem,5vw,3.75rem)] font-semibold leading-none tracking-[-0.04em] text-foreground">
+              Izzac Mobility<span className="text-primary">.</span>
             </p>
             <p className="max-w-[40ch] text-[15px] leading-relaxed text-muted-foreground">
               Executive chauffeur service, evaluated self-drive, airport protocol and corporate fleets across Nigeria&apos;s
               major hubs. One account for riders and hosts.
             </p>
             <div className="flex flex-wrap items-center gap-2.5">
+              {isAuthenticated && (
+                <>
+                  <button
+                    type="button"
+                    onClick={openOnboarding}
+                    className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 font-mono text-xs text-foreground transition-colors duration-150 hover:border-input"
+                  >
+                    Onboarding guide
+                  </button>
+                  <button
+                    type="button"
+                    onClick={startProductTour}
+                    className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 font-mono text-xs text-foreground transition-colors duration-150 hover:border-input"
+                  >
+                    Product tour
+                  </button>
+                </>
+              )}
               <button
                 type="button"
-                onClick={openOnboarding}
+                onClick={openCookieSettings}
                 className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 font-mono text-xs text-foreground transition-colors duration-150 hover:border-input"
               >
-                Onboarding guide
+                Cookie settings
               </button>
-              <button
-                type="button"
-                onClick={startProductTour}
+              <Link
+                href="/privacy"
                 className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 font-mono text-xs text-foreground transition-colors duration-150 hover:border-input"
               >
-                Product tour
-              </button>
+                Privacy & cookies
+              </Link>
             </div>
           </div>
 
@@ -98,6 +119,18 @@ const Footer = () => {
             <span>LOS · ABV · PHC · KAN · IBA · ENU</span>
             <span aria-hidden="true">·</span>
             <span>NIID-verified cover on every trip</span>
+            <span aria-hidden="true">·</span>
+            <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
+              Privacy & Cookie Policy
+            </Link>
+            <span aria-hidden="true">·</span>
+            <button
+              type="button"
+              onClick={openCookieSettings}
+              className="uppercase tracking-[0.1em] underline underline-offset-4 hover:text-foreground"
+            >
+              Manage Cookies
+            </button>
           </div>
           <div className="inline-flex items-center rounded-md border border-border bg-surface-elevated p-0.5" role="group" aria-label="Display currency">
             {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (

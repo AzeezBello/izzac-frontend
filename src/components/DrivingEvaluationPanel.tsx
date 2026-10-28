@@ -384,7 +384,7 @@ const DrivingEvaluationPanel = ({ compact = false }: DrivingEvaluationPanelProps
               tone={qualification.clearance_certificate ? "primary" : "default"}
             />
             <p className="border-t border-border/70 pt-4 text-xs leading-relaxed text-muted-foreground">
-              Once the trial and the test are both passed, self-drive unlocks across every vehicle on Izzac.
+              Once the trial and the test are both passed, self-drive unlocks across every vehicle on Izzac Mobility.
             </p>
           </Card>
 

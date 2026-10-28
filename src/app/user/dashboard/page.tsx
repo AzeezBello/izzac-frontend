@@ -38,14 +38,16 @@ const UserProfileDashboard = () => {
       title="Profile & certificates"
       description="Identity credentials, chauffeur trial record, driving test score, self-drive clearance and the insurance tiers available at checkout."
       actions={
-        <>
-          <Button type="button" variant="outline" onClick={openOnboarding}>
-            Onboarding guide
-          </Button>
-          <Button type="button" variant="ghost" onClick={startProductTour}>
-            Product tour
-          </Button>
-        </>
+        isAuthenticated ? (
+          <>
+            <Button type="button" variant="outline" onClick={openOnboarding}>
+              Onboarding guide
+            </Button>
+            <Button type="button" variant="ghost" onClick={startProductTour}>
+              Product tour
+            </Button>
+          </>
+        ) : undefined
       }
     >
       {isLoading ? (
@@ -191,7 +193,7 @@ const UserProfileDashboard = () => {
 
             <section className="space-y-5 lg:col-span-5">
               <div className="space-y-2">
-                <Eyebrow>Izzac Privilege</Eyebrow>
+                <Eyebrow>Izzac Mobility Privilege</Eyebrow>
                 <h2 className="text-h2 text-foreground">Loyalty tiers</h2>
                 <p className="text-sm text-muted-foreground">Discounts and priority upgrades as you complete bookings.</p>
               </div>

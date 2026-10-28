@@ -191,7 +191,7 @@ export const SERVICE_PILLARS: ServicePillar[] = [
   {
     code: "corporate_flex",
     eyebrow: "04 · B2B & Monthly Subscriptions",
-    title: "Izzac SuperFlex Monthly & Corporate Fleet",
+    title: "Izzac Mobility SuperFlex Monthly & Corporate Fleet",
     subtitle: "1–24 month asset-light leasing without auto-loan debt",
     dailySurchargeNgn: 15000,
     priceTag: "Save 10% Weekly · 22% Monthly",
@@ -215,7 +215,7 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     dailySurchargeNgn: 0,
     priceTag: "From ₦130,000 /day",
     description:
-      "Instead of generic light box vans unsuited to demanding highways, Izzac deploys high-clearance 4x4 double-cab pickups and luxury executive vans.",
+      "Instead of generic light box vans unsuited to demanding highways, Izzac Mobility deploys high-clearance 4x4 double-cab pickups and luxury executive vans.",
     highlights: [
       "Toyota Hilux Adventure 4x4 & Ford Ranger Wildtrak Bi-Turbo for field & escort duty",
       "Mercedes-Benz V250d Avantgarde 7-seater lounge vans for board roadshows & delegations",
@@ -234,9 +234,9 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     dailySurchargeNgn: 0,
     priceTag: "Earn ₦1.2M–₦4.5M /mo",
     description:
-      "Unlike Europcar's closed franchise inventory, Izzac empowers verified car owners and fleet operators to list vehicles and manage bookings from one account.",
+      "Unlike Europcar's closed franchise inventory, Izzac Mobility empowers verified car owners and fleet operators to list vehicles and manage bookings from one account.",
     highlights: [
-      "List as Chauffeur-Only (your driver or Izzac's) or Evaluated Self-Drive",
+      "List as Chauffeur-Only (your driver or Izzac Mobility's) or Evaluated Self-Drive",
       "Direct garage & reservation workspace with instant host/rider view switching",
       "Protected with dynamic daily pricing, guest driving evaluation, and motor insurance",
     ],
@@ -287,7 +287,7 @@ export const SERVICE_TYPE_OPTIONS: {
 export const PICKUP_MODE_OPTIONS: PickupModeOption[] = [
   {
     code: "hub_station",
-    name: "Izzac City Hub / Station Pickup",
+    name: "Izzac Mobility City Hub / Station Pickup",
     flatFeeNgn: 0,
     description: "Collect at VI, Lekki Phase 1, Ikeja GRA, Maitama, Wuse II, or PH GRA hub.",
   },
@@ -307,7 +307,7 @@ export const PICKUP_MODE_OPTIONS: PickupModeOption[] = [
     code: "intercity_one_way",
     name: "Inter-City One-Way Corridor Drop-Off",
     flatFeeNgn: 45000,
-    description: "Pick up in one city hub and return at another Izzac regional station.",
+    description: "Pick up in one city hub and return at another Izzac Mobility regional station.",
   },
 ];
 
@@ -363,7 +363,7 @@ export const SELF_DRIVE_TRIAL_STAGES = [
   {
     stage: "Stage 01",
     title: "Mandatory Chauffeur-Driven Trial Period",
-    subtitle: "Required for all new Izzac accounts",
+    subtitle: "Required for all new Izzac Mobility accounts",
     description:
       "Every new user starts in Chauffeur-Driven mode for their initial trial booking. Our vetted driver handles navigation while our operations team verifies your identity, punctuality, and trip conduct.",
   },
@@ -379,7 +379,7 @@ export const SELF_DRIVE_TRIAL_STAGES = [
     title: "Verified Self-Drive + Active Motor Insurance",
     subtitle: "Instant paperless key handover unlocked",
     description:
-      "Receive your digital Izzac Self-Drive Clearance Certificate (IZZAC-SD) and book any eligible vehicle in Self-Drive mode backed by NIID-verified Comprehensive or Zero-Excess Motor Insurance.",
+      "Receive your digital Izzac Mobility Self-Drive Clearance Certificate (IZZAC-SD) and book any eligible vehicle in Self-Drive mode backed by NIID-verified Comprehensive or Zero-Excess Motor Insurance.",
   },
 ];
 
@@ -400,7 +400,7 @@ export const DRIVING_TEST_QUESTIONS: DrivingTestQuestion[] = [
   {
     id: "q2",
     question:
-      "2. When approaching a flooded urban or expressway corridor during heavy rain, what is the mandatory Izzac self-drive protocol?",
+      "2. When approaching a flooded urban or expressway corridor during heavy rain, what is the mandatory Izzac Mobility self-drive protocol?",
     options: [
       {
         id: "a",
@@ -409,7 +409,7 @@ export const DRIVING_TEST_QUESTIONS: DrivingTestQuestion[] = [
       {
         id: "b",
         label:
-          "Never enter water above tyre hub/exhaust level; halt safely and reroute or contact Izzac 24/7 Operations",
+          "Never enter water above tyre hub/exhaust level; halt safely and reroute or contact Izzac Mobility 24/7 Operations",
       },
       {
         id: "c",
@@ -465,7 +465,7 @@ export const DRIVING_TEST_QUESTIONS: DrivingTestQuestion[] = [
       {
         id: "b",
         label:
-          "Move to a safe spot, activate hazards, capture timestamped photos, and alert Izzac 24/7 Rescue & Insurance Desk immediately",
+          "Move to a safe spot, activate hazards, capture timestamped photos, and alert Izzac Mobility 24/7 Rescue & Insurance Desk immediately",
       },
       { id: "c", label: "Abandon the vehicle unlocked on the highway" },
     ],
@@ -859,7 +859,7 @@ export const hostFeatureCards: FeatureCard[] = [
     eyebrow: "Chauffeur or Self-Drive",
     title: "Protect your asset with chauffeur-inclusive hosting",
     description:
-      "Many owners prefer a trusted driver behind the wheel. Pair your car with your own vetted driver or Izzac's corporate chauffeur pool.",
+      "Many owners prefer a trusted driver behind the wheel. Pair your car with your own vetted driver or Izzac Mobility's corporate chauffeur pool.",
     href: "/dashboard/add-car",
     cta: "Create a listing",
   },
@@ -875,7 +875,7 @@ export const hostFeatureCards: FeatureCard[] = [
     eyebrow: "Corporate & Executive Demand",
     title: "Capture weekly, monthly & airport transfer bookings",
     description:
-      "Unlike traditional car hire desks, your listing automatically participates in Izzac's Airport VIP, Chauffeur, and Monthly SuperFlex channels.",
+      "Unlike traditional car hire desks, your listing automatically participates in Izzac Mobility's Airport VIP, Chauffeur, and Monthly SuperFlex channels.",
     href: "/dashboard/bookings",
     cta: "Check host bookings",
   },
@@ -926,12 +926,12 @@ export const hostFaqs: FaqItem[] = [
   {
     question: "Can I list my car as Chauffeur-Driven only instead of Self-Drive?",
     answer:
-      "Yes. Unlike platforms that force self-drive handovers, you can supply your own trusted driver or tap into Izzac's vetted corporate chauffeur pool—and any Self-Drive guest must first complete a Chauffeur Trial and pass our ≥80% Driving Test.",
+      "Yes. Unlike platforms that force self-drive handovers, you can supply your own trusted driver or tap into Izzac Mobility's vetted corporate chauffeur pool—and any Self-Drive guest must first complete a Chauffeur Trial and pass our ≥80% Driving Test.",
   },
   {
-    question: "How does Izzac improve on traditional franchises like Europcar for hosts and fleet owners?",
+    question: "How does Izzac Mobility improve on traditional franchises like Europcar for hosts and fleet owners?",
     answer:
-      "Europcar operates a closed franchise fleet. Izzac opens enterprise-grade booking channels (Airport VIP Meet & Greet, Corporate Monthly SuperFlex, and Executive Convoy bookings) to verified private owners and fleet operators.",
+      "Europcar operates a closed franchise fleet. Izzac Mobility opens enterprise-grade booking channels (Airport VIP Meet & Greet, Corporate Monthly SuperFlex, and Executive Convoy bookings) to verified private owners and fleet operators.",
   },
   {
     question: "How are potholes, tyre damage, and motor insurance handled?",
@@ -941,7 +941,7 @@ export const hostFaqs: FaqItem[] = [
   {
     question: "What cities and airport hubs are supported?",
     answer:
-      "Izzac supports Lagos (MMIA/VI/Lekki/Ikeja), Abuja (ABV/Maitama/Asokoro/Wuse II), Port Harcourt (PHC/GRA), Kano, Ibadan, and Enugu, plus partner corridors in Accra and Nairobi.",
+      "Izzac Mobility supports Lagos (MMIA/VI/Lekki/Ikeja), Abuja (ABV/Maitama/Asokoro/Wuse II), Port Harcourt (PHC/GRA), Kano, Ibadan, and Enugu, plus partner corridors in Accra and Nairobi.",
   },
   {
     question: "Can corporate clients book my car for a full month?",

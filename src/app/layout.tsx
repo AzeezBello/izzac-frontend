@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import { ReactNode } from "react";
 import { AuthProvider } from "../context/AuthContext";
 import { CurrencyProvider } from "../context/CurrencyContext";
+import { CookieConsentProvider } from "../context/CookieConsentContext";
 import { OnboardingProvider } from "../context/OnboardingContext";
 import { SITE_NAME, SITE_URL } from "../lib/seo";
 export { metadata } from "./metadata";
@@ -73,11 +74,13 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
         <AuthProvider>
           <CurrencyProvider>
-            <OnboardingProvider>
-              <Header />
-              <main id="main" className="flex-1">{children}</main>
-              <Footer />
-            </OnboardingProvider>
+            <CookieConsentProvider>
+              <OnboardingProvider>
+                <Header />
+                <main id="main" className="flex-1">{children}</main>
+                <Footer />
+              </OnboardingProvider>
+            </CookieConsentProvider>
           </CurrencyProvider>
         </AuthProvider>
       </body>

@@ -4,7 +4,7 @@ import { buildPageMetadata } from "../../lib/seo";
 export const metadata = buildPageMetadata({
   title: "Browse 32+ Chauffeur & Self-Drive Vehicles in Lagos, Abuja & PH",
   description:
-    "Explore Izzac's curated 32-vehicle fleet: executive sedans, luxury SUVs, crossovers, EVs, and Hilux 4x4 pickups with live multi-currency rates and motor insurance.",
+    "Explore Izzac Mobility's curated 32-vehicle fleet: executive sedans, luxury SUVs, crossovers, EVs, and Hilux 4x4 pickups with live multi-currency rates and motor insurance.",
   path: "/cars",
 });
 

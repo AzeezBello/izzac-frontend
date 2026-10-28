@@ -1,7 +1,7 @@
 {
-  "name": "Izzac — Peer-to-Peer Mobility",
-  "short_name": "Izzac",
-  "description": "Browse, book, host, and manage executive vehicles from one unified Izzac account.",
+  "name": "Izzac Mobility — Peer-to-Peer & Corporate Mobility",
+  "short_name": "Izzac Mobility",
+  "description": "Browse, book, host, and manage executive vehicles from one unified Izzac Mobility account.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fbfaf7",

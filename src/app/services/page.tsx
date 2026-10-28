@@ -129,7 +129,7 @@ const ServicesPage = () => {
             <div className="relative overflow-hidden rounded-xl bg-secondary">
               <Image
                 src="/images/feature1.webp"
-                alt="Izzac executive SUV and sedan fleet staged for corporate and airport protocol service"
+                alt="Izzac Mobility executive SUV and sedan fleet staged for corporate and airport protocol service"
                 width={1600}
                 height={1000}
                 sizes="(max-width: 1024px) 100vw, 42vw"
@@ -492,7 +492,7 @@ const ServicesPage = () => {
         <SectionHeading
           eyebrow="How we compare"
           index="06"
-          title="Where Izzac departs from the global rental standard."
+          title="Where Izzac Mobility departs from the global rental standard."
           lede="We kept transparent tiers, duration discounts and airport desks. We changed what breaks on Nigerian roads."
         />
         <div
@@ -503,12 +503,12 @@ const ServicesPage = () => {
         >
           <table className="comparison-table text-left text-sm">
             <caption id="competitor-benchmark-caption" className="sr-only">
-              Comparison of Izzac executive mobility services versus the global car rental standard
+              Comparison of Izzac Mobility executive services versus the global car rental standard
             </caption>
             <thead>
               <tr className="border-b border-border bg-surface font-mono text-2xs uppercase tracking-[0.12em] text-muted-foreground">
                 <th scope="col" className="p-4 font-semibold text-foreground">Capability</th>
-                <th scope="col" className="p-4 font-semibold text-primary">Izzac</th>
+                <th scope="col" className="p-4 font-semibold text-primary">Izzac Mobility</th>
                 <th scope="col" className="p-4 font-semibold">Global standard</th>
                 <th scope="col" className="p-4 font-semibold text-foreground">Why it matters</th>
               </tr>
@@ -551,7 +551,7 @@ const ServicesPage = () => {
 
         <div className="mt-20">
           <SectionHeading
-            eyebrow="Izzac Privilege"
+            eyebrow="Izzac Mobility Privilege"
             size="h2"
             title="Loyalty for frequent flyers and fleets."
             lede="Automatic discounts, lounge access, free cabin Wi-Fi and guaranteed December allocation."

@@ -11,6 +11,7 @@ import VehicleCard from "../components/VehicleCard";
 import FleetFilters, { DEFAULT_FLEET_FILTERS, type FleetFilterState } from "../components/FleetFilters";
 import { ScrollWorldStage } from "../components/scrollworld/ScrollWorldStage";
 import { Reveal } from "../components/motion/Reveal";
+import { useAuth } from "../context/AuthContext";
 import { useCurrency } from "../context/CurrencyContext";
 import { useOnboarding } from "../context/OnboardingContext";
 import { hostJourney, riderJourney, SERVICE_PILLARS } from "../lib/productContent";
@@ -112,6 +113,7 @@ const HERO_SLIDES: HeroSlide[] = [
 
 const HomePage = () => {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { formatPrice } = useCurrency();
   const { openOnboarding } = useOnboarding();
   const [cars, setCars] = useState<DetailedCar[]>(DETAILED_CAR_CATALOGUE);
@@ -479,29 +481,20 @@ const HomePage = () => {
           eyebrow="Live catalogue"
           index="03"
           title="Available now across the hubs."
-          lede={`${filteredCars.length} of ${cars.length} vehicles match. Filter by hub or class, or search by model.`}
-          action={
-            <div className="w-full md:w-72">
-              <Label htmlFor="home-search" className="sr-only">
-                Search vehicles
-              </Label>
-              <Input
-                id="home-search"
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Prado, Hilux, Abuja…"
-              />
-            </div>
-          }
+          lede={`${filteredCars.length} of ${cars.length} vehicles match. Select a class or filter by hub and model.`}
+          action={<ArrowLink href="/cars">Full fleet directory ({cars.length})</ArrowLink>}
         />
 
         <FleetFilters
-          className="mt-8"
+          className="mt-8 border-y border-border/70 py-3.5"
           value={filters}
           onChange={setFilters}
           counts={categoryCounts}
-          show={{ hub: true, category: true, service: false }}
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search Prado, Hilux, Abuja…"
+          onReset={resetFilters}
+          show={{ hub: true, category: true, service: false, search: true }}
         />
 
         {error ? (
@@ -515,7 +508,11 @@ const HomePage = () => {
               title="No vehicles match these filters."
               description="Widen the hub or class filter, or clear the search."
               primaryAction={{ label: "Reset filters", onClick: resetFilters }}
-              secondaryAction={{ label: "Open onboarding", onClick: openOnboarding }}
+              secondaryAction={
+                isAuthenticated
+                  ? { label: "Open onboarding", onClick: openOnboarding }
+                  : { label: "Compare services", href: "/services" }
+              }
               tips={[
                 { title: "Try all hubs", description: "Vehicles are spread across Lagos, Abuja, Port Harcourt and Kano." },
                 { title: "Any mode works", description: "Every vehicle supports chauffeur and verified self-drive." },

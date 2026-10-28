@@ -107,7 +107,7 @@ const LoginPage = () => {
           </div>
 
           <div className="flex items-center justify-between border-t border-border/70 px-7 py-4 text-xs text-muted-foreground md:px-8">
-            <span>New to Izzac?</span>
+            <span>New to Izzac Mobility?</span>
             <Link href="/signup" className="font-medium text-primary hover:underline">
               Create an account →
             </Link>

@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import Link from "next/link";
+import { useAuth } from "./AuthContext";
 import { CURRENCIES, CurrencyCode, useCurrency } from "./CurrencyContext";
 import { Eyebrow } from "../components/layout/Eyebrow";
 import { Button } from "../components/ui/button";
@@ -30,10 +31,10 @@ const ONBOARDING_SEEN_KEY = "izzac_onboarding_completed_v1";
 const ONBOARDING_STEPS = [
   {
     step: "01",
-    badge: "Step 1 of 4 · Welcome to Izzac",
+    badge: "Step 1 of 4 · Welcome to Izzac Mobility",
     title: "Your Executive Mobility & Fleet Operating System",
     summary:
-      "Izzac upgrades global car rental models (like Europcar) with mandatory Chauffeur-Driven trials, Self-Drive evaluation, and verified motor insurance.",
+      "Izzac Mobility upgrades global car rental models (like Europcar) with mandatory Chauffeur-Driven trials, Self-Drive evaluation, and verified motor insurance.",
     bullets: [
       "New riders start with a Chauffeur-Driven Trial trip (+₦25k/day) before taking the Driving Test Evaluation to unlock Self-Drive.",
       "Schedule flight-tracked Airport VIP Meet & Greet at LOS, ABV, and PHC terminals.",
@@ -57,7 +58,7 @@ const ONBOARDING_STEPS = [
     badge: "Step 3 of 4 · Motor Insurance, Road & Fuel Protection",
     title: "Engineered for real road & fuel conditions",
     summary:
-      "Instead of generic winter tyres or ski racks, Izzac equips every trip with NIID motor insurance, road protection, and executive add-ons.",
+      "Instead of generic winter tyres or ski racks, Izzac Mobility equips every trip with NIID motor insurance, road protection, and executive add-ons.",
     bullets: [
       "Every booking includes NAICOM/NIID Motor Insurance (Statutory Third-Party, Comprehensive, or Zero-Excess).",
       "Road, Tyre & Flood Shield covers pothole tyre/rim impact and windscreen chips.",
@@ -102,7 +103,7 @@ const PRODUCT_TOUR_STOPS = [
     eyebrow: "Tour Stop 03 / 05 · Services & Europcar Benchmark",
     title: "6 Mobility Pillars & Corporate SuperFlex Calculator",
     description:
-      "Explore our Services & B2B hub to calculate 22% Monthly SuperFlex savings and inspect the side-by-side Izzac vs. Europcar comparison table.",
+      "Explore our Services & B2B hub to calculate 22% Monthly SuperFlex savings and inspect the side-by-side Izzac Mobility vs. Europcar comparison table.",
     actionLabel: "Open Services & B2B",
     actionHref: "/services",
   },
@@ -131,6 +132,7 @@ export const OnboardingProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const { isAuthenticated, isLoading } = useAuth();
   const { currency, setCurrency } = useCurrency();
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -138,10 +140,22 @@ export const OnboardingProvider = ({
   const [isTourActive, setIsTourActive] = useState(false);
   const [tourStep, setTourStep] = useState(0);
 
-  // Show non-blocking welcome bar / onboarding prompt on first visit
+  // Show non-blocking welcome bar / onboarding prompt only for logged-in users who haven't completed it
   const [showFirstVisitBanner, setShowFirstVisitBanner] = useState(false);
 
   useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      setShowFirstVisitBanner(false);
+      setIsOpen(false);
+      setIsTourActive(false);
+      const dialog = dialogRef.current;
+      if (dialog && dialog.open) {
+        dialog.close();
+      }
+      return;
+    }
+
     try {
       const seen = window.localStorage.getItem(ONBOARDING_SEEN_KEY);
       if (!seen) {
@@ -150,7 +164,7 @@ export const OnboardingProvider = ({
     } catch {
       // Ignore storage errors
     }
-  }, []);
+  }, [isAuthenticated, isLoading]);
 
   // Modern Web Guidance (light-dismiss-a-dialog): fallback for browsers without native closedby="any"
   useEffect(() => {
@@ -198,6 +212,7 @@ export const OnboardingProvider = ({
   };
 
   const openOnboarding = () => {
+    if (!isAuthenticated) return;
     setOnboardingStep(0);
     setIsOpen(true);
     setShowFirstVisitBanner(false);
@@ -217,6 +232,7 @@ export const OnboardingProvider = ({
   };
 
   const startProductTour = () => {
+    if (!isAuthenticated) return;
     closeOnboarding();
     setTourStep(0);
     setIsTourActive(true);
@@ -242,8 +258,8 @@ export const OnboardingProvider = ({
         tourStep,
       }}
     >
-      {/* First-visit, non-blocking welcome bar */}
-      {showFirstVisitBanner && !isOpen && !isTourActive && (
+      {/* First-visit, non-blocking welcome bar (logged-in users only) */}
+      {isAuthenticated && showFirstVisitBanner && !isOpen && !isTourActive && (
         <div
           role="region"
           aria-label="First-time visitor onboarding guide"
@@ -396,8 +412,8 @@ export const OnboardingProvider = ({
         </div>
       </dialog>
 
-      {/* Guided product tour dock */}
-      {isTourActive && (
+      {/* Guided product tour dock (logged-in users only) */}
+      {isAuthenticated && isTourActive && (
         <aside
           aria-label="Guided product tour"
           className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl rounded-lg border border-border bg-surface-elevated p-5 text-foreground shadow-floating animate-enter-subtle"

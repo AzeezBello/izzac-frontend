@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ------------------------------------------------------------------
-   Izzac Editorial Mobility Design System · Tokens
+   Izzac Mobility Editorial Design System · Tokens
    Source of truth: DESIGN.md (DTCG front matter)
    ------------------------------------------------------------------ */
 @layer base {
@@ -103,6 +103,14 @@
   input[type="date"]::-webkit-calendar-picker-indicator {
     opacity: 0.55;
     cursor: pointer;
+  }
+
+  dialog:modal {
+    overscroll-behavior: contain;
+  }
+  dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
   }
 }
 
@@ -221,7 +229,7 @@ input.validated-input.user-valid-fallback {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  --label-2: "Izzac";
+  --label-2: "Izzac Mobility";
   --label-3: "Global standard";
   --label-4: "Why it matters";
 }

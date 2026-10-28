@@ -156,7 +156,7 @@ const OverviewDashboard = () => {
         <EmptyStateGuide
           eyebrow="Sign in required"
           title="Sign in to see your rider and host overview"
-          description="One Izzac account covers your chauffeur trial, driving test, insurance certificates and host garage."
+          description="One Izzac Mobility account covers your chauffeur trial, driving test, insurance certificates and host garage."
           primaryAction={{ label: "Sign in", href: "/login?next=/dashboard" }}
           secondaryAction={{ label: "Create account", href: "/signup" }}
           tips={[

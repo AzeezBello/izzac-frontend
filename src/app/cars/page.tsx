@@ -5,7 +5,12 @@ import Link from "next/link";
 import publicApi from "../../lib/publicApi";
 import EmptyStateGuide from "../../components/EmptyStateGuide";
 import VehicleCard from "../../components/VehicleCard";
-import FleetFilters, { DEFAULT_FLEET_FILTERS, type FleetFilterState } from "../../components/FleetFilters";
+import FleetFilters, {
+  DEFAULT_FLEET_FILTERS,
+  type FleetFilterState,
+  type FleetSortOption,
+} from "../../components/FleetFilters";
+import { useAuth } from "../../context/AuthContext";
 import { useCurrency } from "../../context/CurrencyContext";
 import { useOnboarding } from "../../context/OnboardingContext";
 import { SITE_URL } from "../../lib/seo";
@@ -21,19 +26,19 @@ import {
   NigerianCityHub,
 } from "../../lib/carCatalogue";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Container } from "../../components/layout/Container";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { ArrowLink } from "../../components/layout/ArrowLink";
 
 const CarsPage = () => {
-  const { currencyMeta } = useCurrency();
+  const { isAuthenticated } = useAuth();
+  const { formatPrice } = useCurrency();
   const { startProductTour } = useOnboarding();
   const [cars, setCars] = useState<DetailedCar[]>(DETAILED_CAR_CATALOGUE);
   const [search, setSearch] = useState("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
+  const [sortBy, setSortBy] = useState<FleetSortOption>("featured");
   const [filters, setFilters] = useState<FleetFilterState>(DEFAULT_FLEET_FILTERS);
   const [error, setError] = useState<string | null>(null);
   const [fromDate, setFromDate] = useState<string | null>(null);
@@ -69,7 +74,7 @@ const CarsPage = () => {
 
   const filteredCars = useMemo(() => {
     const term = search.toLowerCase().trim();
-    return cars.filter((car) => {
+    const list = cars.filter((car) => {
       const matchesCategory = filters.category === "All" || car.category === filters.category;
       const matchesHub = filters.hub === "All Hubs" || car.cityHub === filters.hub;
       const matchesService =
@@ -82,7 +87,18 @@ const CarsPage = () => {
       const withinBudget = maxPrice ? Number(car.price_per_day) <= Number(maxPrice) : true;
       return matchesCategory && matchesHub && matchesService && matchesSearch && withinBudget;
     });
-  }, [cars, search, maxPrice, filters]);
+
+    if (sortBy === "price-asc") {
+      return [...list].sort((a, b) => Number(a.price_per_day) - Number(b.price_per_day));
+    }
+    if (sortBy === "price-desc") {
+      return [...list].sort((a, b) => Number(b.price_per_day) - Number(a.price_per_day));
+    }
+    if (sortBy === "year-desc") {
+      return [...list].sort((a, b) => Number(b.year) - Number(a.year));
+    }
+    return list;
+  }, [cars, search, maxPrice, sortBy, filters]);
 
   const categoryCounts = useMemo(() => {
     const counts: Partial<Record<CarCategory | "All", number>> = { All: cars.length };
@@ -92,15 +108,56 @@ const CarsPage = () => {
     return counts;
   }, [cars]);
 
-  const hasFilters = Boolean(
-    search || maxPrice || filters.category !== "All" || filters.hub !== "All Hubs" || filters.service !== "All Modes"
-  );
-
   const resetAll = () => {
     setSearch("");
     setMaxPrice("");
+    setSortBy("featured");
     setFilters(DEFAULT_FLEET_FILTERS);
   };
+
+  const activeTags: { key: string; label: string; onClear: () => void }[] = [];
+  if (filters.hub !== "All Hubs") {
+    activeTags.push({
+      key: "hub",
+      label: `Hub: ${filters.hub}`,
+      onClear: () => setFilters((prev) => ({ ...prev, hub: "All Hubs" })),
+    });
+  }
+  if (filters.service !== "All Modes") {
+    activeTags.push({
+      key: "service",
+      label: filters.service,
+      onClear: () => setFilters((prev) => ({ ...prev, service: "All Modes" })),
+    });
+  }
+  if (filters.category !== "All") {
+    activeTags.push({
+      key: "category",
+      label: filters.category,
+      onClear: () => setFilters((prev) => ({ ...prev, category: "All" })),
+    });
+  }
+  if (maxPrice) {
+    activeTags.push({
+      key: "budget",
+      label: `Max ${formatPrice(maxPrice)}/day`,
+      onClear: () => setMaxPrice(""),
+    });
+  }
+  if (search.trim()) {
+    activeTags.push({
+      key: "search",
+      label: `“${search.trim()}”`,
+      onClear: () => setSearch(""),
+    });
+  }
+  if (fromDate) {
+    activeTags.push({
+      key: "from",
+      label: `From ${fromDate}`,
+      onClear: () => setFromDate(null),
+    });
+  }
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -115,14 +172,6 @@ const CarsPage = () => {
     })),
   };
 
-  const scopeLine = [
-    filters.hub !== "All Hubs" ? filters.hub : "All hubs",
-    filters.service !== "All Modes" ? filters.service : null,
-    filters.category !== "All" ? filters.category : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
   return (
     <Container className="py-10 md:py-14">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
@@ -131,55 +180,57 @@ const CarsPage = () => {
         breadcrumbs={[{ label: "Fleet" }]}
         eyebrow="Browse"
         title="The fleet"
-        description="Executive sedans, luxury SUVs, crossovers, EVs and 4x4 pickups across Lagos, Abuja, Port Harcourt and Kano. Filter by hub, mode or budget, then configure chauffeur, insurance and dates on the vehicle page."
+        description="Executive sedans, luxury SUVs, crossovers, EVs and 4x4 pickups across Lagos, Abuja, Port Harcourt and Kano. Select a class or filter by hub, mode and budget."
         actions={
-          <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:items-end lg:w-auto">
-            <div className="w-full sm:w-64">
-              <Label htmlFor="search-cars" className="sr-only">
-                Search make, model, city or airport
-              </Label>
-              <Input
-                id="search-cars"
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search make, model, hub…"
-              />
-            </div>
-            <div className="w-full sm:w-44">
-              <Label htmlFor="max-price" className="sr-only">
-                Maximum daily rate
-              </Label>
-              <Input
-                id="max-price"
-                type="number"
-                inputMode="numeric"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : "")}
-                placeholder={`Max ₦/day (${currencyMeta.code})`}
-                className="font-mono tabular-nums"
-              />
-            </div>
-            {hasFilters && (
-              <Button type="button" variant="ghost" onClick={resetAll}>
-                Reset
-              </Button>
-            )}
-          </div>
+          <ArrowLink href="/services" size="sm" tone="foreground">
+            Compare service modes
+          </ArrowLink>
         }
       />
 
-      <div className="sticky top-[var(--header-height)] z-20 -mx-4 mt-8 border-y border-border/70 bg-background/90 px-4 py-4 backdrop-blur-md sm:mx-0 sm:px-0">
-        <FleetFilters value={filters} onChange={setFilters} counts={categoryCounts} />
+      {/* Unified compact sticky filter bar */}
+      <div className="sticky top-[var(--header-height)] z-20 -mx-4 mt-6 border-y border-border/70 bg-background/95 px-4 py-3 backdrop-blur-md sm:mx-0 sm:px-0">
+        <FleetFilters
+          value={filters}
+          onChange={setFilters}
+          counts={categoryCounts}
+          search={search}
+          onSearchChange={setSearch}
+          maxPrice={maxPrice}
+          onMaxPriceChange={setMaxPrice}
+          sortBy={sortBy}
+          onSortByChange={setSortBy}
+          onReset={resetAll}
+          show={{ hub: true, service: true, category: true, search: true, budget: true, sort: true }}
+        />
       </div>
 
-      <div className="flex items-baseline justify-between gap-4 py-6">
-        <p className="font-mono text-xs text-muted-foreground tabular-nums">
-          <span className="text-foreground">{filteredCars.length}</span> of {cars.length} vehicles · {scopeLine}
+      {/* Live status & removable active filter pills */}
+      <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-mono text-xs text-muted-foreground tabular-nums">
+            Showing <span className="font-semibold text-foreground">{filteredCars.length}</span> of {cars.length} vehicles
+          </p>
+          {activeTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pl-1">
+              {activeTags.map((tag) => (
+                <button
+                  key={tag.key}
+                  type="button"
+                  onClick={tag.onClear}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-elevated px-2.5 py-0.5 font-mono text-2xs text-foreground transition-colors hover:border-foreground/40"
+                  aria-label={`Remove filter ${tag.label}`}
+                >
+                  <span>{tag.label}</span>
+                  <span aria-hidden="true" className="text-muted-foreground">×</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <p className="font-mono text-2xs text-muted-foreground">
+          NIID insured · Chauffeur or verified Self-Drive
         </p>
-        <ArrowLink href="/services" size="sm" tone="foreground">
-          Compare services
-        </ArrowLink>
       </div>
 
       {error ? (
@@ -201,9 +252,17 @@ const CarsPage = () => {
             <EmptyStateGuide
               eyebrow="No matches"
               title="No vehicles match these filters"
-              description="Widen the daily budget, switch to all hubs, or take the product tour to see how the fleet is organised."
+              description={
+                isAuthenticated
+                  ? "Widen the daily budget, switch to all hubs, or take the product tour to see how the fleet is organised."
+                  : "Widen the daily budget, switch to all hubs, or compare our mobility service modes."
+              }
               primaryAction={{ label: "Reset filters", onClick: resetAll }}
-              secondaryAction={{ label: "Take the tour", onClick: startProductTour }}
+              secondaryAction={
+                isAuthenticated
+                  ? { label: "Take the tour", onClick: startProductTour }
+                  : { label: "Compare services", href: "/services" }
+              }
               tips={[
                 {
                   title: "Widen the budget",

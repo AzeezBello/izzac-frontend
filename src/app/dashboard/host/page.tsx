@@ -294,7 +294,7 @@ const HostFleetDashboard = () => {
                   density="compact"
                   index="01"
                   title="Chauffeur trial"
-                  description="Every new user is chauffeured by a vetted Izzac driver before self-drive is available."
+                  description="Every new user is chauffeured by a vetted Izzac Mobility driver before self-drive is available."
                 />
                 <LedgerRow
                   inverted

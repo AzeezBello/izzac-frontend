@@ -1,8 +1,8 @@
 ---
 version: "alpha"
-name: "Izzac Editorial Mobility Design System"
+name: "Izzac Mobility Editorial Design System"
 description: >-
-  Master visual specification, token schema, and motion architecture for Izzac
+  Master visual specification, token schema, and motion architecture for Izzac Mobility
   peer-to-peer mobility platform. Fully adheres to Google Design.Md specification,
   Hallmark Anti-AI-Slop validation gates, UI/UX Pro Max intelligence, GSAP Skills,
   React Bits primitives, Canvas UI shaders, Scroll World timelines, and Open Design contracts.
@@ -115,7 +115,7 @@ components:
     shadow: "{elevation.card}"
 ---
 
-# Izzac Design System & Motion Architecture (`DESIGN.md`)
+# Izzac Mobility Design System & Motion Architecture (`DESIGN.md`)
 
 Structured design specification combining **Google Design.Md (`google-labs-code/design.md`)**, **Hallmark Anti-AI-Slop (`nutlope/hallmark`)**, **UI/UX Pro Max (`nextlevelbuilder/ui-ux-pro-max-skill`)**, **GSAP Skills (`greensock/gsap-skills`)**, **React Bits (`DavidHDev/react-bits`)**, **Canvas UI (`DavidHDev/canvas-ui`)**, **Scroll World (`oso95/scroll-world`)**, and **Open Design (`nexu-io/open-design`)**.
 
